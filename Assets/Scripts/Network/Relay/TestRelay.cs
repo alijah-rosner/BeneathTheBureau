@@ -11,8 +11,17 @@ using UnityEngine;
 
 public class TestRelay : MonoBehaviour
 {
-    public string joinCode;
+    public string joinCode_;
     // Start is called before the first frame update
+
+    private void Awake()
+    {
+        if (this != null)
+        {
+            DontDestroyOnLoad(this);
+        }
+    }
+
     private async void Start()
     {
         await UnityServices.InitializeAsync();
@@ -27,17 +36,20 @@ public class TestRelay : MonoBehaviour
     public async void CreateRelay()
     {
         //host + 3 more players = 4 players max; 
-        try {
+        try
+        {
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(3);
 
-            joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-            Debug.Log(joinCode);
+            joinCode_ = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            Debug.Log(joinCode_);
 
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
 
-        } catch (RelayServiceException e) {
+        }
+        catch (RelayServiceException e)
+        {
             Debug.Log(e);
         }
 
@@ -45,7 +57,8 @@ public class TestRelay : MonoBehaviour
 
     public async void JoinRelay(string joinCode)
     {
-        try {
+        try
+        {
             Debug.Log("Joining Relay with " + joinCode);
             JoinAllocation joinAlloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
 
@@ -55,9 +68,11 @@ public class TestRelay : MonoBehaviour
 
             NetworkManager.Singleton.StartClient();
 
-        } catch (RelayServiceException e) {
+        }
+        catch (RelayServiceException e)
+        {
             Debug.Log(e);
         }
     }
-    
+
 }

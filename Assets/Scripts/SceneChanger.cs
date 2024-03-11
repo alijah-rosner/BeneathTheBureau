@@ -13,7 +13,7 @@ public class SceneChanger : MonoBehaviour
     {
         if (relay_ != null)
         {
-            joinDetails = relay_.joinCode;
+            joinDetails = relay_.joinCode_;
         }
         Debug.Log("Changing scenes...");
         SceneManager.LoadScene(nextScene_);

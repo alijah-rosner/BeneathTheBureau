@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class JoinServer : MonoBehaviour
 {
     // Start is called before the first frame update
-    private InputField inputTextField_;
+    public InputField inputTextField_;
     [SerializeField]TestRelay relay_;
     public string codeToJoin_;
     void Start()
@@ -21,7 +21,7 @@ public class JoinServer : MonoBehaviour
 
     public void Join()
     {
-        codeToJoin_ = inputTextField_.ToString();
-        relay_.JoinRelay(inputTextField_.ToString());
+        codeToJoin_ = inputTextField_.text;
+        relay_.JoinRelay(codeToJoin_);
     }
 }

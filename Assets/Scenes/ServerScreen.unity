@@ -152,7 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 080a669db01e143498650f42d4c8273c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  relay_: {fileID: 0}
+  inputTextField_: {fileID: 0}
+  relay_: {fileID: 1908348226}
+  codeToJoin_: 
 --- !u!4 &78110471
 Transform:
   m_ObjectHideFlags: 0
@@ -1065,7 +1067,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 080a669db01e143498650f42d4c8273c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputTextField_: {fileID: 0}
   relay_: {fileID: 1908348226}
+  codeToJoin_: 
 --- !u!114 &1860314988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1225,7 +1229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb6a73f2d6832d34bbfe7181c16c52db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joinCode: 
+  joinCode_: 
 --- !u!4 &1908348227
 Transform:
   m_ObjectHideFlags: 0
@@ -1532,5 +1536,5 @@ SceneRoots:
   - {fileID: 1552565789}
   - {fileID: 1805374028}
   - {fileID: 1908348227}
-  - {fileID: 1307221486}
   - {fileID: 78110471}
+  - {fileID: 1307221486}
