@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6459257932835820749}
   - component: {fileID: 5117392197271482323}
   - component: {fileID: 6375828022061916656}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Player Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2095246701592870024}
   - component: {fileID: 6803378531566072092}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Camera Holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -162,7 +162,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8405291647909288588}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Orientation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 193814991390878752}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Player Holder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,7 +230,8 @@ GameObject:
   - component: {fileID: 7894335777826233593}
   - component: {fileID: 4109273390388486569}
   - component: {fileID: 8072691387489416806}
-  m_Layer: 2
+  - component: {fileID: 7109835427177737591}
+  m_Layer: 7
   m_Name: Player Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,6 +326,28 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!195 &7109835427177737591
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6086188858570738073}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 0
+  m_AutoBraking: 1
+  m_AutoRepath: 0
+  m_Height: 2
+  m_BaseOffset: 1
+  m_WalkableMask: 0
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &6231845946185698297
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +360,7 @@ GameObject:
   - component: {fileID: 9122906281056180804}
   - component: {fileID: 7088640391229448914}
   - component: {fileID: 5556818737743143022}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -436,7 +459,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6227132261959099191}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Camera Position
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -474,9 +497,9 @@ GameObject:
   - component: {fileID: 7765968581803331268}
   - component: {fileID: 1727222431280514450}
   - component: {fileID: 7221043066124604592}
-  m_Layer: 2
+  m_Layer: 7
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -642,7 +665,7 @@ GameObject:
   - component: {fileID: 2300010358449025906}
   - component: {fileID: 7106925371362071727}
   - component: {fileID: 6388411680088359895}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
