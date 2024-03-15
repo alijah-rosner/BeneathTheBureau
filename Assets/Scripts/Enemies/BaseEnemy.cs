@@ -61,16 +61,23 @@ public class BaseEnemy : MonoBehaviour
   void Update()
   {
     SetNearestPlayer();
-    if (!player)
-    {
-      Patrolling();
-    }
+    //if (!player)
+    //{
+    //  Patrolling();
+    //}
     //Check if player is within sight or attack range
     playerSightRange = Physics.CheckSphere(transform.position, sightRange, isPlayer);
     playerAttackRange = Physics.CheckSphere(transform.position, attackRange, isPlayer);
 
-    //Simple state machine based on available actions
+    if (playerSightRange)
+    {
+      Chasing();
+    }
+    else
+    {
     Patrolling();
+    }
+    //Simple state machine based on available actions
 
   }
 
