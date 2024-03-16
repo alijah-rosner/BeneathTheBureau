@@ -10,23 +10,30 @@ public class BaseEnemy : MonoBehaviour
   public Transform player;
   public LayerMask isGround, isPlayer;
 
+  //Hiding params
+  public Vector3 safeSpot;
+  public bool hideSpotSet;
+  public bool scared;
+  private float hidingDur;
+
   //Patrolling params
   public Vector3 goal;
   public bool isGoalSet;
   public float goalRange;
-
+  LayerMask ignoreLayers;
   //Offensive params
   public float attackCooldown;
   public bool isReady;
 
   //State params
-  public float sightRange, attackRange;
-  public bool playerSightRange, playerAttackRange;
+  public float sightRange, attackRange, hideRange;
+  public bool playerSightRange, playerAttackRange, playerHideRange;
 
   private void Awake()
   {
     agent = GetComponent<NavMeshAgent>();
     //Set target to nearest player if multiple
+    ignoreLayers = LayerMask.GetMask("isEnemy");
 
   }
 
@@ -68,24 +75,70 @@ public class BaseEnemy : MonoBehaviour
     //Check if player is within sight or attack range
     playerSightRange = Physics.CheckSphere(transform.position, sightRange, isPlayer);
     playerAttackRange = Physics.CheckSphere(transform.position, attackRange, isPlayer);
-
-    if (playerSightRange)
+    playerHideRange = Physics.CheckSphere(transform.position, hideRange, isPlayer);
+    if (Input.GetKey(KeyCode.P))
     {
+      if (!scared)
+      {
+
+        Debug.Log("Marcus is now scared\n");
+        scared = true;
+        hideSpotSet = false;
+      }
+      else
+      {
+        scared = false;
+        Debug.Log("Marcus is now brave\n");
+      }
+    }
+    //Simple state machine based on available actions
+    if (playerSightRange && !scared)
+    {
+      Debug.Log("Marcus is on the hunt\n");
       Chasing();
     }
     else
     {
-    Patrolling();
+      if (scared)
+        Hiding();
+      else
+        Patrolling();
     }
-    //Simple state machine based on available actions
 
   }
 
   //State Functions
+  private void Hiding()
+  {
+    if (!hideSpotSet)
+    {
+      safeSpot = SearchHidePoint();
+      hideSpotSet = true;
+    }
+    else
+    {
+      agent.SetDestination(safeSpot);
+    }
+    if (Vector3.Magnitude(transform.position - safeSpot) <= 1.0f)
+    {
+      Debug.Log("Marcus is scared, moving to new space \n");
+      hideSpotSet = false;
+    }
+    hidingDur += Time.deltaTime;
+    if (hidingDur >= 30.0f)
+    {
+      hidingDur = 0.0f;
+      Debug.Log("Marcus is no longer scared \n");
+      scared = false;
+    }
+  }
   private void Patrolling()
   {
     if (!isGoalSet)
+    {
+      Debug.Log("Marcus is patrolling, searching for a new destination \n");
       SearchWalkPoint();
+    }
     else
     {
       agent.SetDestination(goal);
@@ -96,6 +149,10 @@ public class BaseEnemy : MonoBehaviour
   private void Chasing()
   {
     agent.SetDestination(player.position);
+    if (Vector3.Magnitude(transform.position - player.position) <= 2.0f)
+    {
+
+    }
   }
   private void Attacking()
   {
@@ -121,5 +178,102 @@ public class BaseEnemy : MonoBehaviour
     {
       isGoalSet = false; // If there's no valid NavMesh point close to the random point, the goal is not set
     }
+  }
+  private Vector3 SearchHidePoint()
+  {
+    if (!hideSpotSet)
+    {
+
+      Vector3 best;
+      List<Vector3> potentialPoints = GetHiddenPoints(transform.position, goalRange);
+
+      // Filter out points that are visible to the player
+      List<Vector3> hiddenPoints = new List<Vector3>();
+      NavMeshHit hiddenHit;
+      foreach (Vector3 point in potentialPoints)
+      {
+        if (!IsVisibleToPlayer(point, player) && NavMesh.SamplePosition(point, out hiddenHit, 2f, NavMesh.GetAreaFromName("isGround")))
+        {
+          hiddenPoints.Add(hiddenHit.position);
+        }
+      }
+      best = hiddenPoints[0];
+      for (int i = 0; i < hiddenPoints.Count; ++i)
+      {
+        if ((Vector3.Distance(transform.position, hiddenPoints[i]) < 5.0f) || playerHideRange)
+        {
+          hiddenPoints.RemoveAt(i);
+          --i;
+          //if (Vector3.Distance(transform.position, point) < Vector3.Distance(transform.position, closestHide) && Vector3.Distance(point, player.position) > 4.0f)
+          //{
+          //  closestHide = point;
+          //}
+        }
+        else
+        {
+          Debug.DrawRay(player.transform.position, hiddenPoints[i] - player.transform.position, Color.cyan, 10.0f);
+
+        }
+      }
+      best = hiddenPoints[Random.Range(0, hiddenPoints.Count)];
+      hideSpotSet = true;
+      Debug.DrawRay(player.transform.position, best - player.transform.position, Color.red, 10.0f);
+      return hiddenPoints[Random.Range(0, hiddenPoints.Count)];
+    }
+    return safeSpot;
+  }
+  private bool IsVisibleToPlayer(Vector3 loc, Transform playerTrans)
+  {
+    // raycast from the player camera towards the point
+    if (Physics.Raycast(playerTrans.position, loc - playerTrans.position, out RaycastHit hit, Mathf.Infinity, ~ignoreLayers))
+    {
+
+      // Check if the hit point is the location,
+      return Vector3.Distance(hit.point, loc) < 0.05f;
+    }
+    return false;
+  }
+  List<Vector3> GetHiddenPoints(Vector3 center, float radius)
+  {
+    HashSet<Vector3> uniquePoints = new HashSet<Vector3>();
+    List<Vector3> tempPoints = new List<Vector3>();
+
+    // Sample the center position               e
+    if (NavMesh.SamplePosition(center, out NavMeshHit hit, radius, NavMesh.AllAreas))
+    {
+      uniquePoints.Add(hit.position);
+    }
+
+    // Sample additional points around the center
+    for (int i = 0; i < 8; i++)
+    {
+      Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * radius;
+      if (NavMesh.SamplePosition(randomPoint, out hit, radius, NavMesh.AllAreas))
+      {
+        uniquePoints.Add(hit.position);
+      }
+    }
+
+    // Create a temporary list to store points for path calculation
+    tempPoints.AddRange(uniquePoints);
+
+    // Calculate path between sampled points
+    foreach (Vector3 pointA in tempPoints)
+    {
+      foreach (Vector3 pointB in tempPoints)
+      {
+        if (pointA != pointB)
+        {
+          NavMeshPath path = new NavMeshPath();
+          NavMesh.CalculatePath(pointA, pointB, NavMesh.AllAreas, path);
+          foreach (Vector3 corner in path.corners)
+          {
+            uniquePoints.Add(corner); // Add path corners to the HashSet
+          }
+        }
+      }
+    }
+
+    return new List<Vector3>(uniquePoints);
   }
 }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -4367115247522559590}
   - component: {fileID: 4188704929084468997}
   - component: {fileID: 6941624821023386645}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BaseEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -161,6 +161,9 @@ MonoBehaviour:
   isPlayer:
     serializedVersion: 2
     m_Bits: 0
+  safeSpot: {x: 0, y: 0, z: 0}
+  hideSpotSet: 0
+  scared: 0
   goal: {x: 0, y: 0, z: 0}
   isGoalSet: 0
   goalRange: 20
@@ -183,7 +186,7 @@ GameObject:
   - component: {fileID: 4671553602629863584}
   - component: {fileID: 3429340895047656830}
   - component: {fileID: 2141022889930284995}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
