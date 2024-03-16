@@ -121,8 +121,10 @@ public class BaseEnemy : MonoBehaviour
     }
     if (Vector3.Magnitude(transform.position - safeSpot) <= 1.0f)
     {
-      Debug.Log("Marcus is scared, moving to new space \n");
-      hideSpotSet = false;
+      if (IsVisibleToPlayer(safeSpot, player))
+      {
+        hideSpotSet = false;
+      }
     }
     hidingDur += Time.deltaTime;
     if (hidingDur >= 30.0f)
