@@ -19,14 +19,14 @@ public class PlayerMovement : NetworkBehaviour
     Vector3 playerHeight;
     float jumpForce = 7;
     
-    public string joinCode_;
-    [SerializeField] TMP_Text text_; 
+  
+    [SerializeField]TMP_Text text_; 
 
     void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
         rigidBody.freezeRotation = true;
-        text_.text = joinCode_;
+        text_.text = GameObject.Find("Relay").GetComponent<TestRelay>().joinCode_;
     }
 
     void Update()
