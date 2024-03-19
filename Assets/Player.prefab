@@ -559,7 +559,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   orientation: {fileID: 8405291647909288588}
-  joinCode_: 
   text_: {fileID: 6388411680088359895}
 --- !u!114 &598129713992060936
 MonoBehaviour:
@@ -675,7 +674,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8008750320044990069}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &6388411680088359895
 MonoBehaviour:
   m_ObjectHideFlags: 0
