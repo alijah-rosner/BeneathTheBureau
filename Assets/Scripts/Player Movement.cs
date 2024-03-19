@@ -102,6 +102,6 @@ public class PlayerMovement : NetworkBehaviour
 
     void Jump()
     {
-        rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rigidBody.AddForce(Vector3.up * jumpForce * 2.0f, ForceMode.Impulse);
     }
 }
