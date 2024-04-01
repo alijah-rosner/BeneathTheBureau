@@ -36,6 +36,7 @@ public class PlayerMovement : NetworkBehaviour
             RaycastHit groundCheck;
             playerHeight = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
             isGrounded = Physics.SphereCast(playerHeight, .5f, Vector3.down, out groundCheck, 1f);
+            
             PlayerInput();
         }
         
