@@ -10,7 +10,10 @@ public class CameraControl : NetworkBehaviour
     float yLook;
     float mouseSensitivity = 1000;
     public Transform orientation;
-
+    RaycastHit lookHit;
+    float maxDistance = 2f;
+    InteractableObject intObj;
+    float timer;
 
     private void Start()
     {
@@ -32,6 +35,34 @@ public class CameraControl : NetworkBehaviour
             xLook = Mathf.Clamp(xLook, -90f, 90f);
             transform.rotation = Quaternion.Euler(xLook, yLook, 0);
             orientation.rotation = Quaternion.Euler(0, yLook, 0);
+            if (Physics.Raycast(transform.position, transform.forward, out lookHit, maxDistance))
+            {
+                intObj = lookHit.collider.GetComponent<InteractableObject>();
+                if (intObj && Input.GetMouseButtonDown(0))
+                {
+                    intObj.OnObjectClicked();
+                }
+                else if (intObj)
+                {
+                    intObj.OnObjectHover();
+                }
+            }
+            else
+            {
+                if (intObj)
+                {
+                    timer += Time.deltaTime;
+                    if (timer > 3f)
+                    {
+                        intObj.OnLookAway();
+                        intObj = null;
+                        timer = 0;
+                    }
+                }
+            }
+
+
+
         }
     }
 }
