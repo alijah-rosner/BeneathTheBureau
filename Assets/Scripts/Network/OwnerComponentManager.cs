@@ -5,7 +5,7 @@ using Unity.Netcode;
 
 public class OwnerComponentManager : NetworkBehaviour
 {
-    [SerializeField] private Camera _camera;
+    [SerializeField] public Camera _camera;
 
     public override void OnNetworkSpawn()
     {
