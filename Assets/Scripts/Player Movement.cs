@@ -22,31 +22,27 @@ public class PlayerMovement : NetworkBehaviour
   float jumpForce = 7;
 
 
-  [SerializeField] TMP_Text text_;
+  // [SerializeField] TMP_Text text_;
 
   void Start()
   {
     rigidBody = GetComponent<Rigidbody>();
-    text_.text = GameObject.Find("Relay").GetComponent<TestRelay>().joinCode_;
+    //text_.text = GameObject.Find("Relay").GetComponent<TestRelay>().joinCode_;
     playerMovement = this;
   }
 
   void Update()
   {
-    if (IsOwner)
-    {
-      RaycastHit groundCheck;
-      playerHeight = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-      isGrounded = Physics.SphereCast(playerHeight, .5f, Vector3.down, out groundCheck, 1f);
+    RaycastHit groundCheck;
+    playerHeight = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+    isGrounded = Physics.SphereCast(playerHeight, .5f, Vector3.down, out groundCheck, 1f);
 
-      PlayerInput();
-    }
-
+    PlayerInput();
   }
 
   void FixedUpdate()
   {
-    if (IsOwner && !isFlying)
+    if (!isFlying)
     {
 
       if (isGrounded)
