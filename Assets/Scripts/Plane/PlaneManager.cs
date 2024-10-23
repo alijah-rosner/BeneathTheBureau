@@ -12,21 +12,37 @@ public class PlaneManager : MonoBehaviour
     private Dictionary<PlaneComponent.PlaneComponentType, System.Action> _destructionEffects;
     private Dictionary<PlaneComponent.PlaneComponentType, System.Action> _repairEffects;
 
-    private float _fuelConsumptionRate = 1.0f;
     private float _fuel = 100.0f;
+    private float _fuelConsumptionRate = 1.0f;
 
     private float _thrust = 1.0f;
     private float _speed;
-    private float _oxygen = 100.0f; 
 
-    private float _energyConsumptionRate = 1.0f;
+    private float _oxygen = 100.0f; 
+    private float _oxygenConsumptionRate = 1.0f; 
+
     private float _energy = 100.0f;
+    private float _energyConsumptionRate = 1.0f;
 
     private int _damagedEngines = 0;
     private int _destroyedEngines = 0;
 
     private int _damagedGuns = 0; /* hydraulics */
     private int _destroyedGuns = 0;
+
+    public float Fuel => _fuel;
+    public float FuelConsumptionRate => _fuelConsumptionRate;
+    public float Thrust => _thrust;
+    public float Speed => _speed;
+    public float Oxygen => _oxygen;
+    public float OxygenConsumptionRate => _oxygenConsumptionRate;
+    public float Energy => _energy;
+    public float EnergyConsumptionRate => _energyConsumptionRate;
+    public float DamagedEngines => _damagedEngines;
+    public float DestroyedEngines => _destroyedEngines;
+    public float DamagedGuns => _damagedGuns;
+    public float DestroyedGuns => DestroyedGuns; 
+
 
     private void Start()
     {
