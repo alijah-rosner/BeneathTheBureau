@@ -21,11 +21,15 @@ public class MouseFlightController : MonoBehaviour
   [Header("Options")]
   [SerializeField]
   [Tooltip("Follow aircraft using fixed update loop")]
-  private bool useFixed = true;
+  private bool useFixed = true;           
+  
+  [SerializeField]
+  [Tooltip("Fixed Height MousePos will be set at")]
+  private float FixedFlightHeight = 200f;
 
   [SerializeField]
   [Tooltip("How quickly the camera tracks the mouse aim point.")]
-  private float camSmoothSpeed = 5f;
+  private float camSmoothSpeed = 1f;
 
   [SerializeField]
   [Tooltip("Mouse sensitivity for the mouse flight target")]
@@ -41,12 +45,11 @@ public class MouseFlightController : MonoBehaviour
   private bool showDebugInfo = false;
 
   private Vector3 frozenDirection = Vector3.forward;
-  private bool isMouseAimFrozen = false;
+  private bool isMouseAimFrozen = true;  // Initially frozen
+  private bool isMouseClicked = false;   // Track if left mouse button has been clicked
 
   /// <summary>
   /// Get a point along the aircraft's boresight projected out to aimDistance meters.
-  /// Useful for drawing a crosshair to aim fixed forward guns with, or to indicate what
-  /// direction the aircraft is pointed.
   /// </summary>
   public Vector3 BoresightPos
   {
@@ -91,8 +94,6 @@ public class MouseFlightController : MonoBehaviour
       Debug.LogError(name + "MouseFlightController - No camera transform assigned!");
 
     // To work correctly, the entire rig must not be parented to anything.
-    // When parented to something (such as an aircraft) it will inherit those
-    // rotations causing unintended rotations as it gets dragged around.
     transform.parent = null;
   }
 
@@ -115,38 +116,59 @@ public class MouseFlightController : MonoBehaviour
     if (mouseAim == null || cam == null || cameraRig == null)
       return;
 
-    // Freeze the mouse aim direction when the free look key is pressed.
-    if (Input.GetKeyDown(KeyCode.C))
+    // Check if the left mouse button is clicked.
+    if (Input.GetMouseButtonDown(0))
     {
-      isMouseAimFrozen = true;
-      frozenDirection = mouseAim.forward;
-    }
-    else if (Input.GetKeyUp(KeyCode.C))
-    {
-      isMouseAimFrozen = false;
-      mouseAim.forward = frozenDirection;
+      // Toggle the mouse aim freezing state.
+      isMouseAimFrozen = false;  // Enable aim update
+      UpdateMouseAimPosition();  // Instantly set the aim to the cursor position
     }
 
-    // Mouse input.
-    float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-    float mouseY = -Input.GetAxis("Mouse Y") * mouseSensitivity;
+    // If the mouse aim is not frozen, proceed with normal update.
+    if (isMouseAimFrozen)
+    {
+      // The up vector of the camera normally is aligned to the horizon.
+      Vector3 upVec = (Mathf.Abs(mouseAim.forward.y) > 0.9f) ? cameraRig.up : Vector3.up;
 
-    // Rotate the aim target that the plane is meant to fly towards.
-    // Use the camera's axes in world space so that mouse motion is intuitive.
-    mouseAim.Rotate(cam.right, mouseY, Space.World);
-    mouseAim.Rotate(cam.up, mouseX, Space.World);
-
-    // The up vector of the camera normally is aligned to the horizon. However, when
-    // looking straight up/down this can feel a bit weird. At those extremes, the camera
-    // stops aligning to the horizon and instead aligns to itself.
-    Vector3 upVec = (Mathf.Abs(mouseAim.forward.y) > 0.9f) ? cameraRig.up : Vector3.up;
-
-    // Smoothly rotate the camera to face the mouse aim.
-    cameraRig.rotation = Damp(cameraRig.rotation,
-                              Quaternion.LookRotation(mouseAim.forward, upVec),
-                              camSmoothSpeed,
-                              Time.deltaTime);
+      // Smoothly rotate the camera to face the mouse aim.
+      cameraRig.rotation = Damp(cameraRig.rotation,
+                                Quaternion.LookRotation(mouseAim.forward, upVec),
+                                camSmoothSpeed,
+                                Time.deltaTime);
+    }
   }
+
+  // Update the mouseAim position instantly to the cursor position in the world.
+  private void UpdateMouseAimPosition()
+  {
+    // Get the Camera component from the cam transform
+    Camera cameraComponent = cam.GetComponent<Camera>();
+
+    if (cameraComponent == null)
+    {
+      Debug.LogError("No Camera component found on the assigned cam transform.");
+      return;
+    }
+
+    // Get the mouse position in screen space
+    Vector3 mousePosition = Input.mousePosition;
+    mousePosition.y = FixedFlightHeight;
+
+    // Cast a ray from the camera through the mouse position
+    Ray ray = cameraComponent.ScreenPointToRay(mousePosition);
+
+    // Use the ray to get the point in front of the aircraft at the aimDistance
+    Vector3 newAimPosition = ray.GetPoint(aimDistance);
+
+    // Set the mouseAim's forward direction to point towards this new position
+    Vector3 newForward = (newAimPosition - mouseAim.position).normalized;
+    mouseAim.forward = newForward;
+
+    // Freeze the new direction
+    frozenDirection = mouseAim.forward;
+    isMouseAimFrozen = true;  // Freeze until the next click
+  }
+
 
   private Vector3 GetFrozenMouseAimPos()
   {
@@ -165,16 +187,7 @@ public class MouseFlightController : MonoBehaviour
     }
   }
 
-  // Thanks to Rory Driscoll
-  // http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
-  /// <summary>
-  /// Creates dampened motion between a and b that is framerate independent.
-  /// </summary>
-  /// <param name="a">Initial parameter</param>
-  /// <param name="b">Target parameter</param>
-  /// <param name="lambda">Smoothing factor</param>
-  /// <param name="dt">Time since last damp call</param>
-  /// <returns></returns>
+  // Frame-rate independent damping
   private Quaternion Damp(Quaternion a, Quaternion b, float lambda, float dt)
   {
     return Quaternion.Slerp(a, b, 1 - Mathf.Exp(-lambda * dt));

@@ -25,12 +25,15 @@ public class FlightController : MonoBehaviour
 
   public float Pitch { set { pitch = Mathf.Clamp(value, -1f, 1f); } get { return pitch; } }
   public float Yaw { set { yaw = Mathf.Clamp(value, -1f, 1f); } get { return yaw; } }
-  public float Roll { set { roll = Mathf.Clamp(value, -0.25f, 0.25f); } get { return roll; } }
+  public float Roll { set { roll = Mathf.Clamp(value, -1f, 1f); } get { return roll; } }
 
   private Rigidbody rigid;
 
   private bool rollOverride = false;
   private bool pitchOverride = false;
+
+  private float currentPitch = 0f;
+  private float currentRoll = 0f;
 
   private void Awake()
   {
@@ -71,6 +74,7 @@ public class FlightController : MonoBehaviour
     yaw = autoYaw;
     pitch = (pitchOverride) ? keyboardPitch : autoPitch;
     roll = (rollOverride) ? keyboardRoll : autoRoll;
+
   }
 
   private void RunAutopilot(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
@@ -94,7 +98,7 @@ public class FlightController : MonoBehaviour
     // A target is directly in front the aircraft if the relative X and Y are both
     // zero. Note this does not handle for the case where the target is directly behind.
     yaw = Mathf.Clamp(localFlyTarget.x, -1f, 1f);
-    pitch = -Mathf.Clamp(localFlyTarget.y, -1f, 1f);
+    pitch = -Mathf.Clamp(localFlyTarget.y, -0.5f, 0.5f);
 
     // ====================
     // ROLL
@@ -107,11 +111,11 @@ public class FlightController : MonoBehaviour
     // An "aggressive roll" is input such that the aircraft rolls into the target so
     // that pitching up (handled above) will put the nose onto the target. This is
     // done by rolling such that the X component of the target's position is zeroed.
-    var agressiveRoll = Mathf.Clamp(localFlyTarget.x, -1f, 1f);
+    var agressiveRoll = Mathf.Clamp(localFlyTarget.x, -0.35f, 0.35f);
 
     // A "wings level roll" is a roll commands the aircraft to fly wings level.
     // This can be done by zeroing out the Y component of the aircraft's right.
-    var wingsLevelRoll = transform.right.y;
+    var wingsLevelRoll = Mathf.Clamp(transform.right.y, -1f, 1f);
 
     // Blend between auto level and banking into the target.
     var wingsLevelInfluence = Mathf.InverseLerp(0f, aggressiveTurnAngle, angleOffTarget);
@@ -120,12 +124,36 @@ public class FlightController : MonoBehaviour
 
   private void FixedUpdate()
   {
-    // Ultra simple flight where the plane just gets pushed forward and manipulated
-    // with torques to turn.
+    // Smoothing for pitch and roll
+     currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
+     currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
+
+    // Apply forces with smoothed values
     rigid.AddRelativeForce(Vector3.forward * thrust * forceMult, ForceMode.Force);
-    rigid.AddRelativeTorque(new Vector3(turnTorque.x * pitch,
+    rigid.AddRelativeTorque(new Vector3(turnTorque.x * currentPitch,
                                         turnTorque.y * yaw,
-                                        -turnTorque.z * roll) * forceMult,
+                                        -turnTorque.z * currentRoll) * forceMult,
                             ForceMode.Force);
+
+    ClampRotation();
+
+  }
+
+  // Convert angles greater than 180 to a negative equivalent angle
+  // Clamp to keep it from exceeding desired values
+  private void ClampRotation()
+  {
+    Vector3 currentRotation = transform.localEulerAngles;
+
+    // Handle pitch 
+    float pitch = currentRotation.x > 180 ? currentRotation.x - 360 : currentRotation.x;
+    pitch = Mathf.Clamp(pitch, -30f, 30f);  
+
+    // Handle roll 
+    float roll = currentRotation.z > 180 ? currentRotation.z - 360 : currentRotation.z;
+    roll = Mathf.Clamp(roll, -45f, 45f); 
+
+    // Update the rotation
+    transform.localEulerAngles = new Vector3(pitch, currentRotation.y, roll);
   }
 }
