@@ -152,7 +152,7 @@ public class MouseFlightController : MonoBehaviour
 
     // Get the mouse position in screen space
     Vector3 mousePosition = Input.mousePosition;
-    mousePosition.y = FixedFlightHeight;
+
 
     // Cast a ray from the camera through the mouse position
     Ray ray = cameraComponent.ScreenPointToRay(mousePosition);
