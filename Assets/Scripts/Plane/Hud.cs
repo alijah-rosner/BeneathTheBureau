@@ -20,7 +20,7 @@ public class Hud : MonoBehaviour
 
     playerCam = mouseFlight.GetComponentInChildren<Camera>();
 
-    if (playerCam == null)
+    if (playerCam == null && mouseFlight._isEnabled)
       Debug.LogError(name + ": Hud - No camera found on assigned Mouse Flight Controller!");
   }
 

@@ -35,6 +35,21 @@ public class FlightController : MonoBehaviour
   private float currentPitch = 0f;
   private float currentRoll = 0f;
 
+  //Whether or not to recieve input
+  private bool _isControlling = false;
+  private HashSet<Rigidbody> _passengers = new();
+
+  private Vector3 previousLocalVelocity;
+
+  public void TriggerController()
+  {
+    _isControlling = !_isControlling;
+  }
+
+  public bool GetController()
+  {
+    return _isControlling;
+  }
   private void Awake()
   {
     rigid = GetComponent<Rigidbody>();
@@ -47,8 +62,6 @@ public class FlightController : MonoBehaviour
   {
     // When the player commands their own stick input, it should override what the
     // autopilot is trying to do.
-    rollOverride = false;
-    pitchOverride = false;
 
     float keyboardRoll = Input.GetAxis("Horizontal");
     if (Mathf.Abs(keyboardRoll) > .25f)
@@ -61,6 +74,11 @@ public class FlightController : MonoBehaviour
     {
       pitchOverride = true;
       rollOverride = true;
+    }
+    if (!_isControlling)
+    {
+      rollOverride = false;
+      pitchOverride = false;
     }
 
     // Calculate the autopilot stick inputs.
@@ -79,16 +97,9 @@ public class FlightController : MonoBehaviour
 
   private void RunAutopilot(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
   {
-    // This is my usual trick of converting the fly to position to local space.
-    // You can derive a lot of information from where the target is relative to self.
+    // Convert destination to local space.
     var localFlyTarget = transform.InverseTransformPoint(flyTarget).normalized * sensitivity;
     var angleOffTarget = Vector3.Angle(transform.forward, flyTarget - transform.position);
-
-    // IMPORTANT!
-    // These inputs are created proportionally. This means it can be prone to
-    // overshooting. The physics in this example are tweaked so that it's not a big
-    // issue, but in something with different or more realistic physics this might
-    // not be the case. Use of a PID controller for each axis is highly recommended.
 
     // ====================
     // PITCH AND YAW
@@ -96,7 +107,7 @@ public class FlightController : MonoBehaviour
 
     // Yaw/Pitch into the target so as to put it directly in front of the aircraft.
     // A target is directly in front the aircraft if the relative X and Y are both
-    // zero. Note this does not handle for the case where the target is directly behind.
+    // zero. Note: this does not handle for the case where the target is directly behind.
     yaw = Mathf.Clamp(localFlyTarget.x, -1f, 1f);
     pitch = -Mathf.Clamp(localFlyTarget.y, -0.5f, 0.5f);
 
@@ -125,8 +136,8 @@ public class FlightController : MonoBehaviour
   private void FixedUpdate()
   {
     // Smoothing for pitch and roll
-     currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
-     currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
+    currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
+    currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
 
     // Apply forces with smoothed values
     rigid.AddRelativeForce(Vector3.forward * thrust * forceMult, ForceMode.Force);
@@ -136,7 +147,24 @@ public class FlightController : MonoBehaviour
                             ForceMode.Force);
 
     ClampRotation();
+    UpdatePassengers();
+    previousLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
 
+  }
+  private void UpdatePassengers()
+  {
+    // Convert the current velocity of the aircraft to local space
+    Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
+
+    // Calculate the change in local velocity (local acceleration) per fixed update
+    Vector3 localAcceleration = (currentLocalVelocity - previousLocalVelocity) / Time.fixedDeltaTime;
+
+    foreach (Rigidbody passenger in _passengers)
+    {
+      // Convert the local acceleration back to world space and apply it as a counteracting force
+      Vector3 counteractingForce = transform.TransformDirection(-localAcceleration);
+      passenger.AddForce(counteractingForce, ForceMode.Acceleration);
+    }
   }
 
   // Convert angles greater than 180 to a negative equivalent angle
@@ -147,13 +175,31 @@ public class FlightController : MonoBehaviour
 
     // Handle pitch 
     float pitch = currentRotation.x > 180 ? currentRotation.x - 360 : currentRotation.x;
-    pitch = Mathf.Clamp(pitch, -30f, 30f);  
+    pitch = Mathf.Clamp(pitch, -15f, 15f);
 
     // Handle roll 
     float roll = currentRotation.z > 180 ? currentRotation.z - 360 : currentRotation.z;
-    roll = Mathf.Clamp(roll, -45f, 45f); 
+    roll = Mathf.Clamp(roll, -25f, 25f);
 
     // Update the rotation
     transform.localEulerAngles = new Vector3(pitch, currentRotation.y, roll);
+  }
+
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (other.GetComponent<Rigidbody>())
+    {
+      _passengers.Add(other.GetComponent<Rigidbody>());
+      other.transform.parent = transform;
+    }
+  }
+  private void OnTriggerExit(Collider other)
+  {
+    if (other.GetComponent<Rigidbody>())
+    {
+      _passengers.Remove(other.GetComponent<Rigidbody>());
+      other.transform.parent = null;
+    }
   }
 }

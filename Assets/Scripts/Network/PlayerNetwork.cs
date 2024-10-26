@@ -29,7 +29,7 @@ public class PlayerNetwork : NetworkBehaviour
     {
         if (!IsOwner)
         {
-            Destroy(transform.GetComponent<PlayerMovement>());
+            Destroy(transform.GetComponent<DemoPlayerMovement>());
         }
     }
 

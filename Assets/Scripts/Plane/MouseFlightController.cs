@@ -21,8 +21,8 @@ public class MouseFlightController : MonoBehaviour
   [Header("Options")]
   [SerializeField]
   [Tooltip("Follow aircraft using fixed update loop")]
-  private bool useFixed = true;           
-  
+  private bool useFixed = true;
+
   [SerializeField]
   [Tooltip("Fixed Height MousePos will be set at")]
   private float FixedFlightHeight = 200f;
@@ -47,10 +47,10 @@ public class MouseFlightController : MonoBehaviour
   private Vector3 frozenDirection = Vector3.forward;
   private bool isMouseAimFrozen = true;  // Initially frozen
   private bool isMouseClicked = false;   // Track if left mouse button has been clicked
+  public bool _isEnabled = false; // Track if someone is operating the aircraft
 
-  /// <summary>
-  /// Get a point along the aircraft's boresight projected out to aimDistance meters.
-  /// </summary>
+
+  // Get a point along the aircraft's boresight projected out to aimDistance meters.
   public Vector3 BoresightPos
   {
     get
@@ -90,7 +90,7 @@ public class MouseFlightController : MonoBehaviour
       Debug.LogError(name + "MouseFlightController - No mouse aim transform assigned!");
     if (cameraRig == null)
       Debug.LogError(name + "MouseFlightController - No camera rig transform assigned!");
-    if (cam == null)
+    if (cam == null && _isEnabled)
       Debug.LogError(name + "MouseFlightController - No camera transform assigned!");
 
     // To work correctly, the entire rig must not be parented to anything.
@@ -99,6 +99,7 @@ public class MouseFlightController : MonoBehaviour
 
   private void Update()
   {
+    _isEnabled = aircraft.GetComponent<FlightController>().GetController();
     if (useFixed == false)
       UpdateCameraPos();
 
@@ -117,7 +118,7 @@ public class MouseFlightController : MonoBehaviour
       return;
 
     // Check if the left mouse button is clicked.
-    if (Input.GetMouseButtonDown(0))
+    if (Input.GetMouseButtonDown(0) && _isEnabled)
     {
       // Toggle the mouse aim freezing state.
       isMouseAimFrozen = false;  // Enable aim update
@@ -141,32 +142,38 @@ public class MouseFlightController : MonoBehaviour
   // Update the mouseAim position instantly to the cursor position in the world.
   private void UpdateMouseAimPosition()
   {
-    // Get the Camera component from the cam transform
-    Camera cameraComponent = cam.GetComponent<Camera>();
-
-    if (cameraComponent == null)
+    if (_isEnabled)
     {
-      Debug.LogError("No Camera component found on the assigned cam transform.");
-      return;
+
+      // Get the Camera component from the cam transform
+      Camera cameraComponent = cam.GetComponent<Camera>();
+
+      if (cameraComponent == null)
+      {
+        Debug.LogError("No Camera component found on the assigned cam transform.");
+        return;
+      }
+
+      // Get the mouse position in screen space
+      Vector3 mousePosition = Input.mousePosition;
+
+      // Cast a ray from the camera through the mouse position
+      Ray ray = cameraComponent.ScreenPointToRay(mousePosition);
+
+      // Use the ray to get the point in front of the aircraft at the aimDistance
+      Vector3 newAimPosition = ray.GetPoint(aimDistance);
+
+      // Lock the Y-axis to the current height of the mouseAim position
+      newAimPosition.y = mouseAim.position.y;
+
+      // Set the mouseAim's forward direction to point towards this new position
+      Vector3 newForward = (newAimPosition - mouseAim.position).normalized;
+      mouseAim.forward = newForward;
+
+      // Freeze the new direction until next click
+      frozenDirection = mouseAim.forward;
+      isMouseAimFrozen = true;
     }
-
-    // Get the mouse position in screen space
-    Vector3 mousePosition = Input.mousePosition;
-
-
-    // Cast a ray from the camera through the mouse position
-    Ray ray = cameraComponent.ScreenPointToRay(mousePosition);
-
-    // Use the ray to get the point in front of the aircraft at the aimDistance
-    Vector3 newAimPosition = ray.GetPoint(aimDistance);
-
-    // Set the mouseAim's forward direction to point towards this new position
-    Vector3 newForward = (newAimPosition - mouseAim.position).normalized;
-    mouseAim.forward = newForward;
-
-    // Freeze the new direction
-    frozenDirection = mouseAim.forward;
-    isMouseAimFrozen = true;  // Freeze until the next click
   }
 
 

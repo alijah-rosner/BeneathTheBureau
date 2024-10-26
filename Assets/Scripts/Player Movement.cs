@@ -4,9 +4,9 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerMovement : NetworkBehaviour
+public class DemoPlayerMovement : NetworkBehaviour
 {
-  private PlayerMovement playerMovement;
+  private DemoPlayerMovement playerMovement;
   Rigidbody rigidBody;
   float forwardMovement;
   float lateralMovement;
