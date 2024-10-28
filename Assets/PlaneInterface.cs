@@ -4,64 +4,63 @@ using UnityEngine;
 
 public class PlaneInterface : MonoBehaviour
 {
-  [Header("Components")]
-  [Tooltip("Necessary world objects to trigger flight control")]
-  [Space]
+    [Header("Components")]
+    [Tooltip("Necessary world objects to trigger flight control")]
+    [Space]
 
-  [SerializeField]
-  private GameObject player = null;
+    [SerializeField]
+    private GameObject player = null;
 
-  [SerializeField]
-  private GameObject playerCamera = null;
+    [SerializeField]
+    private GameObject playerCamera = null;
 
-  [SerializeField]
-  private GameObject aircraft = null;
+    [SerializeField]
+    private GameObject aircraft = null;
 
-  [SerializeField]
-  private GameObject aircraftCamera = null;
+    [SerializeField]
+    private GameObject aircraftCamera = null;
 
-  private bool _active = false;
-  // Start is called before the first frame update
-  void Start()
-  {
-
-  }
-
-  // Update is called once per frame
-  void Update()
-  {
-    if (Input.GetKeyDown(KeyCode.E))
+    private bool _active = false;
+    // Start is called before the first frame update
+    void Start()
     {
-
-      if (!_active)
-      {
-        ActivateFlightController();
-        _active = true;
-      }
-      else
-      {
-        ActivatePlayerController();
-        _active = false;
-      }
 
     }
 
-  }
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
 
-  void ActivateFlightController()
-  {
-    player.GetComponent<TestPlayerMovement>().enabled = false;
-    playerCamera.SetActive(false);
-    aircraftCamera.SetActive(true);
-    aircraft.GetComponent<FlightController>().enabled = true;
-    aircraft.GetComponent<FlightController>().TriggerController();
-  }
+            if (!_active)
+            {
+                ActivateFlightController();
+                _active = true;
+            }
+            else
+            {
+                ActivatePlayerController();
+                _active = false;
+            }
 
-  void ActivatePlayerController()
-  {
-    aircraft.GetComponent<FlightController>().TriggerController();
-    aircraftCamera.SetActive(false);
-    playerCamera.SetActive(true);
-    player.GetComponent<TestPlayerMovement>().enabled = true;
-  }
+        }
+
+    }
+
+    void ActivateFlightController()
+    {
+        playerCamera.SetActive(false);
+        aircraftCamera.SetActive(true);
+        aircraft.GetComponent<FlightController>().enabled = true;
+        aircraft.GetComponent<FlightController>().TriggerController();
+    }
+
+    void ActivatePlayerController()
+    {
+        aircraft.GetComponent<FlightController>().TriggerController();
+        aircraftCamera.SetActive(false);
+        playerCamera.SetActive(true);
+        //player.GetComponent<TestPlayerMovement>().DeactivatePlanePhysics();
+    }
 }

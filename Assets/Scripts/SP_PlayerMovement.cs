@@ -11,7 +11,7 @@ public class TestPlayerMovement : MonoBehaviour
     Rigidbody rigidBody;
     float forwardMovement;
     float lateralMovement;
-    float moveSpeed = 40;
+    float moveSpeed = 80;
     float topSpeed = 6;
     Vector3 moveDirection;
     public Transform orientation;
@@ -62,7 +62,6 @@ public class TestPlayerMovement : MonoBehaviour
                 topSpeed = 6;
             }
 
-
             if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
             {
                 Jump();
@@ -94,7 +93,7 @@ public class TestPlayerMovement : MonoBehaviour
         rigidBody.AddForce(moveDirection * moveSpeed * accelerationFactor, ForceMode.Force);
 
         // Dynamically set max velocity as a proportion of aircraft speed
-        float maxVelocity = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>().velocity.magnitude * 0.85f;  // Allow passengers to move at 50% of aircraft speed
+        float maxVelocity = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>().velocity.magnitude * 0.85f;  // Allow passengers to move at 85% of aircraft speed
 
         // Cap velocity to avoid unintended high speeds
         if (rigidBody.velocity.magnitude > maxVelocity)
