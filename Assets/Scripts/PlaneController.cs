@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//
+//DEPRECATED FOGETABOUTI
+//
+//
+
 public class PlaneController : MonoBehaviour
 {
   Rigidbody rb;

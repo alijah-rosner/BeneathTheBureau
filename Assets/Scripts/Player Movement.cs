@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class DemoPlayerMovement : NetworkBehaviour
 {
-  private DemoPlayerMovement playerMovement;
   Rigidbody rigidBody;
   float forwardMovement;
   float lateralMovement;
@@ -16,11 +15,13 @@ public class DemoPlayerMovement : NetworkBehaviour
   public Transform orientation;
   float accelerationFactor = 1;
   float turnFactor = 1;
-  bool isGrounded;
-  bool isFlying;
   Vector3 playerHeight;
   float jumpForce = 7;
 
+  [SerializeField]
+  private bool isFlying;
+  [SerializeField]
+  private bool isGrounded;
 
   // [SerializeField] TMP_Text text_;
 
@@ -28,7 +29,6 @@ public class DemoPlayerMovement : NetworkBehaviour
   {
     rigidBody = GetComponent<Rigidbody>();
     //text_.text = GameObject.Find("Relay").GetComponent<TestRelay>().joinCode_;
-    playerMovement = this;
   }
 
   void Update()

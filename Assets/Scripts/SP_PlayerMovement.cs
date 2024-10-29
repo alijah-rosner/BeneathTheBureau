@@ -7,103 +7,187 @@ using UnityEngine;
 //To Be Depricated
 public class TestPlayerMovement : MonoBehaviour
 {
-    private DemoPlayerMovement playerMovement;
-    Rigidbody rigidBody;
-    float forwardMovement;
-    float lateralMovement;
-    float moveSpeed = 80;
-    float topSpeed = 6;
-    Vector3 moveDirection;
-    public Transform orientation;
-    float accelerationFactor = 1;
-    float turnFactor = 1;
-    bool isGrounded;
-    bool isFlying;
-    Vector3 playerHeight;
-    float jumpForce = 7;
+  Rigidbody rigidBody;
+  float forwardMovement;
+  float lateralMovement;
+  float moveSpeed = 40;
+  float topSpeed = 6;
+  Vector3 moveDirection;
+  public Transform orientation;
+  float accelerationFactor = 1;
+  float turnFactor = 1;
+  bool isGrounded;
+  bool isFlying;
+  Vector3 playerHeight;
+  float jumpForce = 1.5f;
+  private bool _inAircraft = false;
+  private bool _isPilot = false;
 
 
-    // [SerializeField] TMP_Text text_;
+  // [SerializeField] TMP_Text text_;
 
-    void Start()
+  public void SetIsPilot()
+  {
+    _isPilot = !_isPilot;
+  }
+  public bool GetIsPilot()
+  {
+    return _isPilot;
+  }
+  public void SetInAircraft()
+  {
+    _inAircraft = !_inAircraft;
+  }
+
+  public bool GetInAircraft()
+  {
+    return _inAircraft;
+  }
+  void Start()
+  {
+    rigidBody = GetComponent<Rigidbody>();
+  }
+
+  void Update()
+  {
+    RaycastHit groundCheck;
+    playerHeight = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+    isGrounded = Physics.SphereCast(playerHeight, .5f, Vector3.down, out groundCheck, 1f);
+
+    PlayerInput();
+  }
+
+  void FixedUpdate()
+  {
+    if (_inAircraft)
     {
-        rigidBody = GetComponent<Rigidbody>();
+      MovePlayerInPlane();
+    }
+    else
+    {
+      MovePlayer();
     }
 
-    void Update()
-    {
-        RaycastHit groundCheck;
-        playerHeight = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-        isGrounded = Physics.SphereCast(playerHeight, .5f, Vector3.down, out groundCheck, 1f);
+    ApplyGravity();
+  }
 
-        PlayerInput();
+  void PlayerInput()
+  {
+    if (!_isPilot)
+    {
+      forwardMovement = Input.GetAxisRaw("Vertical");
+      lateralMovement = Input.GetAxisRaw("Horizontal");
     }
 
-    void FixedUpdate()
+    if (Input.GetKey(KeyCode.LeftShift))
     {
-
-        MovePlayer();
+      topSpeed = 12;
+    }
+    else
+    {
+      topSpeed = 6;
     }
 
-    void PlayerInput()
+    if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
     {
-        if (!isFlying)
-        {
-
-            forwardMovement = Input.GetAxisRaw("Vertical");
-            lateralMovement = Input.GetAxisRaw("Horizontal");
-
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                topSpeed = 12;
-            }
-            else
-            {
-                topSpeed = 6;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-            {
-                Jump();
-            }
-        }
+      Jump();
     }
 
-    void MovePlayer()
+    if (Input.GetKeyDown(KeyCode.G))
     {
-        if (forwardMovement != 0 || lateralMovement != 0)
-        {
-            accelerationFactor = Mathf.Clamp(accelerationFactor += .06f, 0, 5);
-        }
-        else
-        {
-            accelerationFactor = 0;
-        }
+      Debug.Log(isGrounded);
+    }
+  }
 
-        turnFactor = ((Mathf.Abs(Input.GetAxis("Mouse X"))) + 1);
-        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0, 1);
-        moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-
-        if (accelerationFactor == 0)
-        {
-            rigidBody.velocity = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>().velocity;
-        }
-
-        // Apply movement force
-        rigidBody.AddForce(moveDirection * moveSpeed * accelerationFactor, ForceMode.Force);
-
-        // Dynamically set max velocity as a proportion of aircraft speed
-        float maxVelocity = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>().velocity.magnitude * 0.85f;  // Allow passengers to move at 85% of aircraft speed
-
-        // Cap velocity to avoid unintended high speeds
-        if (rigidBody.velocity.magnitude > maxVelocity)
-        {
-            rigidBody.velocity = rigidBody.velocity.normalized * maxVelocity;
-        }
+  private void MovePlayer()
+  {
+    if (forwardMovement != 0 || lateralMovement != 0)
+    {
+      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.06f, 0, 1);
+    }
+    else
+    {
+      accelerationFactor = 0;
     }
 
-    void Jump()
+    turnFactor = ((Mathf.Abs(Input.GetAxis("Mouse X"))) + 1);
+    accelerationFactor = Mathf.Clamp(accelerationFactor /= turnFactor, 0, 1);
+    moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+
+
+    rigidBody.AddForce(moveDirection * (moveSpeed / 4f) * accelerationFactor, ForceMode.Force);
+
+
+  }
+  void MovePlayerInPlane()
+  {
+    float maxVelocity = topSpeed;
+    Rigidbody aircraftRigidbody = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>();
+
+    if (forwardMovement != 0 || lateralMovement != 0)
     {
-        rigidBody.AddForce(Vector3.up * jumpForce * 2.0f, ForceMode.Impulse);
+      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.06f, 0, 3f);
     }
+    else
+    {
+      accelerationFactor = 0;
+    }
+
+    // Calculate move direction in world space
+    moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+
+    // Apply movement force relative to aircraft
+    Vector3 adjustedMoveDirection = moveDirection * moveSpeed * accelerationFactor;
+
+    if (_inAircraft && aircraftRigidbody.velocity.magnitude > 2.0f)
+    {
+      rigidBody.rotation = aircraftRigidbody.rotation;
+      maxVelocity = (aircraftRigidbody.velocity + adjustedMoveDirection).magnitude;
+
+      if (accelerationFactor == 0)
+      {
+        // Adjust velocity to match aircraft's velocity when stationary
+        rigidBody.velocity = aircraftRigidbody.velocity;//Vector3.Lerp(rigidBody.velocity, aircraftRigidbody.velocity, 20f);
+      }
+      else
+      {
+        // Add player's own force plus the aircraft velocity to give relative movement
+        rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
+      }
+    }
+
+    else
+    {
+      rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.5f);
+      maxVelocity = topSpeed;
+    }
+
+    // Cap velocity to avoid unintended high speeds
+    if (rigidBody.velocity.magnitude > maxVelocity)
+    {
+      rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
+    }
+  }
+
+  void ApplyGravity()
+  {
+    // Gravity constant
+    float gravityStrength = 9.81f;
+
+    //// If the player is in the aircraft, reduce the gravity effect.
+    //if (_inAircraft)
+    //{
+    //  // You could reduce gravity's effect to simulate being inside an aircraft, e.g., zero-g or lower influence
+    //  rigidBody.AddForce(Vector3.down * gravityStrength * 0.2f, ForceMode.Acceleration);
+    //}
+    //else
+    //{
+      // Apply normal gravity
+      rigidBody.AddForce(Vector3.down * gravityStrength, ForceMode.Acceleration);
+    //}
+  }
+  void Jump()
+  {
+    rigidBody.AddForce(Vector3.up * jumpForce * 5.0f, ForceMode.Impulse);
+  }
 }
