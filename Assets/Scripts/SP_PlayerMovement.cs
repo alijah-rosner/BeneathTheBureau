@@ -11,7 +11,7 @@ public class TestPlayerMovement : MonoBehaviour
   float forwardMovement;
   float lateralMovement;
   float moveSpeed = 40;
-  float topSpeed = 6;
+  float topSpeed = 12;
   Vector3 moveDirection;
   public Transform orientation;
   float accelerationFactor = 1;
@@ -79,14 +79,14 @@ public class TestPlayerMovement : MonoBehaviour
       lateralMovement = Input.GetAxisRaw("Horizontal");
     }
 
-    if (Input.GetKey(KeyCode.LeftShift))
-    {
-      topSpeed = 12;
-    }
-    else
-    {
-      topSpeed = 6;
-    }
+    //if (Input.GetKey(KeyCode.LeftShift))
+    //{
+    //  topSpeed = 12;
+    //}
+    //else
+    //{
+    //  topSpeed = 6;
+    //}
 
     if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
     {
@@ -103,11 +103,19 @@ public class TestPlayerMovement : MonoBehaviour
   {
     if (forwardMovement != 0 || lateralMovement != 0)
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.06f, 0, 1);
+      if (isGrounded)
+      {
+        accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 0, 2);
+      }
+      else
+      {
+        accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.05f, 0, 2);
+
+      }
     }
     else
     {
-      accelerationFactor = 0;
+      accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.75f, 0, 2);
     }
 
     turnFactor = ((Mathf.Abs(Input.GetAxis("Mouse X"))) + 1);
@@ -115,7 +123,7 @@ public class TestPlayerMovement : MonoBehaviour
     moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
 
 
-    rigidBody.AddForce(moveDirection * (moveSpeed / 4f) * accelerationFactor, ForceMode.Force);
+    rigidBody.AddForce(moveDirection * (moveSpeed / 4f) * accelerationFactor, ForceMode.Acceleration);
 
 
   }
@@ -126,11 +134,11 @@ public class TestPlayerMovement : MonoBehaviour
 
     if (forwardMovement != 0 || lateralMovement != 0)
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.06f, 0, 3f);
+      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 0, 2);
     }
     else
     {
-      accelerationFactor = 0;
+      accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.75f, 0, 2);
     }
 
     // Calculate move direction in world space
@@ -154,19 +162,20 @@ public class TestPlayerMovement : MonoBehaviour
         // Add player's own force plus the aircraft velocity to give relative movement
         rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
       }
+      rigidBody.AddForce(moveDirection * (moveSpeed / 8f) * accelerationFactor, ForceMode.Acceleration);
     }
 
     else
     {
-      rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.5f);
+      rigidBody.AddForce(moveDirection * (moveSpeed / 8f) * accelerationFactor, ForceMode.Acceleration);
       maxVelocity = topSpeed;
     }
 
     // Cap velocity to avoid unintended high speeds
-    if (rigidBody.velocity.magnitude > maxVelocity)
-    {
-      rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
-    }
+    //if (rigidBody.velocity.magnitude > maxVelocity)
+    //{
+    //  rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
+    //}
   }
 
   void ApplyGravity()
@@ -174,17 +183,9 @@ public class TestPlayerMovement : MonoBehaviour
     // Gravity constant
     float gravityStrength = 9.81f;
 
-    //// If the player is in the aircraft, reduce the gravity effect.
-    //if (_inAircraft)
-    //{
-    //  // You could reduce gravity's effect to simulate being inside an aircraft, e.g., zero-g or lower influence
-    //  rigidBody.AddForce(Vector3.down * gravityStrength * 0.2f, ForceMode.Acceleration);
-    //}
-    //else
-    //{
-      // Apply normal gravity
-      rigidBody.AddForce(Vector3.down * gravityStrength, ForceMode.Acceleration);
-    //}
+
+    // Apply normal gravity
+    rigidBody.AddForce(Vector3.down * gravityStrength, ForceMode.Acceleration);
   }
   void Jump()
   {
