@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class CameraPosition : MonoBehaviour
 {
-    public Transform cameraPosition;
+  public Transform cameraPosition;
 
-    void Update()
-    {
-        //if (IsOwner)
-        //{
-            transform.position = Vector3.Lerp(transform.position, cameraPosition.position, .5f);
-        //}
-    }
+  void Update()
+  {
+    Transform playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
+    //if (IsOwner)
+    //{
+    transform.position = Vector3.Lerp(transform.position, cameraPosition.position, .5f);
+    transform.rotation = Quaternion.Euler(new Vector3(playerTrans.rotation.eulerAngles.x, playerTrans.rotation.eulerAngles.y, playerTrans.rotation.eulerAngles.z));
+    //}
+  }
 }

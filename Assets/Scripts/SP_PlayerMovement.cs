@@ -79,15 +79,6 @@ public class TestPlayerMovement : MonoBehaviour
       lateralMovement = Input.GetAxisRaw("Horizontal");
     }
 
-    //if (Input.GetKey(KeyCode.LeftShift))
-    //{
-    //  topSpeed = 12;
-    //}
-    //else
-    //{
-    //  topSpeed = 6;
-    //}
-
     if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
     {
       Jump();
@@ -105,17 +96,17 @@ public class TestPlayerMovement : MonoBehaviour
     {
       if (isGrounded)
       {
-        accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 0, 2);
+        accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 1, 2);
       }
       else
       {
-        accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.05f, 0, 2);
+        accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.75f, 0, 2);
 
       }
     }
     else
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.75f, 0, 2);
+      accelerationFactor = Mathf.Clamp(accelerationFactor -= 0.75f, 0.5f, 2);
     }
 
     turnFactor = ((Mathf.Abs(Input.GetAxis("Mouse X"))) + 1);
@@ -134,7 +125,7 @@ public class TestPlayerMovement : MonoBehaviour
 
     if (forwardMovement != 0 || lateralMovement != 0)
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 0, 2);
+      accelerationFactor = Mathf.Clamp(accelerationFactor += 0.05f, 1, 2);
     }
     else
     {
@@ -150,12 +141,13 @@ public class TestPlayerMovement : MonoBehaviour
     if (_inAircraft && aircraftRigidbody.velocity.magnitude > 2.0f)
     {
       rigidBody.rotation = aircraftRigidbody.rotation;
+      transform.rotation = aircraftRigidbody.rotation;
       maxVelocity = (aircraftRigidbody.velocity + adjustedMoveDirection).magnitude;
 
       if (accelerationFactor == 0)
       {
         // Adjust velocity to match aircraft's velocity when stationary
-        rigidBody.velocity = aircraftRigidbody.velocity;//Vector3.Lerp(rigidBody.velocity, aircraftRigidbody.velocity, 20f);
+        rigidBody.velocity = aircraftRigidbody.velocity;
       }
       else
       {
@@ -171,17 +163,13 @@ public class TestPlayerMovement : MonoBehaviour
       maxVelocity = topSpeed;
     }
 
-    // Cap velocity to avoid unintended high speeds
-    //if (rigidBody.velocity.magnitude > maxVelocity)
-    //{
-    //  rigidBody.velocity = aircraftRigidbody.velocity + (adjustedMoveDirection * 0.01f);
-    //}
   }
 
   void ApplyGravity()
   {
-    // Gravity constant
     float gravityStrength = 9.81f;
+    // Gravity constant
+
 
 
     // Apply normal gravity
@@ -189,6 +177,15 @@ public class TestPlayerMovement : MonoBehaviour
   }
   void Jump()
   {
-    rigidBody.AddForce(Vector3.up * jumpForce * 5.0f, ForceMode.Impulse);
+    if (_inAircraft)
+    {
+      rigidBody.AddForce(Vector3.up * jumpForce * 6.0f, ForceMode.Impulse);
+
+    }
+    else
+    {
+
+      rigidBody.AddForce(Vector3.up * jumpForce * 5.0f, ForceMode.Impulse);
+    }
   }
 }
