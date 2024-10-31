@@ -175,6 +175,8 @@ MonoBehaviour:
   groundCheckHeight: 1
   groundCheckDistance: 1
   orientation: {fileID: 339950763}
+  _inAircraft: 0
+  _isPilot: 0
 --- !u!1 &233312189
 GameObject:
   m_ObjectHideFlags: 0
@@ -274,7 +276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_Drag
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_Mass

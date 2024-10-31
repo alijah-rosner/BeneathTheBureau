@@ -30,11 +30,14 @@ public class PlayerController : MonoBehaviour
   private float accelerationFactor;
   private float turnFactor = 1f;
   private bool isGrounded;
+  [Header("Debug Tooltip")]
+  [SerializeField]
   private bool _inAircraft;
+  [SerializeField]
   private bool _isPilot;
 
-  private const float BASE_GRAVITY = 9.81f;
-  private const float AIRCRAFT_GRAVITY_MULTIPLIER = 5f;
+  private const float groundGravity = 9.81f;
+  private const float flightGravityScale = 5f;
 
   private void Start()
   {
@@ -97,7 +100,7 @@ public class PlayerController : MonoBehaviour
     rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
 
     // Apply drag only when grounded
-    if (isGrounded && !_inAircraft)
+    if (isGrounded)
     {
       rigidBody.drag = 1f;
     }
@@ -137,8 +140,7 @@ public class PlayerController : MonoBehaviour
       else
       {
         // Calculate relative movement within the aircraft
-        Vector3 localMoveDirection = aircraftRb.transform.TransformDirection(moveDirection);
-        relativeVelocity = localMoveDirection * aircraftMoveSpeed * accelerationFactor;
+        relativeVelocity = moveDirection * aircraftMoveSpeed * accelerationFactor;
 
         // Combine aircraft velocity with relative movement
         rigidBody.velocity = aircraftRb.velocity + relativeVelocity;
@@ -160,8 +162,8 @@ public class PlayerController : MonoBehaviour
 
   private void ApplyGravity()
   {
-    float gravityMultiplier = _inAircraft ? AIRCRAFT_GRAVITY_MULTIPLIER : 1f;
-    float effectiveGravity = BASE_GRAVITY * gravityMultiplier;
+    float gravityMultiplier = _inAircraft ? flightGravityScale : 1f;
+    float effectiveGravity = groundGravity * gravityMultiplier;
 
     // Don't apply extra gravity when grounded
     if (!isGrounded)
@@ -172,8 +174,20 @@ public class PlayerController : MonoBehaviour
 
   private void Jump()
   {
-    float jumpPower = _inAircraft ? aircraftJumpForce : jumpForce;
-    rigidBody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+    if (_inAircraft)
+    {
+      // Get the aircraft's up direction for the jump
+      FlightController aircraft = FindObjectOfType<FlightController>();
+      if (aircraft != null)
+      {
+        Vector3 jumpDirection = aircraft.transform.up;
+        rigidBody.AddForce(jumpDirection * aircraftJumpForce, ForceMode.Impulse);
+      }
+    }
+    else
+    {
+      rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+    }
   }
 
   private void SetupCursor()
@@ -182,20 +196,20 @@ public class PlayerController : MonoBehaviour
     Cursor.visible = false;
   }
 
-  public void SetIsPilot()
+  public void SetIsPilot(bool r)
   {
-    _isPilot = !_isPilot;
+    _isPilot = r;
     Cursor.lockState = _isPilot ? CursorLockMode.Confined : CursorLockMode.Locked;
     Cursor.visible = _isPilot;
   }
 
   public bool GetIsPilot() => _isPilot;
 
-  public void SetInAircraft()
+  public void SetInAircraft(bool r)
   {
-    _inAircraft = !_inAircraft;
+    _inAircraft = r;
     // Reset acceleration when transitioning
-    accelerationFactor = 0f;
+    //accelerationFactor = 0f;
   }
 
   public bool GetInAircraft() => _inAircraft;

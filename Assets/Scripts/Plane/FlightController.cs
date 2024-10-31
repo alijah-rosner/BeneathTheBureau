@@ -11,6 +11,8 @@ public class FlightController : MonoBehaviour
 
   [Header("Physics")]
   [Tooltip("Force to push plane forwards with")] public float thrust = 100f;
+  [Tooltip("Force to push plane forwards with")] public float maxThrust = 100f;
+  [Tooltip("Force to push plane forwards with")] public float acceleration = 25f;
   [Tooltip("Pitch, Yaw, Roll")] public Vector3 turnTorque = new Vector3(90f, 25f, 45f);
   [Tooltip("Multiplier for all forces")] public float forceMult = 1000f;
 
@@ -34,6 +36,7 @@ public class FlightController : MonoBehaviour
 
   private float currentPitch = 0f;
   private float currentRoll = 0f;
+  private float curThrust;
 
   //Whether or not to recieve input
   private bool _isControlling = false;
@@ -42,10 +45,11 @@ public class FlightController : MonoBehaviour
   private Vector3 previousLocalVelocity;
 
   private bool _isMoving => rigid.velocity.magnitude > 0f;
+  private bool _hasStartedMoving = false;
 
-  public void TriggerController()
+  public void TriggerController(bool r)
   {
-    _isControlling = !_isControlling;
+    _isControlling = r;
   }
 
   public bool GetIsMoving()
@@ -58,6 +62,7 @@ public class FlightController : MonoBehaviour
   }
   private void Awake()
   {
+    curThrust = 0f;
     rigid = GetComponent<Rigidbody>();
 
     if (controller == null)
@@ -145,22 +150,44 @@ public class FlightController : MonoBehaviour
 
   private void FixedUpdate()
   {
+    curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
     // Smoothing for pitch and roll
     currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
     currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
 
     // Apply forces with smoothed values
-    rigid.AddRelativeForce(Vector3.forward * thrust * forceMult, ForceMode.Force);
+    rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
     rigid.AddRelativeTorque(new Vector3(turnTorque.x * currentPitch,
                                         turnTorque.y * yaw,
                                         -turnTorque.z * currentRoll) * forceMult,
                             ForceMode.Force);
 
     ClampRotation();
+
+    // Check if the aircraft has started moving
+    if (!_hasStartedMoving && _isMoving)
+    {
+      _hasStartedMoving = true;
+      SetPassengersInAircraft(true);
+    }
+
     UpdatePassengers();
     previousLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
 
   }
+
+  private void SetPassengersInAircraft(bool inAircraft)
+  {
+    foreach (Rigidbody passenger in _passengers)
+    {
+      passenger.drag = 0f;
+      if (passenger.GetComponent<PlayerController>())
+      {
+        passenger.GetComponent<PlayerController>().SetInAircraft(inAircraft);
+      }
+    }
+  }
+
   private void UpdatePassengers()
   {
     // Calculate the local velocity and its change compared to previous frame
@@ -202,11 +229,6 @@ public class FlightController : MonoBehaviour
     if (other.GetComponent<Rigidbody>())
     {
       _passengers.Add(other.GetComponent<Rigidbody>());
-      //other.transform.parent = transform;
-      if (other.GetComponent<PlayerController>())
-      {
-        other.GetComponent<PlayerController>().SetInAircraft();
-      }
     }
   }
   private void OnTriggerExit(Collider other)
@@ -217,7 +239,7 @@ public class FlightController : MonoBehaviour
       other.transform.parent = null;
       if (other.GetComponent<PlayerController>())
       {
-        other.GetComponent<PlayerController>().SetInAircraft();
+        other.GetComponent<PlayerController>().SetInAircraft(false);
       }
     }
   }

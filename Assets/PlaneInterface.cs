@@ -50,23 +50,24 @@ public class PlaneInterface : MonoBehaviour
       if (_active && Vector3.Distance(player.transform.position, transform.position) > 2f)
       {
         ActivatePlayerController();
+        _active = false;
       }
     }
   }
 
   void ActivateFlightController()
   {
-    player.GetComponent<PlayerController>().SetIsPilot();
+    player.GetComponent<PlayerController>().SetIsPilot(true);
     playerCamera.SetActive(false);
     aircraftCamera.SetActive(true);
     aircraft.GetComponent<FlightController>().enabled = true;
-    aircraft.GetComponent<FlightController>().TriggerController();
+    aircraft.GetComponent<FlightController>().TriggerController(true);
   }
 
   void ActivatePlayerController()
   {
-    player.GetComponent<PlayerController>().SetIsPilot();
-    aircraft.GetComponent<FlightController>().TriggerController();
+    player.GetComponent<PlayerController>().SetIsPilot(false);
+    aircraft.GetComponent<FlightController>().TriggerController(false);
     aircraftCamera.SetActive(false);
     playerCamera.SetActive(true);
   }
