@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8552575024771352992}
   m_Layer: 7
   m_Name: Player Camera
-  m_TagString: Untagged
+  m_TagString: PlayerCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -42,7 +42,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 391025870614014956}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -106,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 723da169f78d7c240af51c42d46fd1ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mouseSensitivity: 1000
   orientation: {fileID: 8405291647909288588}
   player: {fileID: 7563475157052288702}
 --- !u!114 &8552575024771352992
@@ -366,7 +367,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5
   m_Height: 1.97
@@ -538,7 +539,8 @@ GameObject:
   - component: {fileID: 5882345721888207361}
   - component: {fileID: 4747646154222465945}
   - component: {fileID: 9050062122058575287}
-  - component: {fileID: 362401189169605583}
+  - component: {fileID: 7483198450874217366}
+  - component: {fileID: 663013783004744486}
   m_Layer: 7
   m_Name: SPDemo_Player
   m_TagString: Player
@@ -556,7 +558,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.1, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 193814991390878752}
@@ -571,9 +573,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7563475157052288702}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 4
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -585,11 +587,11 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
 --- !u!208 &9050062122058575287
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -597,16 +599,16 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7563475157052288702}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 0
   m_Extents: {x: 0.54, y: 0.18, z: 0.54}
   m_MoveThreshold: 0.1
-  m_Carve: 1
+  m_Carve: 0
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
---- !u!114 &362401189169605583
+--- !u!114 &7483198450874217366
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -615,10 +617,47 @@ MonoBehaviour:
   m_GameObject: {fileID: 7563475157052288702}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eff4be1ced1f833418ee240cdb2926d5, type: 3}
+  m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundMoveSpeed: 5
+  aircraftMoveSpeed: 5
+  jumpForce: 10
+  aircraftJumpForce: 9
+  groundAcceleration: 0.05
+  groundDeceleration: 3
+  aircraftAcceleration: 0.03
+  aircraftDeceleration: 5
+  groundCheckRadius: 0.5
+  groundCheckHeight: 1
+  groundCheckDistance: 1
   orientation: {fileID: 8405291647909288588}
+  isGrounded: 0
+  _inAircraft: 0
+  _isPilot: 0
+--- !u!136 &663013783004744486
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7563475157052288702}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &8008750320044990069
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,7 +675,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2300010358449025906
 RectTransform:
   m_ObjectHideFlags: 0
