@@ -167,10 +167,10 @@ public class PlayerController : MonoBehaviour
         float effectiveGravity = groundGravity * gravityMultiplier;
 
         // Don't apply extra gravity when grounded
-        if (!isGrounded)
-        {
+        //if (!isGrounded)
+        //{
             rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
-        }
+        //}
     }
 
     private void Jump()
