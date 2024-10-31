@@ -5,8 +5,6 @@ using UnityEngine;
 public class PlaneInterface : MonoBehaviour
 {
   [Header("Components")]
-  [Tooltip("Necessary world objects to trigger flight control")]
-  [Space]
 
   [SerializeField]
   private GameObject player = null;
@@ -33,24 +31,32 @@ public class PlaneInterface : MonoBehaviour
     if (Input.GetKeyDown(KeyCode.E))
     {
 
-      if (!_active)
+      if (Vector3.Distance(player.transform.position, transform.position) < 2f)
       {
-        ActivateFlightController();
-        _active = true;
+        if (!_active)
+        {
+          ActivateFlightController();
+          _active = true;
+        }
+        else
+        {
+          ActivatePlayerController();
+          _active = false;
+        }
       }
-      else
+    }
+    else
+    {
+      if (_active && Vector3.Distance(player.transform.position, transform.position) > 2f)
       {
         ActivatePlayerController();
-        _active = false;
       }
-
     }
-
   }
 
   void ActivateFlightController()
   {
-    player.GetComponent<TestPlayerMovement>().SetIsPilot();
+    player.GetComponent<PlayerController>().SetIsPilot();
     playerCamera.SetActive(false);
     aircraftCamera.SetActive(true);
     aircraft.GetComponent<FlightController>().enabled = true;
@@ -59,10 +65,9 @@ public class PlaneInterface : MonoBehaviour
 
   void ActivatePlayerController()
   {
-    player.GetComponent<TestPlayerMovement>().SetIsPilot();
+    player.GetComponent<PlayerController>().SetIsPilot();
     aircraft.GetComponent<FlightController>().TriggerController();
     aircraftCamera.SetActive(false);
     playerCamera.SetActive(true);
-    //player.GetComponent<TestPlayerMovement>().DeactivatePlanePhysics();
   }
 }

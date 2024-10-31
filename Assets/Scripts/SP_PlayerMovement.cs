@@ -11,40 +11,26 @@ public class TestPlayerMovement : MonoBehaviour
   float forwardMovement;
   float lateralMovement;
   float moveSpeed = 40;
-  float topSpeed = 12;
   Vector3 moveDirection;
   public Transform orientation;
-  float accelerationFactor = 1;
+  float accelerationFactor = 0.5f;
   float turnFactor = 1;
+  
   bool isGrounded;
-  bool isFlying;
   Vector3 playerHeight;
+
   float jumpForce = 1.5f;
+
   private bool _inAircraft = false;
   private bool _isPilot = false;
 
 
   // [SerializeField] TMP_Text text_;
 
-  public void SetIsPilot()
-  {
-    _isPilot = !_isPilot;
-  }
-  public bool GetIsPilot()
-  {
-    return _isPilot;
-  }
-  public void SetInAircraft()
-  {
-    _inAircraft = !_inAircraft;
-  }
-
-  public bool GetInAircraft()
-  {
-    return _inAircraft;
-  }
   void Start()
   {
+    Cursor.lockState = CursorLockMode.Locked;
+    Cursor.visible = false;
     rigidBody = GetComponent<Rigidbody>();
   }
 
@@ -84,10 +70,6 @@ public class TestPlayerMovement : MonoBehaviour
       Jump();
     }
 
-    if (Input.GetKeyDown(KeyCode.G))
-    {
-      Debug.Log(isGrounded);
-    }
   }
 
   private void MovePlayer()
@@ -120,7 +102,6 @@ public class TestPlayerMovement : MonoBehaviour
   }
   void MovePlayerInPlane()
   {
-    float maxVelocity = topSpeed;
     Rigidbody aircraftRigidbody = GameObject.FindObjectOfType<FlightController>().GetComponent<Rigidbody>();
 
     if (forwardMovement != 0 || lateralMovement != 0)
@@ -142,7 +123,6 @@ public class TestPlayerMovement : MonoBehaviour
     {
       rigidBody.rotation = aircraftRigidbody.rotation;
       transform.rotation = aircraftRigidbody.rotation;
-      maxVelocity = (aircraftRigidbody.velocity + adjustedMoveDirection).magnitude;
 
       if (accelerationFactor == 0)
       {
@@ -160,7 +140,6 @@ public class TestPlayerMovement : MonoBehaviour
     else
     {
       rigidBody.AddForce(moveDirection * (moveSpeed / 8f) * accelerationFactor, ForceMode.Acceleration);
-      maxVelocity = topSpeed;
     }
 
   }
@@ -179,7 +158,7 @@ public class TestPlayerMovement : MonoBehaviour
   {
     if (_inAircraft)
     {
-      rigidBody.AddForce(Vector3.up * jumpForce * 6.0f, ForceMode.Impulse);
+      rigidBody.AddForce(Vector3.up * jumpForce * 6.0f, ForceMode.VelocityChange);
 
     }
     else
@@ -187,5 +166,32 @@ public class TestPlayerMovement : MonoBehaviour
 
       rigidBody.AddForce(Vector3.up * jumpForce * 5.0f, ForceMode.Impulse);
     }
+  }
+  public void SetIsPilot()
+  {
+    _isPilot = !_isPilot;
+    if (!_isPilot)
+    {
+      Cursor.lockState = CursorLockMode.Locked;
+      Cursor.visible = false;
+    }
+    else
+    {
+      Cursor.lockState = CursorLockMode.Confined;
+      Cursor.visible = true;
+    }
+  }
+  public bool GetIsPilot()
+  {
+    return _isPilot;
+  }
+  public void SetInAircraft()
+  {
+    _inAircraft = !_inAircraft;
+  }
+
+  public bool GetInAircraft()
+  {
+    return _inAircraft;
   }
 }

@@ -5,48 +5,68 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-  Vector2 mouseMove = Vector2.zero;
-  float xLook;
-  float yLook;
-  float mouseSensitivity = 1000;
-  public Transform orientation;
-  public GameObject player; // Reference to the player's Rigidbody to access rotation
-  float rollAngle; // Variable to hold roll angle for tilting camera
+  [Header("Mouse Settings")]
+  [SerializeField] private float mouseSensitivity = 1000f;
 
+  [Header("References")]
+  public Transform orientation;
+  public GameObject player;
+
+  private Vector2 mouseMove = Vector2.zero;
+  private float xLook;
+  private float yLook;
   private Rigidbody playerRigidbody;
+  private Quaternion targetRotation;
 
   private void Start()
   {
     playerRigidbody = player.GetComponent<Rigidbody>();
-    // Lock the cursor (optional)
-    // Cursor.lockState = CursorLockMode.Locked;
-    // Cursor.visible = false;
+    // Initialize rotation to match current camera orientation
+    targetRotation = transform.rotation;
   }
 
-  void Update()
+  private void Update()
+  {
+    HandleMouseInput();
+    UpdateCameraRotation();
+    UpdateOrientation();
+  }
+
+  private void HandleMouseInput()
   {
     // Get mouse input for looking around
     mouseMove.y = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * mouseSensitivity;
-    mouseMove.x = -Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseSensitivity;
+    mouseMove.x = Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseSensitivity;
 
-    // Update pitch and yaw based on mouse movement
+    // Update look angles
     xLook -= mouseMove.y;
-    yLook -= mouseMove.x;
+    yLook += mouseMove.x;
+
+    // Clamp vertical look
     xLook = Mathf.Clamp(xLook, -90f, 90f);
+  }
 
-    // Get the current roll angle from the player's Rigidbody
-    rollAngle = player.transform.eulerAngles.z;
+  private void UpdateCameraRotation()
+  {
+    // Get the player's up vector in world space
+    Vector3 playerUp = player.transform.up;
 
-    // Ensure the roll angle is in the range of -180 to 180 degrees
-    if (rollAngle > 180)
-    {
-      rollAngle -= 360f;
-    }
+    // Create a rotation that aligns with the player's up direction
+    Quaternion alignRotation = Quaternion.FromToRotation(Vector3.up, playerUp);
 
-    // Apply rotation to the camera (pitch, yaw, and roll)
-    transform.rotation = Quaternion.Euler(xLook, yLook, rollAngle);  // Apply roll to camera with some scaling
+    // Create the base camera rotation (pitch and yaw)
+    Quaternion lookRotation = Quaternion.Euler(xLook, yLook, 0);
 
-    // Update orientation for the player's direction (ignoring pitch and roll)
+    // Combine the rotations in the correct order
+    targetRotation = alignRotation * lookRotation;
+
+    // Apply the final rotation
+    transform.rotation = targetRotation;
+  }
+
+  private void UpdateOrientation()
+  {
+    // Update orientation for player direction (yaw only)
     orientation.rotation = Quaternion.Euler(0, yLook, 0);
   }
 }

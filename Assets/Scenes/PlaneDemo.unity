@@ -151,6 +151,30 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &105589656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105589645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundMoveSpeed: 5
+  aircraftMoveSpeed: 5
+  jumpForce: 10
+  aircraftJumpForce: 12
+  groundAcceleration: 0.05
+  groundDeceleration: 3
+  aircraftAcceleration: 0.03
+  aircraftDeceleration: 5
+  groundCheckRadius: 0.5
+  groundCheckHeight: 1
+  groundCheckDistance: 1
+  orientation: {fileID: 339950763}
 --- !u!1 &233312189
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,6 +247,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233312189}
   m_CullTransparentMesh: 1
+--- !u!1 &292367194 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 391025870614014956, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+  m_PrefabInstance: {fileID: 310106145}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &310106145
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -231,13 +260,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
-      propertyPath: m_Drag
+    - target: {fileID: 362401189169605583, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 391025870614014956, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      propertyPath: m_TagString
+      value: PlayerCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 391025870614014956, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
-      propertyPath: m_Mass
+      propertyPath: m_Drag
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      propertyPath: m_Mass
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4747646154222465945, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_UseGravity
@@ -281,15 +322,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5882345721888207361, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -9.16
+      value: -15.04
       objectReference: {fileID: 0}
     - target: {fileID: 5882345721888207361, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.26
+      value: 1.836
       objectReference: {fileID: 0}
     - target: {fileID: 5882345721888207361, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -13.99
+      value: -7.2
       objectReference: {fileID: 0}
     - target: {fileID: 5882345721888207361, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_LocalRotation.w
@@ -340,13 +381,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9050062122058575287, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      propertyPath: m_Carve
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9050062122058575287, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 362401189169605583, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7563475157052288702, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 105589656}
     - targetCorrespondingSourceObject: {fileID: 7563475157052288702, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
       insertIndex: -1
       addedObject: {fileID: 105589651}
@@ -425,12 +474,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4139182777527644824, guid: 5c31b1f226d257d408499abc4a00fb95, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4139182777527644824, guid: 5c31b1f226d257d408499abc4a00fb95, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4139182777527644824, guid: 5c31b1f226d257d408499abc4a00fb95, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: 4139182777527644824, guid: 5c31b1f226d257d408499abc4a00fb95, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1484,11 +1537,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1 &1317842133 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 391025870614014956, guid: 7290bae87425d7f48b286a46e705c296, type: 3}
-  m_PrefabInstance: {fileID: 310106145}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1535264622
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,7 +1637,7 @@ Transform:
   m_GameObject: {fileID: 1535264622}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.18583742, w: 0.98258054}
-  m_LocalPosition: {x: -4.502, y: 0.394, z: -9.99}
+  m_LocalPosition: {x: -4.65, y: 0.76, z: -10}
   m_LocalScale: {x: 0.47636, y: 1, z: 0.2217}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1799,7 +1847,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 105589645}
-  playerCamera: {fileID: 1317842133}
+  playerCamera: {fileID: 292367194}
   aircraft: {fileID: 451416188}
   aircraftCamera: {fileID: 948687946}
 --- !u!1 &2079991330

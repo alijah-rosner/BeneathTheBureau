@@ -41,11 +41,17 @@ public class FlightController : MonoBehaviour
 
   private Vector3 previousLocalVelocity;
 
+  private bool _isMoving => rigid.velocity.magnitude > 0f;
+
   public void TriggerController()
   {
     _isControlling = !_isControlling;
   }
 
+  public bool GetIsMoving()
+  {
+    return _isMoving;
+  }
   public bool GetController()
   {
     return _isControlling;
@@ -197,9 +203,9 @@ public class FlightController : MonoBehaviour
     {
       _passengers.Add(other.GetComponent<Rigidbody>());
       //other.transform.parent = transform;
-      if (other.GetComponent<TestPlayerMovement>())
+      if (other.GetComponent<PlayerController>())
       {
-        other.GetComponent<TestPlayerMovement>().SetInAircraft();
+        other.GetComponent<PlayerController>().SetInAircraft();
       }
     }
   }
@@ -209,9 +215,9 @@ public class FlightController : MonoBehaviour
     {
       _passengers.Remove(other.GetComponent<Rigidbody>());
       other.transform.parent = null;
-      if (other.GetComponent<TestPlayerMovement>())
+      if (other.GetComponent<PlayerController>())
       {
-        other.GetComponent<TestPlayerMovement>().SetInAircraft();
+        other.GetComponent<PlayerController>().SetInAircraft();
       }
     }
   }
