@@ -10,11 +10,18 @@ public class FlightController : MonoBehaviour
 
   [Header("Physics")]
   [Tooltip("Force to push plane forwards with")] public float thrust = 100f;
-  [Tooltip("Force to push plane forwards with")] public float pitchModifier = 25f;
-  [Tooltip("Force to push plane forwards with")] public float maxThrust = 100f;
-  [Tooltip("Force to push plane forwards with")] public float acceleration = 25f;
+  [Tooltip("Rate at which pitch adjusts from Altimeter")] public float pitchModifier = 25f;
+  [Tooltip("Max speed plane can reach")] public float maxThrust = 100f;
+  [Tooltip("Force to accelerate thrust")] public float acceleration = 50f;
   [Tooltip("Pitch, Yaw, Roll")] public Vector3 turnTorque = new Vector3(90f, 25f, 45f);
   [Tooltip("Multiplier for all forces")] public float forceMult = 1000f;
+
+  [Header("Turbulence")]
+  [Tooltip("Slight rumble effect intensity")] public float rumbleForce = 0.05f;
+  [Tooltip("Turbulence intensity")] public float turbulenceForce = 2.5f;
+  [Tooltip("Rotational turbulence intensity")] public float turbulenceTorqueForce = 5.0f;
+  [Tooltip("Probability of turbulence to occur (between 0 and 1)")] public float turbulenceChance = 0.01f;
+
 
   [Header("Autopilot")]
   [Tooltip("Sensitivity for autopilot flight.")] public float sensitivity = 5f;
@@ -45,6 +52,8 @@ public class FlightController : MonoBehaviour
 
   private bool _isMoving => rigid.velocity.magnitude > 0f;
   private bool _hasStartedMoving = false;
+  private bool _turbulenceFlag = false;
+
 
   public void TriggerController(bool r)
   {
@@ -59,6 +68,7 @@ public class FlightController : MonoBehaviour
   {
     return _isControlling;
   }
+
   private void Awake()
   {
     curThrust = 0f;
@@ -87,24 +97,47 @@ public class FlightController : MonoBehaviour
     roll = autoRoll;
 
   }
-
-  private void UpdateAltimeter()
+  private void FixedUpdate()
   {
-    if (_isControlling)
+    // Calculate thrust
+    curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
+    // Smoothing for pitch and roll
+    currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
+    currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
+
+    // Apply forces with smoothed values
+    rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
+    rigid.AddRelativeTorque(new Vector3(turnTorque.x * currentPitch,
+                                        turnTorque.y * yaw,
+                                        -turnTorque.z * currentRoll) * forceMult,
+                            ForceMode.Force);
+
+
+    ClampRotation();
+
+    // Check if the aircraft has started moving
+    if (!_hasStartedMoving && _isMoving)
     {
-      float keyboardPitch = Input.GetAxis("Vertical");
-      {
-        if (Mathf.Abs(keyboardPitch) > .25f)
-        {
-          float roundedPitch = -Mathf.Sign(keyboardPitch);
-          float currentAltitude = controller.GetDestinationAltitude();
-          float newAltitude = currentAltitude + (roundedPitch * pitchModifier * Time.deltaTime);
-          controller.SetDestinationAltitude(newAltitude);
-        }
-      }
+      _hasStartedMoving = true;
+      SetPassengersInAircraft(true);
     }
+    AddRumbleEffect();
+
+    // Occasionally add larger random forces to simulate turbulence (5% chance)
+    if (Random.value < turbulenceChance)
+    {
+      AddTurbulenceEffect();
+    }
+
+    UpdatePassengers();
+    previousLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
+
   }
 
+
+  /// <summary>
+  /// Calculate the yaw, pitch, and roll based off the aircraft position relative to target.
+  /// </summary>
   private void RunAutopilot(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
   {
     // Convert destination to local space.
@@ -143,33 +176,63 @@ public class FlightController : MonoBehaviour
     roll = Mathf.Lerp(wingsLevelRoll, agressiveRoll, wingsLevelInfluence);
   }
 
-  private void FixedUpdate()
+  /// <summary>
+  /// Set desired altitude of target position.
+  /// </summary>
+  private void UpdateAltimeter()
   {
-    curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
-    // Smoothing for pitch and roll
-    currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
-    currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
-
-    // Apply forces with smoothed values
-    rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
-    rigid.AddRelativeTorque(new Vector3(turnTorque.x * currentPitch,
-                                        turnTorque.y * yaw,
-                                        -turnTorque.z * currentRoll) * forceMult,
-                            ForceMode.Force);
-
-    ClampRotation();
-
-    // Check if the aircraft has started moving
-    if (!_hasStartedMoving && _isMoving)
+    if (_isControlling)
     {
-      _hasStartedMoving = true;
-      SetPassengersInAircraft(true);
+      float keyboardPitch = Input.GetAxis("Vertical");
+      {
+        if (Mathf.Abs(keyboardPitch) > .25f)
+        {
+          float roundedPitch = -Mathf.Sign(keyboardPitch);
+          float currentAltitude = controller.GetDestinationAltitude();
+          float newAltitude = currentAltitude + (roundedPitch * pitchModifier * Time.deltaTime);
+          controller.SetDestinationAltitude(newAltitude);
+        }
+      }
     }
-
-    UpdatePassengers();
-    previousLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
-
   }
+
+  /// <summary>
+  /// Adds small random forces to simulate rumble effect .
+  /// </summary>
+  private void AddRumbleEffect()
+  {
+    Vector3 rumble = new Vector3(
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f)
+    ) * rumbleForce;
+
+    rigid.AddForce(rumble, ForceMode.Acceleration);
+  }
+
+  /// <summary>
+  /// Calculate the yaw, pitch, and roll based off the aircraft position relative to target.
+  /// </summary>
+  private void AddTurbulenceEffect()
+  {
+    _turbulenceFlag = true;
+    Vector3 turbulence = new Vector3(
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f),
+        0f
+    ) * turbulenceForce;
+
+    rigid.AddForce(turbulence, ForceMode.Acceleration);
+
+    Vector3 turbulenceTorque = new Vector3(
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f)
+    ) * turbulenceTorqueForce;
+
+    rigid.AddTorque(turbulenceTorque, ForceMode.Acceleration);
+  }
+
 
   private void SetPassengersInAircraft(bool inAircraft)
   {
@@ -191,9 +254,21 @@ public class FlightController : MonoBehaviour
 
     foreach (Rigidbody passenger in _passengers)
     {
-      // Apply acceleration compensation as a force to simulate realistic movement
       Vector3 counteractingForce = transform.TransformDirection(localAcceleration);
-      passenger.AddForce(counteractingForce, ForceMode.Acceleration);
+      if (!_turbulenceFlag)
+      {
+        // Apply acceleration compensation as a force to simulate realistic movement
+        passenger.AddForce(counteractingForce, ForceMode.Acceleration);
+      }
+      else
+      {
+        Vector3 turbulenceJerk = new Vector3(
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f),
+        Random.Range(-1f, 1f)) * turbulenceForce * 2f;
+        passenger.AddForce(counteractingForce + turbulenceJerk, ForceMode.Acceleration);
+        _turbulenceFlag = false;
+      }
     }
 
     // Update the previous velocity to the current one for the next frame
