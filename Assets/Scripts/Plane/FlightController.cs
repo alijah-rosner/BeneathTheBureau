@@ -5,12 +5,12 @@ using UnityEngine;
 public class FlightController : MonoBehaviour
 {
 
-  // Start is called before the first frame update
   [Header("Components")]
   [SerializeField] private MouseFlightController controller = null;
 
   [Header("Physics")]
   [Tooltip("Force to push plane forwards with")] public float thrust = 100f;
+  [Tooltip("Force to push plane forwards with")] public float pitchModifier = 25f;
   [Tooltip("Force to push plane forwards with")] public float maxThrust = 100f;
   [Tooltip("Force to push plane forwards with")] public float acceleration = 25f;
   [Tooltip("Pitch, Yaw, Roll")] public Vector3 turnTorque = new Vector3(90f, 25f, 45f);
@@ -31,15 +31,14 @@ public class FlightController : MonoBehaviour
 
   private Rigidbody rigid;
 
-  private bool rollOverride = false;
-  private bool pitchOverride = false;
-
   private float currentPitch = 0f;
   private float currentRoll = 0f;
   private float curThrust;
 
   //Whether or not to recieve input
   private bool _isControlling = false;
+
+  //Container of all rigidbodies inside plane
   private HashSet<Rigidbody> _passengers = new();
 
   private Vector3 previousLocalVelocity;
@@ -71,43 +70,39 @@ public class FlightController : MonoBehaviour
 
   private void Update()
   {
-    // When the player commands their own stick input, it should override what the
-    // autopilot is trying to do.
+    // Update altitude based on plane interface tool.
 
-    float keyboardRoll = Input.GetAxis("Horizontal");
-    if (Mathf.Abs(keyboardRoll) > .25f)
-    {
-      rollOverride = true;
-    }
-    else
-    {
-      rollOverride = false;
-    }
+    UpdateAltimeter();
 
-    float keyboardPitch = Input.GetAxis("Vertical");
-    if (Mathf.Abs(keyboardPitch) > .25f)
-    {
-      pitchOverride = true;
-      rollOverride = true;
-    }
-    if (!_isControlling)
-    {
-      rollOverride = false;
-      pitchOverride = false;
-    }
+    // Calculate the autopilot inputs.
 
-    // Calculate the autopilot stick inputs.
     float autoYaw = 0f;
     float autoPitch = 0f;
     float autoRoll = 0f;
     if (controller != null)
       RunAutopilot(controller.MouseAimPos, out autoYaw, out autoPitch, out autoRoll);
 
-    // Use either keyboard or autopilot input.
     yaw = autoYaw;
-    pitch = (pitchOverride) ? keyboardPitch : autoPitch;
-    roll = (rollOverride) ? keyboardRoll : autoRoll;
+    pitch = autoPitch;
+    roll = autoRoll;
 
+  }
+
+  private void UpdateAltimeter()
+  {
+    if (_isControlling)
+    {
+      float keyboardPitch = Input.GetAxis("Vertical");
+      {
+        if (Mathf.Abs(keyboardPitch) > .25f)
+        {
+          float roundedPitch = -Mathf.Sign(keyboardPitch);
+          float currentAltitude = controller.GetDestinationAltitude();
+          float newAltitude = currentAltitude + (roundedPitch * pitchModifier * Time.deltaTime);
+          controller.SetDestinationAltitude(newAltitude);
+        }
+      }
+    }
   }
 
   private void RunAutopilot(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
@@ -231,6 +226,7 @@ public class FlightController : MonoBehaviour
       _passengers.Add(other.GetComponent<Rigidbody>());
       if (_isMoving && other.GetComponent<SP_PlayerController>())
       {
+        other.GetComponent<Rigidbody>().drag = 0;
         Debug.Log(rigid.velocity.magnitude);
         other.GetComponent<SP_PlayerController>().SetInAircraft(true);
       }
