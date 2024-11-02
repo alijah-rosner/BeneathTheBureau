@@ -181,9 +181,9 @@ public class FlightController : MonoBehaviour
     foreach (Rigidbody passenger in _passengers)
     {
       passenger.drag = 0f;
-      if (passenger.GetComponent<PlayerController>())
+      if (passenger.GetComponent<SP_PlayerController>())
       {
-        passenger.GetComponent<PlayerController>().SetInAircraft(inAircraft);
+        passenger.GetComponent<SP_PlayerController>().SetInAircraft(inAircraft);
       }
     }
   }
@@ -229,6 +229,11 @@ public class FlightController : MonoBehaviour
     if (other.GetComponent<Rigidbody>())
     {
       _passengers.Add(other.GetComponent<Rigidbody>());
+      if (_isMoving && other.GetComponent<SP_PlayerController>())
+      {
+        Debug.Log(rigid.velocity.magnitude);
+        other.GetComponent<SP_PlayerController>().SetInAircraft(true);
+      }
     }
   }
   private void OnTriggerExit(Collider other)
@@ -237,9 +242,9 @@ public class FlightController : MonoBehaviour
     {
       _passengers.Remove(other.GetComponent<Rigidbody>());
       other.transform.parent = null;
-      if (other.GetComponent<PlayerController>())
+      if (other.GetComponent<SP_PlayerController>())
       {
-        other.GetComponent<PlayerController>().SetInAircraft(false);
+        other.GetComponent<SP_PlayerController>().SetInAircraft(false);
       }
     }
   }
