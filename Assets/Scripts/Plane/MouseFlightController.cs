@@ -24,10 +24,6 @@ public class MouseFlightController : MonoBehaviour
   private bool useFixed = true;
 
   [SerializeField]
-  [Tooltip("Fixed Height MousePos will be set at")]
-  private float FixedFlightHeight = 200f;
-
-  [SerializeField]
   [Tooltip("How quickly the camera tracks the mouse aim point.")]
   private float camSmoothSpeed = 1f;
 
@@ -39,6 +35,12 @@ public class MouseFlightController : MonoBehaviour
   [Tooltip("How far the boresight and mouse flight are from the aircraft")]
   private float aimDistance = 500f;
 
+  [SerializeField]
+  [Tooltip("Altitude set by pilot")]
+  private float destinationAltitude = 50; // Default height
+
+
+
   [Space]
   [SerializeField]
   [Tooltip("How far the boresight and mouse flight are from the aircraft")]
@@ -49,6 +51,30 @@ public class MouseFlightController : MonoBehaviour
   private bool isMouseClicked = false;   // Track if left mouse button has been clicked
   public bool _isEnabled = false; // Track if someone is operating the aircraft
 
+  public void SetDestinationAltitude(float newAltitude)
+  {
+    Vector3 currentPos = mouseAim.position;
+    if (Mathf.Abs((destinationAltitude) - aircraft.position.y) <= 120f)
+    {
+
+      destinationAltitude = newAltitude;
+
+      // If we're currently frozen, update the mouseAim's position to the new height
+      if (isMouseAimFrozen && mouseAim != null)
+      {
+        currentPos.y = destinationAltitude;
+        mouseAim.position = currentPos;
+
+        // Update the frozen direction to maintain the same horizontal direction
+        frozenDirection = (GetFrozenMouseAimPos() - mouseAim.position).normalized;
+      }
+    }
+  }
+
+  public float GetDestinationAltitude()
+  {
+    return destinationAltitude;
+  }
 
   // Get a point along the aircraft's boresight projected out to aimDistance meters.
   public Vector3 BoresightPos
@@ -111,6 +137,7 @@ public class MouseFlightController : MonoBehaviour
     if (useFixed == true)
       UpdateCameraPos();
   }
+
 
   private void RotateRig()
   {
