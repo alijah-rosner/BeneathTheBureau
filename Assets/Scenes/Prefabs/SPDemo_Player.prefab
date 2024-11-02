@@ -558,7 +558,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.1, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 193814991390878752}
@@ -620,9 +620,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundMoveSpeed: 5
+  groundMoveSpeed: 7
   aircraftMoveSpeed: 5
-  jumpForce: 10
+  jumpForce: 12
   aircraftJumpForce: 9
   groundAcceleration: 0.05
   groundDeceleration: 3
@@ -630,7 +630,7 @@ MonoBehaviour:
   aircraftDeceleration: 5
   groundCheckRadius: 0.5
   groundCheckHeight: 1
-  groundCheckDistance: 1
+  groundCheckDistance: 0.75
   orientation: {fileID: 8405291647909288588}
   isGrounded: 0
   _inAircraft: 0

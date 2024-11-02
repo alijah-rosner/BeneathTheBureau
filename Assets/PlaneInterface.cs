@@ -31,7 +31,7 @@ public class PlaneInterface : MonoBehaviour
     if (Input.GetKeyDown(KeyCode.E))
     {
 
-      if (Vector3.Distance(player.transform.position, transform.position) < 2f)
+      if (Vector3.Distance(player.transform.position, transform.position) < 1.5f)
       {
         if (!_active)
         {
@@ -57,7 +57,7 @@ public class PlaneInterface : MonoBehaviour
 
   void ActivateFlightController()
   {
-    player.GetComponent<PlayerController>().SetIsPilot(true);
+    player.GetComponent<SP_PlayerController>().SetIsPilot(true);
     playerCamera.SetActive(false);
     aircraftCamera.SetActive(true);
     aircraft.GetComponent<FlightController>().enabled = true;
@@ -66,7 +66,7 @@ public class PlaneInterface : MonoBehaviour
 
   void ActivatePlayerController()
   {
-    player.GetComponent<PlayerController>().SetIsPilot(false);
+    player.GetComponent<SP_PlayerController>().SetIsPilot(false);
     aircraft.GetComponent<FlightController>().TriggerController(false);
     aircraftCamera.SetActive(false);
     playerCamera.SetActive(true);
