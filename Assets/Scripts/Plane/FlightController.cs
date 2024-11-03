@@ -69,6 +69,11 @@ public class FlightController : MonoBehaviour
     return _isControlling;
   }
 
+  public HashSet<Rigidbody> GetPassengers()
+  {
+    return _passengers;
+  }
+
   private void Awake()
   {
     curThrust = 0f;
