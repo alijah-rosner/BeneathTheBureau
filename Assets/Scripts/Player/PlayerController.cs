@@ -6,238 +6,259 @@ using Unity.Netcode;
 
 public class PlayerController : NetworkBehaviour
 {
-  [Header("Movement Settings")]
-  [SerializeField] private float groundMoveSpeed = 40f;
-  [SerializeField] private float aircraftMoveSpeed = 5f;
-  [SerializeField] private float jumpForce = 7f;
-  [SerializeField] private float aircraftJumpForce = 9f;
-  [SerializeField] private float groundAcceleration = 0.05f;
-  [SerializeField] private float groundDeceleration = 0.75f;
-  [SerializeField] private float aircraftAcceleration = 0.03f;
-  [SerializeField] private float aircraftDeceleration = 0.5f;
+    [Header("Movement Settings")]
+    [SerializeField] private float groundMoveSpeed = 40f;
+    [SerializeField] private float aircraftMoveSpeed = 5f;
+    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private float aircraftJumpForce = 9f;
+    [SerializeField] private float groundAcceleration = 0.05f;
+    [SerializeField] private float groundDeceleration = 0.75f;
+    [SerializeField] private float aircraftAcceleration = 0.03f;
+    [SerializeField] private float aircraftDeceleration = 0.5f;
 
-  [Header("Ground Check Settings")]
-  [SerializeField] private float groundCheckRadius = 0.5f;
-  [SerializeField] private float groundCheckHeight = 0.5f;
-  [SerializeField] private float groundCheckDistance = 0.015f;
+    [Header("Ground Check Settings")]
+    [SerializeField] private float groundCheckRadius = 0.5f;
+    [SerializeField] private float groundCheckHeight = 0.5f;
+    [SerializeField] private float groundCheckDistance = 0.015f;
 
-  [Header("References")]
-  [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
-  public Transform orientation;
+    [Header("References")]
+    [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
+    public Transform orientation;
+    [SerializeField] private Camera _camera; 
 
-  private Rigidbody rigidBody;
-  private float forwardMovement;
-  private float lateralMovement;
-  private float accelerationFactor;
-  private float turnFactor = 1f;
-  [Header("Debug Tooltip")]
-  [SerializeField]
-  private bool isGrounded;
-  [SerializeField]
-  private NetworkVariable<bool> _inAircraft = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-  [SerializeField]
-  private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    private Rigidbody rigidBody;
+    private float forwardMovement;
+    private float lateralMovement;
+    private float accelerationFactor;
+    private float turnFactor = 1f;
+    [Header("Debug Tooltip")]
+    [SerializeField]
+    private bool isGrounded;
+    [SerializeField]
+    private NetworkVariable<bool> _inAircraft = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [SerializeField]
+    private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-  private const float groundGravity = 9.81f;
-  private const float flightGravityScale = 9f;
+    private const float groundGravity = 9.81f;
+    private const float flightGravityScale = 9f;
 
-  private void Start()
-  {
-    SetupCursor();
-    rigidBody = GetComponent<Rigidbody>();
-  }
-
-  private void Update()
-  {
-    if (!IsOwner) return; // Only the owner can control the player
-
-    CheckGround();
-    HandleInput();
-  }
-
-  private void FixedUpdate()
-  {
-    if (!IsOwner) return; // Only the owner can control the player
-
-    if (_inAircraft.Value)
+    public override void OnNetworkSpawn()
     {
-      HandleAircraftMovement();
-    }
-    else
-    {
-      HandleGroundMovement();
+        base.OnNetworkSpawn();
+        if (!IsOwner)
+        {
+            return;
+        }
+        _camera.enabled = true;
     }
 
-    ApplyGravity();
-  }
-
-
-  private void CheckGround()
-  {
-    Vector3 checkPosition = transform.position + Vector3.up * groundCheckHeight;
-    isGrounded = Physics.SphereCast(checkPosition, groundCheckRadius, Vector3.down, out _, groundCheckDistance, groundLayer);
-  }
-
-  private void HandleInput()
-  {
-    if (!_isPilot.Value)
+    private void Start()
     {
-      forwardMovement = Input.GetAxisRaw("Vertical");
-      lateralMovement = Input.GetAxisRaw("Horizontal");
+        if (!IsOwner) return;
+
+
+        SetupCursor();
+        rigidBody = GetComponent<Rigidbody>();
+
     }
 
-    if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+    private void Update()
     {
-      JumpServerRpc();
+        if (IsLocalPlayer)
+        {
+            CheckGround();
+            HandleInput();
+
+        }
     }
-  }
 
-  private void HandleGroundMovement()
-  {
-    UpdateAcceleration(groundAcceleration, groundDeceleration);
-
-    // Update turn factor based on mouse movement
-    turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
-    accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
-
-    // Calculate move direction
-    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-
-    // Apply movement force
-    rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
-
-    // Apply drag only when grounded
-    if (isGrounded)
+    private void FixedUpdate()
     {
-      rigidBody.drag = 1f;
+        if (IsLocalPlayer)
+        {
+            if (_inAircraft.Value)
+            {
+                HandleAircraftMovement();
+            }
+            else
+            {
+                HandleGroundMovement();
+            }
+
+            ApplyGravity();
+            // Only the owner can control the player
+        }
+
+
     }
-    else
+
+
+    private void CheckGround()
     {
-      rigidBody.drag = 0f;
+        Vector3 checkPosition = transform.position + Vector3.up * groundCheckHeight;
+        isGrounded = Physics.SphereCast(checkPosition, groundCheckRadius, Vector3.down, out _, groundCheckDistance, groundLayer);
     }
-  }
 
-  private void HandleAircraftMovement()
-  {
-    FlightController aircraft = FindObjectOfType<FlightController>();
-    if (aircraft == null) return;
-    if (!aircraft.GetIsMoving())
+    private void HandleInput()
     {
-      HandleGroundMovement();
+        if (!_isPilot.Value)
+        {
+            forwardMovement = Input.GetAxisRaw("Vertical");
+            lateralMovement = Input.GetAxisRaw("Horizontal");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            JumpServerRpc();
+        }
     }
-    else
+
+    private void HandleGroundMovement()
     {
-      Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
-      UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
+        UpdateAcceleration(groundAcceleration, groundDeceleration);
 
-      // Calculate relative movement
-      Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-      Vector3 relativeVelocity = Vector3.zero;
+        // Update turn factor based on mouse movement
+        turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
+        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
 
-      // Match aircraft rotation
-      rigidBody.rotation = aircraftRb.rotation;
-      transform.rotation = aircraftRb.rotation;
+        // Calculate move direction
+        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
 
-      if (accelerationFactor < 0.05f && isGrounded)
-      {
-        rigidBody.velocity = aircraftRb.velocity;
-      }
-      else
-      {
-        // Calculate relative movement within the aircraft
-        relativeVelocity = moveDirection * aircraftMoveSpeed * accelerationFactor;
+        // Apply movement force
+        rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
 
-        // Combine aircraft velocity with relative movement
-        rigidBody.velocity = aircraftRb.velocity + relativeVelocity;
-      }
+        // Apply drag only when grounded
+        if (isGrounded)
+        {
+            rigidBody.drag = 1f;
+        }
+        else
+        {
+            rigidBody.drag = 0f;
+        }
     }
-  }
 
-  private void UpdateAcceleration(float accelerationRate, float decelerationRate)
-  {
-    if (Mathf.Abs(forwardMovement) > 0.1f || Mathf.Abs(lateralMovement) > 0.1f)
+    private void HandleAircraftMovement()
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor + accelerationRate, 0f, 1f);
+        FlightController aircraft = FindObjectOfType<FlightController>();
+        if (aircraft == null) return;
+        if (!aircraft.GetIsMoving())
+        {
+            HandleGroundMovement();
+        }
+        else
+        {
+            Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
+            UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
+
+            // Calculate relative movement
+            Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+            Vector3 relativeVelocity = Vector3.zero;
+
+            // Match aircraft rotation
+            rigidBody.rotation = aircraftRb.rotation;
+            transform.rotation = aircraftRb.rotation;
+
+            if (accelerationFactor < 0.05f && isGrounded)
+            {
+                rigidBody.velocity = aircraftRb.velocity;
+            }
+            else
+            {
+                // Calculate relative movement within the aircraft
+                relativeVelocity = moveDirection * aircraftMoveSpeed * accelerationFactor;
+
+                // Combine aircraft velocity with relative movement
+                rigidBody.velocity = aircraftRb.velocity + relativeVelocity;
+            }
+        }
     }
-    else
+
+    private void UpdateAcceleration(float accelerationRate, float decelerationRate)
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor - decelerationRate, 0f, 1f);
+        if (Mathf.Abs(forwardMovement) > 0.1f || Mathf.Abs(lateralMovement) > 0.1f)
+        {
+            accelerationFactor = Mathf.Clamp(accelerationFactor + accelerationRate, 0f, 1f);
+        }
+        else
+        {
+            accelerationFactor = Mathf.Clamp(accelerationFactor - decelerationRate, 0f, 1f);
+        }
     }
-  }
 
-  private void ApplyGravity()
-  {
-    float gravityMultiplier = _inAircraft.Value ? flightGravityScale : 1f;
-    float effectiveGravity = groundGravity * gravityMultiplier;
-
-    // Don't apply extra gravity when grounded
-
-    rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
-  }
-
-  [ServerRpc]
-  private void JumpServerRpc()
-  {
-    JumpClientRpc();
-  }
-
-  [ClientRpc]
-  private void JumpClientRpc()
-  {
-    isGrounded = false;
-    if (_inAircraft.Value)
+    private void ApplyGravity()
     {
-      StartCoroutine(AirJump());
+        float gravityMultiplier = _inAircraft.Value ? flightGravityScale : 1f;
+        float effectiveGravity = groundGravity * gravityMultiplier;
+
+        // Don't apply extra gravity when grounded
+
+        rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
     }
-    else
+
+    [ServerRpc]
+    private void JumpServerRpc()
     {
-      rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        JumpClientRpc();
     }
-  }
 
-  private IEnumerator AirJump()
-  {
-    float duration = 0.35f; // Total duration of the jump
-    float timeElapsed = 0.0f;
-
-    while (timeElapsed < duration)
+    [ClientRpc]
+    private void JumpClientRpc()
     {
-      FlightController aircraft = FindObjectOfType<FlightController>();
-      if (aircraft != null)
-      {
-        Vector3 jumpDirection = aircraft.transform.up;
-        rigidBody.AddForce(jumpDirection * aircraftJumpForce, ForceMode.Impulse);
-      }
-      timeElapsed += Time.fixedDeltaTime;
-      yield return null; // Wait for the next frame
+        isGrounded = false;
+        if (_inAircraft.Value)
+        {
+            StartCoroutine(AirJump());
+        }
+        else
+        {
+            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
     }
-  }
 
-  private void SetupCursor()
-  {
-    Cursor.lockState = CursorLockMode.Locked;
-    Cursor.visible = false;
-  }
-
-  public void SetIsPilot(bool r)
-  {
-    if (IsOwner)
+    private IEnumerator AirJump()
     {
-      _isPilot.Value = r;
-      Cursor.lockState = _isPilot.Value ? CursorLockMode.Confined : CursorLockMode.Locked;
-      Cursor.visible = _isPilot.Value;
+        float duration = 0.35f; // Total duration of the jump
+        float timeElapsed = 0.0f;
+
+        while (timeElapsed < duration)
+        {
+            FlightController aircraft = FindObjectOfType<FlightController>();
+            if (aircraft != null)
+            {
+                Vector3 jumpDirection = aircraft.transform.up;
+                rigidBody.AddForce(jumpDirection * aircraftJumpForce, ForceMode.Impulse);
+            }
+            timeElapsed += Time.fixedDeltaTime;
+            yield return null; // Wait for the next frame
+        }
     }
-  }
 
-  public bool GetIsPilot() => _isPilot.Value;
-
-  public void SetInAircraft(bool r)
-  {
-    if (IsOwner)
+    private void SetupCursor()
     {
-      _inAircraft.Value = r;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
-  }
 
-  public bool GetInAircraft() => _inAircraft.Value;
+    public void SetIsPilot(bool r)
+    {
+        if (IsOwner)
+        {
+            _isPilot.Value = r;
+            Cursor.lockState = _isPilot.Value ? CursorLockMode.Confined : CursorLockMode.Locked;
+            Cursor.visible = _isPilot.Value;
+        }
+    }
+
+    public bool GetIsPilot() => _isPilot.Value;
+
+    public void SetInAircraft(bool r)
+    {
+        if (IsOwner)
+        {
+            _inAircraft.Value = r;
+        }
+    }
+
+    public bool GetInAircraft() => _inAircraft.Value;
 }

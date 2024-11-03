@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 262597725}
   - component: {fileID: 262597724}
+  - component: {fileID: 262597726}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -217,6 +218,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &262597726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262597723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &339291244
 GameObject:
   m_ObjectHideFlags: 0
@@ -388,6 +412,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1226885705 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6090002749279691495, guid: 30a685bccc269224d909782a85663453, type: 3}
+  m_PrefabInstance: {fileID: 1648204122680947692}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25afedf0f243c0441a2955ae1beec78b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1648204122680947692
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -396,6 +431,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1226885705}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LockIn
+      objectReference: {fileID: 0}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: NET_CharacterSelectionDisplay, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 804622214962017226, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1226133424702633404, guid: 30a685bccc269224d909782a85663453, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -479,6 +542,18 @@ PrefabInstance:
     - target: {fileID: 2893233702141839888, guid: 30a685bccc269224d909782a85663453, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 2634383412
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541785848377301029, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1835534994
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541785848377301029, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: AlwaysReplicateAsRoot
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541785848377301029, guid: 30a685bccc269224d909782a85663453, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1478655127
       objectReference: {fileID: 0}
     - target: {fileID: 5125631798870526445, guid: 30a685bccc269224d909782a85663453, type: 3}
       propertyPath: m_LocalPosition.x

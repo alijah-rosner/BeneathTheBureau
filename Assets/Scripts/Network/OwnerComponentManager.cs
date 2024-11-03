@@ -7,13 +7,5 @@ public class OwnerComponentManager : NetworkBehaviour
 {
     [SerializeField] public Camera _camera;
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        if (!IsOwner) 
-        { 
-            return; 
-        }
-        _camera.enabled = true;
-    }
+    
 }

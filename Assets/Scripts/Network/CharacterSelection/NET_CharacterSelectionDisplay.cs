@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using UnityEngine.UI;
 
 public class NET_CharacterSelectionDisplay : NetworkBehaviour
 {
@@ -15,9 +16,12 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
     [SerializeField] private GameObject _characterInfoPanel;
     [SerializeField] private TMP_Text _characterNameText;
     [SerializeField] private TMP_Text _characterBioText;
+    [SerializeField] private Transform _introSpawnPoint;
+    [SerializeField] private Button _lockInButton; 
 
-    private NetworkList<NET_CharacterSelectState> _players;
+
     private List<NET_CharacterSelectButton> _buttons = new();
+    private NetworkList<NET_CharacterSelectState> _players;
 
     private void Awake()
     {
@@ -82,6 +86,29 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
 
     public void Select(SO_Character character)
     {
+        for (int i = 0; i < _players.Count; i++)
+        {
+            if (_players[i].ClientID != NetworkManager.Singleton.LocalClientId)
+            {
+                continue; 
+            }
+
+            if (_players[i].IsLockedIn)
+            {
+                return;
+            }
+
+            if (_players[i].CharacterID == character.Id)
+            {
+                return; 
+            }
+
+            if (IsCharacterTaken(character.Id, false))
+            {
+                return; 
+            }
+        }
+
         _characterNameText.text = character.DisplayName;
         _characterBioText.text = character.CharacterBio;
 
@@ -97,8 +124,18 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
         {
             if (_players[i].ClientID == serverRpcParams.Receive.SenderClientId)
             {
+                if (!_characterDatabase.IsValidCharacterID(characterID))
+                {
+                    return;
+                }
+
+                if (IsCharacterTaken(characterID, true))
+                {
+                    return;
+                }
+
                 _players[i] = new NET_CharacterSelectState(
-                    _players[i].ClientID, characterID
+                    _players[i].ClientID, characterID, _players[i].IsLockedIn
                     );
             }
         }
@@ -117,5 +154,108 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
                 _playerCards[i].DisableDisplay();
             }
         }
+
+        foreach(var button in _buttons)
+        {
+            if (button.IsDisabled)
+            {
+                continue; 
+            }
+
+            if (IsCharacterTaken(button.Character.Id, false))
+            {
+                button.SetDisabled();
+            }
+        }
+
+        foreach (var player in _players)
+        {
+            if (player.ClientID != NetworkManager.Singleton.LocalClientId)
+            {
+                continue;
+
+            }
+
+            if (player.IsLockedIn)
+            {
+                _lockInButton.interactable = false;
+                break; 
+            }
+
+            if (IsCharacterTaken(player.CharacterID, false))
+            {
+                _lockInButton.interactable = false;
+                break; 
+            }
+            _lockInButton.interactable = true;
+            break; 
+        }
+    }
+
+    private bool IsCharacterTaken(int characterID, bool checkAll)
+    {
+        for (int i = 0; i < _players.Count; i++)
+        {
+            if (!checkAll)
+            {
+                if (_players[i].ClientID == NetworkManager.Singleton.LocalClientId)
+                {
+                    continue; 
+                }
+            }
+            
+            if (_players[i].IsLockedIn && _players[i].CharacterID == characterID)
+            {
+                return true; 
+            }
+        }
+
+        return false; 
+    }
+
+    public void LockIn()
+    {
+        //HostManager.Instance.StartGame();
+
+       LockInServerRPC();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void LockInServerRPC(ServerRpcParams serverRpcParams = default)
+    {
+        for (int i = 0; i < _players.Count; i++)
+        {
+            if (_players[i].ClientID == serverRpcParams.Receive.SenderClientId)
+            {
+                if (!_characterDatabase.IsValidCharacterID(_players[i].CharacterID))
+                {
+                    return; 
+                }
+
+                if (IsCharacterTaken(_players[i].CharacterID, true))
+                {
+                    return; 
+                }
+
+                _players[i] = new NET_CharacterSelectState(
+                    _players[i].ClientID, _players[i].CharacterID, true
+                    );
+            }
+        }
+
+        foreach (var player in _players)
+        {
+            if (!player.IsLockedIn)
+            {
+                return;
+            }
+        }
+
+        foreach (var player in _players)
+        {
+            HostManager.Instance.SetCharacter(player.ClientID, player.CharacterID);
+        }
+
+        HostManager.Instance.StartGame();
     }
 }

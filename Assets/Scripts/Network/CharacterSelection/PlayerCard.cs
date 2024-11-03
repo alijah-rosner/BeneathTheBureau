@@ -21,13 +21,13 @@ public class PlayerCard : MonoBehaviour
             _characterIconImage.sprite = character.Icon;
             _characterIconImage.enabled = true;
             _characterNameText.text = character.DisplayName;
-            _characterBio.text = character.CharacterBio;
+            //_characterBio.text = character.CharacterBio;
         }
         else
         {
             _characterIconImage.enabled = false; 
         }
-        _playerNameText.text = $"Player {state.ClientID}";
+        _playerNameText.text = state.IsLockedIn ? $"Player {state.ClientID}" : $"Player {state.ClientID} (Selecting...)";
         _visuals.SetActive(true);
     }
 

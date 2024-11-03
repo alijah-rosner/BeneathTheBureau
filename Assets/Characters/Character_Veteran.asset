@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a59c6af8d8c9dfe46b76b289631f2305, type: 3}
   m_Name: Character_Veteran
   m_EditorClassIdentifier: 
-  _id: -1
+  _id: 1
   _displayName: The Veteran
   _characterBio: '- Squeamish overthinker. - Fast learner, easily frightened. - Recovers
     through dealing with difficult problems.'
   _icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  _gameplayPrefab: {fileID: 417080042839615562, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}

@@ -15,10 +15,10 @@ using Unity.Netcode;
 using Unity.Networking;
 using UnityEngine.SocialPlatforms.Impl;
 using Unity.Netcode.Transports.UTP;
+using UnityEngine.SceneManagement;
 
 public class HostManager : MonoBehaviour
 {
-    // Start is called before the first frame update
     private ConcurrentQueue<string> _createdLobbyIds = new ConcurrentQueue<string>();
     public Lobby CurrentLobby => _currentLobby;
     private Lobby _currentLobby;
@@ -28,6 +28,8 @@ public class HostManager : MonoBehaviour
 
     private Task _heartbeatTask;
     private static HostManager _hostManagerSingleton;
+
+    public Dictionary<ulong, ClientData> ClientData { get; private set; }
 
     public static HostManager Instance
     {
@@ -39,7 +41,7 @@ public class HostManager : MonoBehaviour
 
             if (_hostManagerSingleton == null)
             {
-                Debug.LogError("No HostSingleton in scene, did you run this from the bootStrap scene?");
+                Debug.LogError("No HostManager Singleton Created");
                 return null;
             }
 
@@ -97,11 +99,13 @@ public class HostManager : MonoBehaviour
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += OnNetworkReady;
 
+
         try
         {
             //Create lobby and also make a player for our host
             CreateLobbyOptions options = new CreateLobbyOptions();
             options.IsPrivate = isPrivate;
+
             options.Data = new Dictionary<string, DataObject>()
             {
                 {
@@ -120,21 +124,34 @@ public class HostManager : MonoBehaviour
             Debug.Log(e);
             throw;
         }
-
+        ClientData = new Dictionary<ulong, ClientData>();
         NetworkManager.Singleton.StartHost();
-        NetworkManager.Singleton.SceneManager.LoadScene("Scene_CharacterSelection", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        //NetworkManager.Singleton.SceneManager.LoadScene("Scene_CharacterSelection", UnityEngine.SceneManagement.LoadSceneMode.Single);
 
         return _currentLobby;
     }
 
     private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
+        if (ClientData.Count >= 4)
+        {
+            response.Approved = false;
+            return;
+        }
+
+        response.Approved = true;
+        response.CreatePlayerObject = false;
+        response.Pending = false;
+
+        ClientData[request.ClientNetworkId] = new ClientData(request.ClientNetworkId);
+        Debug.Log($"Added client {request.ClientNetworkId}");
 
     }
 
     private void OnNetworkReady()
     {
-
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnect;
+        NetworkManager.Singleton.SceneManager.LoadScene("Scene_CharacterSelection", LoadSceneMode.Single);
     }
 
     private IEnumerator HeartbeatLobbyCoroutine(string lobbyId, float waitTimeSeconds)
@@ -153,6 +170,17 @@ public class HostManager : MonoBehaviour
         while (_createdLobbyIds.TryDequeue(out var lobbyId))
         {
             LobbyService.Instance.DeleteLobbyAsync(lobbyId);
+        }
+    }
+
+    private void OnClientDisconnect(ulong clientID)
+    {
+        if (ClientData.ContainsKey(clientID))
+        {
+            if (ClientData.Remove(clientID))
+            {
+                Debug.Log($"Removed client {clientID}");
+            }
         }
     }
 
@@ -176,6 +204,19 @@ public class HostManager : MonoBehaviour
         //NetworkServer.OnClientLeft -= OnClientDisconnect;
 
         //NetworkServer?.Dispose();
+    }
+
+    public void SetCharacter(ulong clientID, int characterID)
+    {
+        if (ClientData.TryGetValue(clientID, out ClientData data))
+        {
+            data.CharacterID = characterID;
+        }
+    }
+
+    public void StartGame()
+    {
+        NetworkManager.Singleton.SceneManager.LoadScene("PlaneDemo", LoadSceneMode.Single);
     }
 
 

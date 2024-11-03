@@ -8,10 +8,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Scene_ServerScreen.unity
     guid: 51d71857334116440946b7003e94d5b1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Game.unity
     guid: aedf6beeecb98f745a1a212c4d8e8aec
   - enabled: 1
     path: Assets/Scenes/Scene_CharacterSelection.unity
     guid: ebd1e93d7381179418ec2a69be1234a8
+  - enabled: 1
+    path: Assets/Scenes/PlaneDemo.unity
+    guid: 369dd3b375650d049864d1acbead35cc
   m_configObjects: {}
