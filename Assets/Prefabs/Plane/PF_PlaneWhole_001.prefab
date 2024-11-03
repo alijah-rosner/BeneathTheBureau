@@ -911,10 +911,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
   thrust: 300
+  pitchModifier: 25
   maxThrust: 100
   acceleration: 100
   turnTorque: {x: 90, y: 45, z: 60}
   forceMult: 500
+  rumbleForce: 0.05
+  turbulenceForce: 2.5
+  turbulenceTorqueForce: 5
+  turbulenceChance: 0.01
   sensitivity: 3
   aggressiveTurnAngle: 1
   pitch: 0
@@ -939,8 +944,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.4529037, y: 3.18968, z: 6.5761566}
-  m_Center: {x: 0.22645116, y: -0.12, z: -1.6880789}
+  m_Size: {x: 2.5, y: 2, z: 18}
+  m_Center: {x: 0, y: 0.25, z: -6}
 --- !u!54 &2838466425460961863
 Rigidbody:
   m_ObjectHideFlags: 0
