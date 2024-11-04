@@ -306,11 +306,11 @@ public class FlightController : NetworkBehaviour
     if (other.GetComponent<Rigidbody>())
     {
       _passengers.Add(other.GetComponent<Rigidbody>());
-      if (_isMoving && other.GetComponent<SP_PlayerController>())
+      if (_isMoving && other.GetComponent<PlayerController>())
       {
         other.GetComponent<Rigidbody>().drag = 0;
         Debug.Log(rigid.velocity.magnitude);
-        other.GetComponent<SP_PlayerController>().SetInAircraft(true);
+        other.GetComponent<PlayerController>().SetInAircraft(true);
       }
     }
   }
@@ -320,9 +320,9 @@ public class FlightController : NetworkBehaviour
     {
       _passengers.Remove(other.GetComponent<Rigidbody>());
       other.transform.parent = null;
-      if (other.GetComponent<SP_PlayerController>())
+      if (other.GetComponent<PlayerController>())
       {
-        other.GetComponent<SP_PlayerController>().SetInAircraft(false);
+        other.GetComponent<PlayerController>().SetInAircraft(false);
       }
     }
   }
