@@ -100,14 +100,14 @@ public class PlaneInterface : NetworkBehaviour
 
   private void OnTriggerEnter(Collider other)
   {
-    if (other.GetComponent<PlayerController>())
+    if (other.gameObject.tag == "Player")
     {
       players.Add(other.gameObject);
     }
   }
   private void OnTriggerExit(Collider other)
   {
-    if (other.GetComponent<PlayerController>())
+    if (other.gameObject.tag == "Player")
     {
       players.Remove(other.gameObject);
     }
