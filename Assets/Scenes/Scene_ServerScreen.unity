@@ -314,6 +314,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4495485495618509013, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
+      propertyPath: NetworkConfig.ForceSamePrefabs
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4495485495618509013, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
       propertyPath: NetworkConfig.ConnectionApproval
       value: 1
       objectReference: {fileID: 0}

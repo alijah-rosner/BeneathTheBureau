@@ -1,16 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlaneInterface : MonoBehaviour
+public class PlaneInterface : NetworkBehaviour
 {
   [Header("Components")]
+  [SerializeField]
+  private GameObject pilot = null;
 
   [SerializeField]
-  private GameObject player = null;
-
-  [SerializeField]
-  private GameObject playerCamera = null;
+  private GameObject pilotCamera = null;
 
   [SerializeField]
   private GameObject aircraft = null;
@@ -18,6 +18,7 @@ public class PlaneInterface : MonoBehaviour
   [SerializeField]
   private GameObject aircraftCamera = null;
 
+  private HashSet<GameObject> players = null;
   private bool _active = false;
   // Start is called before the first frame update
   void Start()
@@ -28,14 +29,39 @@ public class PlaneInterface : MonoBehaviour
   // Update is called once per frame
   void Update()
   {
+    if (!_active)
+    {
+      if (!pilot)
+      {
+        foreach (var player in players)
+        {
+          if (player.GetComponent<NetworkObject>().IsLocalPlayer && Input.GetKeyDown(KeyCode.E))
+          {
+            pilotCamera = player.GetComponent<Camera>().gameObject;
+            pilot = player;
+            ActivatePilotController();
+            _active = true;
+          }
+        }
+      }
+      else
+      {
+        if (pilot.GetComponent<NetworkObject>().IsLocalPlayer && Input.GetKeyDown(KeyCode.E))
+        {
+          ActivatePlayerController();
+          pilot = null;
+          _active = false;
+        }
+      }
+    }
     if (Input.GetKeyDown(KeyCode.E))
     {
 
-      if (Vector3.Distance(player.transform.position, transform.position) < 1.5f)
+      if (Vector3.Distance(pilot.transform.position, transform.position) < 1.5f)
       {
         if (!_active)
         {
-          ActivateFlightController();
+          ActivatePilotController();
           _active = true;
         }
         else
@@ -47,7 +73,7 @@ public class PlaneInterface : MonoBehaviour
     }
     else
     {
-      if (_active && Vector3.Distance(player.transform.position, transform.position) > 2f)
+      if (_active && Vector3.Distance(pilot.transform.position, transform.position) > 2f)
       {
         ActivatePlayerController();
         _active = false;
@@ -55,10 +81,10 @@ public class PlaneInterface : MonoBehaviour
     }
   }
 
-  void ActivateFlightController()
+  void ActivatePilotController()
   {
-    player.GetComponent<SP_PlayerController>().SetIsPilot(true);
-    playerCamera.SetActive(false);
+    pilot.GetComponent<PlayerController>().SetIsPilot(true);
+    pilotCamera.SetActive(false);
     aircraftCamera.SetActive(true);
     aircraft.GetComponent<FlightController>().enabled = true;
     aircraft.GetComponent<FlightController>().TriggerController(true);
@@ -66,9 +92,24 @@ public class PlaneInterface : MonoBehaviour
 
   void ActivatePlayerController()
   {
-    player.GetComponent<SP_PlayerController>().SetIsPilot(false);
+    pilot.GetComponent<PlayerController>().SetIsPilot(false);
     aircraft.GetComponent<FlightController>().TriggerController(false);
     aircraftCamera.SetActive(false);
-    playerCamera.SetActive(true);
+    pilotCamera.SetActive(true);
+  }
+
+  private void OnTriggerEnter(Collider other)
+  {
+    if (other.GetComponent<PlayerController>())
+    {
+      players.Add(other.gameObject);
+    }
+  }
+  private void OnTriggerExit(Collider other)
+  {
+    if (other.GetComponent<PlayerController>())
+    {
+      players.Remove(other.gameObject);
+    }
   }
 }
