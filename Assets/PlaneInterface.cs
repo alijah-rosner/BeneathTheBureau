@@ -55,31 +55,6 @@ public class PlaneInterface : NetworkBehaviour
         }
       }
     }
-    if (Input.GetKeyDown(KeyCode.E))
-    {
-
-      if (Vector3.Distance(pilot.transform.position, transform.position) < 1.5f)
-      {
-        if (!_active)
-        {
-          ActivatePilotController();
-          _active = true;
-        }
-        else
-        {
-          ActivatePlayerController();
-          _active = false;
-        }
-      }
-    }
-    else
-    {
-      if (_active && Vector3.Distance(pilot.transform.position, transform.position) > 2f)
-      {
-        ActivatePlayerController();
-        _active = false;
-      }
-    }
   }
 
   void ActivatePilotController()
