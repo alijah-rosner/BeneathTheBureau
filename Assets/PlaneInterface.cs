@@ -18,7 +18,7 @@ public class PlaneInterface : NetworkBehaviour
   [SerializeField]
   private GameObject aircraftCamera = null;
 
-  private HashSet<GameObject> players = null;
+  private HashSet<GameObject> players = new HashSet<GameObject>();
   private bool _active = false;
   // Start is called before the first frame update
   void Start()
