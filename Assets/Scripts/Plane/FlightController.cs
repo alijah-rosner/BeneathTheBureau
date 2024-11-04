@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class FlightController : MonoBehaviour
+public class FlightController : NetworkBehaviour
 {
 
   [Header("Components")]
@@ -44,7 +45,8 @@ public class FlightController : MonoBehaviour
 
   //Whether or not to recieve input
   private bool _isControlling = false;
-
+  [Header("Input")]
+  [SerializeField]
   //Container of all rigidbodies inside plane
   private HashSet<Rigidbody> _passengers = new();
 
