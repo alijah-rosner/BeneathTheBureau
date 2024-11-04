@@ -450,17 +450,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundMoveSpeed: 7
-  aircraftMoveSpeed: 5
-  jumpForce: 12
+  groundMoveSpeed: 9
+  aircraftMoveSpeed: 9
+  jumpForce: 11
   aircraftJumpForce: 9
   groundAcceleration: 0.05
-  groundDeceleration: 3
+  groundDeceleration: 0.75
   aircraftAcceleration: 0.03
-  aircraftDeceleration: 5
-  groundCheckRadius: 0.5
+  aircraftDeceleration: 0.5
+  groundCheckRadius: 0
   groundCheckHeight: 1
-  groundCheckDistance: 0.75
+  groundCheckDistance: 1
   groundLayer:
     serializedVersion: 2
     m_Bits: 0

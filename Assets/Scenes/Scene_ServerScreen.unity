@@ -255,11 +255,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 162201991035112829, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
       propertyPath: m_ProtocolType
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 162201991035112829, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
       propertyPath: m_MaxPacketQueueSize
       value: 512
+      objectReference: {fileID: 0}
+    - target: {fileID: 162201991035112829, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
+      propertyPath: ConnectionData.ServerListenAddress
+      value: 0.0.0.0
       objectReference: {fileID: 0}
     - target: {fileID: 4186214911289327065, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
       propertyPath: m_LocalPosition.x
