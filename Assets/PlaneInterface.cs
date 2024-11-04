@@ -37,7 +37,7 @@ public class PlaneInterface : NetworkBehaviour
         {
           if (player.GetComponent<NetworkObject>().IsLocalPlayer && Input.GetKeyDown(KeyCode.E))
           {
-            pilotCamera = player.GetComponent<Camera>().gameObject;
+            pilotCamera = player.GetComponent<PlayerController>().GetCamera().gameObject;
             pilot = player;
             ActivatePilotController();
             _active = true;
@@ -50,6 +50,7 @@ public class PlaneInterface : NetworkBehaviour
         {
           ActivatePlayerController();
           pilot = null;
+          pilotCamera = null;
           _active = false;
         }
       }
