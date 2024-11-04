@@ -95,9 +95,20 @@ public class PlayerController : NetworkBehaviour
 
     private void CheckGround()
     {
-        Vector3 checkPosition = transform.position + Vector3.up * groundCheckHeight;
-        isGrounded = Physics.SphereCast(checkPosition, groundCheckRadius, Vector3.down, out _, groundCheckDistance, groundLayer);
-    }
+    int playerLayerMask = 1 << LayerMask.NameToLayer("isPlayer");
+    int defaultLayerMask = 1 << LayerMask.NameToLayer("Default");
+    int combinedLayerMask = (groundLayer | defaultLayerMask) & ~playerLayerMask;
+
+    // Perform the SphereCast with the combined mask
+    isGrounded = Physics.SphereCast(
+        transform.position,
+        groundCheckRadius,
+        Vector3.down,
+        out _,
+        groundCheckDistance,
+        combinedLayerMask
+    );
+  }
 
     private void HandleInput()
     {
