@@ -65,6 +65,13 @@ public class FlightController : NetworkBehaviour
   private bool _hasStartedMoving = false;
   private bool _turbulenceFlag = false;
 
+  //NetworkVariables for synchronization
+  private NetworkVariable<Vector3> netLocalAcceleration = new NetworkVariable<Vector3>();
+  private NetworkVariable<bool> netTurbulenceFlag = new NetworkVariable<bool>();
+
+  // Store previous velocity as NetworkVariable
+  private NetworkVariable<Vector3> netPreviousLocalVelocity = new NetworkVariable<Vector3>();
+
 
   public void TriggerController(bool r)
   {
@@ -239,6 +246,7 @@ public class FlightController : NetworkBehaviour
 
   private void AddTurbulenceEffect()
   {
+    if (!IsServer) return;
     _turbulenceFlag = true;
     Vector3 turbulence = new Vector3(
         Random.Range(-1f, 1f),
@@ -269,34 +277,75 @@ public class FlightController : NetworkBehaviour
     }
   }
 
+  [ClientRpc]
+  private void ApplyPassengerForcesClientRpc(
+        NetworkObjectReference passengerRef,
+        Vector3 counteractingForce,
+        bool hasTurbulence)
+  {
+    // Try to get the referenced network object
+    if (!passengerRef.TryGet(out NetworkObject passengerObj))
+      return;
+
+    // Get the rigidbody component
+    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
+      return;
+
+    if (!hasTurbulence)
+    {
+      // Apply normal force
+      passengerRb.AddForce(counteractingForce, ForceMode.Acceleration);
+    }
+    else
+    {
+      // Generate synchronized turbulence using a deterministic seed
+      uint seed = (uint)(Time.time * 1000 + passengerObj.NetworkObjectId);
+      Random.InitState((int)seed);
+
+      Vector3 turbulenceJerk = new Vector3(
+          Random.Range(-1f, 1f),
+          Random.Range(-1f, 1f),
+          Random.Range(-1f, 1f)
+      ) * turbulenceForce * 2f;
+
+      passengerRb.AddForce(counteractingForce + turbulenceJerk, ForceMode.Acceleration);
+    }
+  }
+
   private void UpdatePassengers()
   {
-    Debug.Log("Passenger Count:" + _passengers.Count);
+    if (!IsServer) return; // Only server should calculate and apply forces
+
     // Calculate the local velocity and its change compared to previous frame
     Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
-    Vector3 localAcceleration = (currentLocalVelocity - previousLocalVelocity) / Time.fixedDeltaTime;
+    Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
 
+    // Update network variables
+    netLocalAcceleration.Value = localAcceleration;
+    netPreviousLocalVelocity.Value = currentLocalVelocity;
+
+    // Apply forces to passengers
     foreach (Rigidbody passenger in _passengers)
     {
-      Vector3 counteractingForce = transform.TransformDirection(localAcceleration);
-      if (!_turbulenceFlag)
-      {
-        // Apply acceleration compensation as a force to simulate realistic movement
-        passenger.AddForce(counteractingForce, ForceMode.Acceleration);
-      }
-      else
-      {
-        Vector3 turbulenceJerk = new Vector3(
-        Random.Range(-1f, 1f),
-        Random.Range(-1f, 1f),
-        Random.Range(-1f, 1f)) * turbulenceForce * 2f;
-        passenger.AddForce(counteractingForce + turbulenceJerk, ForceMode.Acceleration);
-        _turbulenceFlag = false;
-      }
+      if (!passenger.TryGetComponent<NetworkObject>(out NetworkObject passengerNetObj))
+        continue;
+
+      // Skip if the passenger's NetworkObject isn't spawned
+      if (!passengerNetObj.IsSpawned)
+        continue;
+
+      ApplyPassengerForcesClientRpc(
+          new NetworkObjectReference(passengerNetObj),
+          transform.TransformDirection(localAcceleration),
+          netTurbulenceFlag.Value
+      );
     }
 
-    // Update the previous velocity to the current one for the next frame
-    previousLocalVelocity = currentLocalVelocity;
+    // Reset turbulence flag after processing
+    if (netTurbulenceFlag.Value)
+    {
+      netTurbulenceFlag.Value = false;
+    }
   }
 
   // Convert angles greater than 180 to a negative equivalent angle
