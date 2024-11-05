@@ -401,4 +401,10 @@ public class PlayerController : NetworkBehaviour
   {
     _inAircraft.Value = inAircraft;
   }
+
+  public Vector3 GetRelativeMovement()
+  {
+    // Return the current movement input as a local space vector
+    return new Vector3(lateralMovement, 0, forwardMovement) * aircraftMoveSpeed;
+  }
 }

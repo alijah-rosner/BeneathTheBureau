@@ -60,6 +60,9 @@ public class FlightController : NetworkBehaviour
   private NetworkVariable<float> netYaw = new NetworkVariable<float>();
   private NetworkVariable<float> netRoll = new NetworkVariable<float>();
 
+  private NetworkVariable<Vector3> netAircraftVelocity = new NetworkVariable<Vector3>();
+  private NetworkVariable<Vector3> netAngularVelocity = new NetworkVariable<Vector3>();
+
 
   private bool _isMoving => rigid.velocity.magnitude > 0f;
   private bool _hasStartedMoving = false;
@@ -314,40 +317,75 @@ public class FlightController : NetworkBehaviour
 
   private void UpdatePassengers()
   {
-    if (!IsServer) return; // Only server should calculate and apply forces
+    if (!IsServer) return;
 
-    // Calculate the local velocity and its change compared to previous frame
     Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
     Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
 
     // Update network variables
     netLocalAcceleration.Value = localAcceleration;
     netPreviousLocalVelocity.Value = currentLocalVelocity;
+    netAircraftVelocity.Value = rigid.velocity;
+    netAngularVelocity.Value = rigid.angularVelocity;
 
-    // Apply forces to passengers
     foreach (Rigidbody passenger in _passengers)
     {
-      if (!passenger.TryGetComponent<NetworkObject>(out NetworkObject passengerNetObj))
-        continue;
+      if (passenger == null) continue;
 
-      // Skip if the passenger's NetworkObject isn't spawned
-      if (!passengerNetObj.IsSpawned)
-        continue;
+      NetworkObject passengerNetObj = passenger.GetComponent<NetworkObject>();
+      if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
 
-      ApplyPassengerForcesClientRpc(
-          new NetworkObjectReference(passengerNetObj),
+      // Instead of creating NetworkObjectReference, pass the NetworkObjectId
+      SyncPassengerPhysicsClientRpc(
+          passengerNetObj.NetworkObjectId,
           transform.TransformDirection(localAcceleration),
           netTurbulenceFlag.Value
       );
     }
-
-    // Reset turbulence flag after processing
-    if (netTurbulenceFlag.Value)
-    {
-      netTurbulenceFlag.Value = false;
-    }
   }
 
+  [ClientRpc]
+  private void SyncPassengerPhysicsClientRpc(
+    ulong networkObjectId,
+    Vector3 localAcceleration,
+    bool hasTurbulence)
+  {
+    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject passengerObj))
+      return;
+
+    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
+      return;
+
+    // Rest of your physics calculations...
+    Vector3 desiredVelocity = netAircraftVelocity.Value;
+
+    if (passengerObj.TryGetComponent<PlayerController>(out var playerController))
+    {
+      Vector3 relativeMovement = playerController.GetRelativeMovement();
+      desiredVelocity += transform.TransformDirection(relativeMovement);
+    }
+
+    Vector3 velocityDiff = desiredVelocity - passengerRb.velocity;
+    passengerRb.AddForce(velocityDiff * 10f, ForceMode.Acceleration);
+    passengerRb.AddForce(localAcceleration, ForceMode.Acceleration);
+
+    Vector3 centerOfRotation = transform.position;
+    Vector3 relativePos = passengerRb.position - centerOfRotation;
+    Vector3 rotationalVelocity = Vector3.Cross(netAngularVelocity.Value, relativePos);
+    passengerRb.AddForce(rotationalVelocity * 2f, ForceMode.Acceleration);
+
+    if (hasTurbulence)
+    {
+      uint seed = (uint)(Time.time * 1000 + networkObjectId);
+      Random.InitState((int)seed);
+      Vector3 turbulenceJerk = new Vector3(
+          Random.Range(-1f, 1f),
+          Random.Range(-1f, 1f),
+          Random.Range(-1f, 1f)
+      ) * turbulenceForce * 2f;
+      passengerRb.AddForce(turbulenceJerk, ForceMode.Acceleration);
+    }
+  }
   // Convert angles greater than 180 to a negative equivalent angle
   // Clamp to keep it from exceeding desired values
   private void ClampRotation()
@@ -376,24 +414,26 @@ public class FlightController : NetworkBehaviour
     netThrust.Value = thrust;
   }
 
-  [ServerRpc]
-  private void AddPassengerServerRpc(NetworkObjectReference passengerNetObj)
+  [ServerRpc(RequireOwnership = false)]
+  private void AddPassengerServerRpc(ulong networkObjectId)
   {
-    if (passengerNetObj.TryGet(out NetworkObject networkObject))
+    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
+      return;
+
+    var rb = networkObject.GetComponent<Rigidbody>();
+    if (rb != null)
     {
-      var rb = networkObject.GetComponent<Rigidbody>();
-      if (rb != null)
-      {
-        _passengers.Add(rb);
-        AddPassengerClientRpc(passengerNetObj);
-      }
+      _passengers.Add(rb);
+      AddPassengerClientRpc(networkObjectId);
     }
   }
 
   [ClientRpc]
-  private void AddPassengerClientRpc(NetworkObjectReference passengerNetObj)
+  private void AddPassengerClientRpc(ulong networkObjectId)
   {
-    if (!IsServer && passengerNetObj.TryGet(out NetworkObject networkObject))
+    if (IsServer) return;
+
+    if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
     {
       var rb = networkObject.GetComponent<Rigidbody>();
       if (rb != null)
@@ -403,29 +443,31 @@ public class FlightController : NetworkBehaviour
     }
   }
 
-  [ServerRpc]
-  private void RemovePassengerServerRpc(NetworkObjectReference passengerNetObj)
+  [ServerRpc(RequireOwnership = false)]
+  private void RemovePassengerServerRpc(ulong networkObjectId)
   {
-    if (passengerNetObj.TryGet(out NetworkObject networkObject))
+    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
+      return;
+
+    var rb = networkObject.GetComponent<Rigidbody>();
+    if (rb != null)
     {
-      var rb = networkObject.GetComponent<Rigidbody>();
-      if (rb != null)
-      {
-        _passengers.Add(rb);
-        RemovePassengerClientRpc(passengerNetObj);
-      }
+      _passengers.Remove(rb); 
+      RemovePassengerClientRpc(networkObjectId);
     }
   }
 
   [ClientRpc]
-  private void RemovePassengerClientRpc(NetworkObjectReference passengerNetObj)
+  private void RemovePassengerClientRpc(ulong networkObjectId)
   {
-    if (!IsServer && passengerNetObj.TryGet(out NetworkObject networkObject))
+    if (IsServer) return;
+
+    if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject networkObject))
     {
       var rb = networkObject.GetComponent<Rigidbody>();
       if (rb != null)
       {
-        _passengers.Add(rb);
+        _passengers.Remove(rb); 
       }
     }
   }
@@ -435,20 +477,21 @@ public class FlightController : NetworkBehaviour
   {
     if (!IsServer) return;
 
-    if (other.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
-        other.TryGetComponent<Rigidbody>(out Rigidbody rb))
+    NetworkObject netObj = other.GetComponent<NetworkObject>();
+    if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
     {
-      AddPassengerServerRpc(new NetworkObjectReference(netObj));
+      AddPassengerServerRpc(netObj.NetworkObjectId);
     }
   }
+
   private void OnTriggerExit(Collider other)
   {
     if (!IsServer) return;
 
-    if (other.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
-        other.TryGetComponent<Rigidbody>(out Rigidbody rb))
+    NetworkObject netObj = other.GetComponent<NetworkObject>();
+    if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
     {
-      RemovePassengerServerRpc(new NetworkObjectReference(netObj));
+      RemovePassengerServerRpc(netObj.NetworkObjectId);
     }
   }
 }
