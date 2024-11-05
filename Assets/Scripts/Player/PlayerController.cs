@@ -199,6 +199,7 @@ public class PlayerController : NetworkBehaviour
     private void HandleAircraftMovement()
     {
         rigidBody.drag = 0f;
+        rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
         FlightController aircraft = FindObjectOfType<FlightController>();
         if (aircraft == null) return;
 

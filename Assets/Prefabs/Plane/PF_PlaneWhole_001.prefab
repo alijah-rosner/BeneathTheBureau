@@ -933,12 +933,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
-  thrust: 300
+  thrust: 500
   pitchModifier: 25
   maxThrust: 100
   acceleration: 100
   turnTorque: {x: 90, y: 45, z: 60}
-  forceMult: 500
+  forceMult: 800
   rumbleForce: 0
   turbulenceForce: 0
   turbulenceTorqueForce: 0

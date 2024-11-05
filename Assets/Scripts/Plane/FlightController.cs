@@ -280,6 +280,7 @@ public class FlightController : NetworkBehaviour
     }
   }
 
+
   private void UpdatePassengers()
   {
     if (!IsServer) return;
