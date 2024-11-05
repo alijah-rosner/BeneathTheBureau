@@ -6,405 +6,406 @@ using Unity.Netcode;
 
 public class PlayerController : NetworkBehaviour
 {
-  [Header("Movement Settings")]
-  [SerializeField] private float groundMoveSpeed = 40f;
-  [SerializeField] private float aircraftMoveSpeed = 5f;
-  [SerializeField] private float jumpForce = 7f;
-  [SerializeField] private float aircraftJumpForce = 9f;
-  [SerializeField] private float groundAcceleration = 0.05f;
-  [SerializeField] private float groundDeceleration = 0.75f;
-  [SerializeField] private float aircraftAcceleration = 0.03f;
-  [SerializeField] private float aircraftDeceleration = 0.5f;
+    [Header("Movement Settings")]
+    [SerializeField] private float groundMoveSpeed = 40f;
+    [SerializeField] private float aircraftMoveSpeed = 5f;
+    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private float aircraftJumpForce = 9f;
+    [SerializeField] private float groundAcceleration = 0.05f;
+    [SerializeField] private float groundDeceleration = 0.75f;
+    [SerializeField] private float aircraftAcceleration = 0.03f;
+    [SerializeField] private float aircraftDeceleration = 0.5f;
 
-  [Header("Ground Check Settings")]
-  [SerializeField] private float groundCheckRadius = 0.5f;
-  [SerializeField] private float groundCheckHeight = 0.5f;
-  [SerializeField] private float groundCheckDistance = 0.015f;
+    [Header("Ground Check Settings")]
+    [SerializeField] private float groundCheckRadius = 0.5f;
+    [SerializeField] private float groundCheckHeight = 0.5f;
+    [SerializeField] private float groundCheckDistance = 0.015f;
 
-  [Header("References")]
-  [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
-  public Transform orientation;
-  [SerializeField] private Camera _camera;
+    [Header("References")]
+    [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
+    public Transform orientation;
+    [SerializeField] private Camera _camera;
 
-  private Rigidbody rigidBody;
-  private float forwardMovement;
-  private float lateralMovement;
-  private float accelerationFactor;
-  private float turnFactor = 1f;
+    private Rigidbody rigidBody;
+    private float forwardMovement;
+    private float lateralMovement;
+    private float accelerationFactor;
+    private float turnFactor = 1f;
 
-  [Header("Debug Tooltip")]
-  [SerializeField]
-  private bool isGrounded;
-  [SerializeField]
-  private NetworkVariable<bool> _inAircraft = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-  [SerializeField]
-  private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [Header("Debug Tooltip")]
+    [SerializeField]
+    private bool isGrounded;
+    [SerializeField]
+    private NetworkVariable<bool> _inAircraft = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [SerializeField]
+    private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-  private const float groundGravity = 9.81f;
-  private const float flightGravityScale = 9f;
+    private const float groundGravity = 9.81f;
+    private const float flightGravityScale = 9f;
 
-  private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
-  private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
-  private NetworkVariable<Vector3> netVelocity = new NetworkVariable<Vector3>();
-  private NetworkVariable<Vector3> netRelativePosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
+    private NetworkVariable<Vector3> netVelocity = new NetworkVariable<Vector3>();
+    private NetworkVariable<Vector3> netRelativePosition = new NetworkVariable<Vector3>();
 
-  // Reference to the current aircraft
-  private FlightController currentAircraft;
-  private Vector3 lastAircraftPosition;
-  private Quaternion lastAircraftRotation;
+    // Reference to the current aircraft
+    private FlightController currentAircraft;
+    private Vector3 lastAircraftPosition;
+    private Quaternion lastAircraftRotation;
 
-  public override void OnNetworkSpawn()
-  {
-    base.OnNetworkSpawn();
-    if (!IsOwner)
+    public override void OnNetworkSpawn()
     {
-      return;
-    }
-    _camera.enabled = true;
-    rigidBody = GetComponent<Rigidbody>();
-    // Initialize network variables
-    if (IsServer)
-    {
-      netPosition.Value = transform.position;
-      netRotation.Value = transform.rotation;
-      netVelocity.Value = Vector3.zero;
-    }
-  }
-
-
-  private void Awake()
-  {
-    // Initialize Rigidbody reference for ALL clients
-    rigidBody = GetComponent<Rigidbody>();
-
-    if (rigidBody == null)
-    {
-      Debug.LogError($"[PlayerController] No Rigidbody component found on {gameObject.name}");
-    }
-  }
-
-  private void Start()
-  {
-    if (!IsOwner) return;
-
-
-    SetupCursor();
-
-  }
-
-  private void Update()
-  {
-    if (IsLocalPlayer)
-    {
-      CheckGround();
-      HandleInput();
-
-    }
-  }
-
-  private void FixedUpdate()
-  {
-    if (!IsOwner)
-    {
-      // Non-owners should interpolate to the networked position
-      if (!_inAircraft.Value)
-      {
-        transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
-        transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
-        rigidBody.velocity = netVelocity.Value;
-      }
-      return;
+        base.OnNetworkSpawn();
+        if (!IsOwner)
+        {
+            return;
+        }
+        _camera.enabled = true;
+        rigidBody = GetComponent<Rigidbody>();
+        // Initialize network variables
+        if (IsServer)
+        {
+            netPosition.Value = transform.position;
+            netRotation.Value = transform.rotation;
+            netVelocity.Value = Vector3.zero;
+        }
     }
 
-    if (_inAircraft.Value)
+
+    private void Awake()
     {
-      HandleAircraftMovement();
-    }
-    else
-    {
-      HandleGroundMovement();
-    }
+        // Initialize Rigidbody reference for ALL clients
+        rigidBody = GetComponent<Rigidbody>();
 
-    ApplyGravity();
-
-    // Update network variables if we're the server
-    if (IsServer)
-    {
-      UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
-    }
-    else
-    {
-      // Request update from server
-      UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
-    }
-  }
-
-
-  private void CheckGround()
-  {
-    int playerLayerMask = 1 << LayerMask.NameToLayer("isPlayer");
-    int defaultLayerMask = 1 << LayerMask.NameToLayer("Default");
-    int combinedLayerMask = (groundLayer | defaultLayerMask) & ~playerLayerMask;
-
-    // Perform the SphereCast with the combined mask
-    isGrounded = Physics.SphereCast(
-        transform.position,
-        groundCheckRadius,
-        Vector3.down,
-        out _,
-        groundCheckDistance,
-        combinedLayerMask
-    );
-  }
-
-  private void HandleInput()
-  {
-    if (!_isPilot.Value)
-    {
-      forwardMovement = Input.GetAxisRaw("Vertical");
-      lateralMovement = Input.GetAxisRaw("Horizontal");
+        if (rigidBody == null)
+        {
+            Debug.LogError($"[PlayerController] No Rigidbody component found on {gameObject.name}");
+        }
     }
 
-    if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+    private void Start()
     {
-      JumpServerRpc();
-    }
-  }
+        if (!IsOwner) return;
 
-  private void HandleGroundMovement()
-  {
-    UpdateAcceleration(groundAcceleration, groundDeceleration);
 
-    // Update turn factor based on mouse movement
-    turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
-    accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
+        SetupCursor();
 
-    // Calculate move direction
-    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-
-    // Apply movement force
-    rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
-
-    // Apply drag only when grounded
-    if (isGrounded)
-    {
-      rigidBody.drag = 1f;
-    }
-    else
-    {
-      rigidBody.drag = 0f;
-    }
-  }
-
-  private void HandleAircraftMovement()
-  {
-    FlightController aircraft = FindObjectOfType<FlightController>();
-    if (aircraft == null) return;
-
-    // Store reference to current aircraft if not already set
-    if (currentAircraft != aircraft)
-    {
-      currentAircraft = aircraft;
-      lastAircraftPosition = aircraft.transform.position;
-      lastAircraftRotation = aircraft.transform.rotation;
     }
 
-    if (!aircraft.GetIsMoving())
+    private void Update()
     {
-      HandleGroundMovement();
-      return;
+        if (IsLocalPlayer)
+        {
+            CheckGround();
+            HandleInput();
+
+        }
     }
 
-    Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
-    UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
-
-    // Calculate relative position to aircraft
-    Vector3 relativePos = transform.position - aircraft.transform.position;
-
-    // Update position based on aircraft movement
-    Vector3 aircraftDelta = aircraft.transform.position - lastAircraftPosition;
-    Vector3 newPosition = transform.position + aircraftDelta;
-
-    // Calculate relative movement within aircraft
-    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-    Vector3 relativeMovement = moveDirection * aircraftMoveSpeed * accelerationFactor;
-
-    // Apply rotation with aircraft
-    Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
-    Vector3 rotatedRelativePos = rotationDelta * relativePos;
-    newPosition = aircraft.transform.position + rotatedRelativePos;
-
-    // Update position and rotation
-    transform.position = newPosition;
-    transform.rotation = aircraft.transform.rotation;
-
-    // Update velocity
-    if (accelerationFactor < 0.05f && isGrounded)
+    private void FixedUpdate()
     {
-      rigidBody.velocity = aircraftRb.velocity;
+        if (!IsOwner)
+        {
+            // Non-owners should interpolate to the networked position
+            if (!_inAircraft.Value)
+            {
+                transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
+                transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
+                rigidBody.velocity = netVelocity.Value;
+            }
+            return;
+        }
+
+        if (_inAircraft.Value)
+        {
+            HandleAircraftMovement();
+        }
+        else
+        {
+            HandleGroundMovement();
+        }
+
+        ApplyGravity();
+
+        // Update network variables if we're the server
+        if (IsServer)
+        {
+            UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
+        }
+        else
+        {
+            // Request update from server
+            UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
+        }
     }
-    else
+
+
+    private void CheckGround()
     {
-      rigidBody.velocity = aircraftRb.velocity + relativeMovement;
+        int playerLayerMask = 1 << LayerMask.NameToLayer("isPlayer");
+        int defaultLayerMask = 1 << LayerMask.NameToLayer("Default");
+        int combinedLayerMask = (groundLayer | defaultLayerMask) & ~playerLayerMask;
+
+        // Perform the SphereCast with the combined mask
+        isGrounded = Physics.SphereCast(
+            transform.position,
+            groundCheckRadius,
+            Vector3.down,
+            out _,
+            groundCheckDistance,
+            combinedLayerMask
+        );
     }
 
-    // Store current aircraft transform for next frame
-    lastAircraftPosition = aircraft.transform.position;
-    lastAircraftRotation = aircraft.transform.rotation;
-
-    // Sync across network
-    if (IsServer)
+    private void HandleInput()
     {
-      netRelativePosition.Value = relativePos;
-      SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.velocity);
+        if (!_isPilot.Value)
+        {
+            forwardMovement = Input.GetAxisRaw("Vertical");
+            lateralMovement = Input.GetAxisRaw("Horizontal");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            JumpServerRpc();
+        }
     }
-    else
+
+    private void HandleGroundMovement()
     {
-      SyncPassengerPositionServerRpc(relativePos);
-    }
-  }
+        UpdateAcceleration(groundAcceleration, groundDeceleration);
 
-  private void UpdateAcceleration(float accelerationRate, float decelerationRate)
-  {
-    if (Mathf.Abs(forwardMovement) > 0.1f || Mathf.Abs(lateralMovement) > 0.1f)
+        // Update turn factor based on mouse movement
+        turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
+        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
+
+        // Calculate move direction
+        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+
+        // Apply movement force
+        rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+
+        // Apply drag only when grounded
+        if (isGrounded)
+        {
+            rigidBody.drag = 1f;
+        }
+        else
+        {
+            rigidBody.drag = 0f;
+        }
+    }
+
+    private void HandleAircraftMovement()
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor + accelerationRate, 0f, 1f);
+        rigidBody.drag = 0f;
+        FlightController aircraft = FindObjectOfType<FlightController>();
+        if (aircraft == null) return;
+
+        // Store reference to current aircraft if not already set
+        if (currentAircraft != aircraft)
+        {
+            currentAircraft = aircraft;
+            lastAircraftPosition = aircraft.transform.position;
+            lastAircraftRotation = aircraft.transform.rotation;
+        }
+
+        if (!aircraft.GetIsMoving())
+        {
+            HandleGroundMovement();
+            return;
+        }
+
+        Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
+        UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
+
+        // Calculate relative position to aircraft
+        Vector3 relativePos = transform.position - aircraft.transform.position;
+
+        // Update position based on aircraft movement
+        Vector3 aircraftDelta = aircraft.transform.position - lastAircraftPosition;
+        Vector3 newPosition = transform.position + aircraftDelta;
+
+        // Calculate relative movement within aircraft
+        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+        Vector3 relativeMovement = moveDirection * aircraftMoveSpeed * accelerationFactor;
+
+        // Apply rotation with aircraft
+        Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
+        Vector3 rotatedRelativePos = rotationDelta * relativePos;
+        newPosition = aircraft.transform.position + rotatedRelativePos;
+
+        // Update position and rotation
+        transform.position = newPosition;
+        transform.rotation = aircraft.transform.rotation;
+
+        // Update velocity
+        if (accelerationFactor < 0.05f && isGrounded)
+        {
+            rigidBody.velocity = aircraftRb.velocity;
+        }
+        else
+        {
+            rigidBody.velocity = aircraftRb.velocity + relativeMovement;
+        }
+
+        // Store current aircraft transform for next frame
+        lastAircraftPosition = aircraft.transform.position;
+        lastAircraftRotation = aircraft.transform.rotation;
+
+        // Sync across network
+        if (IsServer)
+        {
+            netRelativePosition.Value = relativePos;
+            SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.velocity);
+        }
+        else
+        {
+            SyncPassengerPositionServerRpc(relativePos);
+        }
     }
-    else
+
+    private void UpdateAcceleration(float accelerationRate, float decelerationRate)
     {
-      accelerationFactor = Mathf.Clamp(accelerationFactor - decelerationRate, 0f, 1f);
+        if (Mathf.Abs(forwardMovement) > 0.1f || Mathf.Abs(lateralMovement) > 0.1f)
+        {
+            accelerationFactor = Mathf.Clamp(accelerationFactor + accelerationRate, 0f, 1f);
+        }
+        else
+        {
+            accelerationFactor = Mathf.Clamp(accelerationFactor - decelerationRate, 0f, 1f);
+        }
     }
-  }
 
-  private void ApplyGravity()
-  {
-    float gravityMultiplier = _inAircraft.Value ? flightGravityScale : 1f;
-    float effectiveGravity = groundGravity * gravityMultiplier;
-
-    // Don't apply extra gravity when grounded
-
-    rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
-  }
-
-  [ServerRpc]
-  private void JumpServerRpc()
-  {
-    JumpClientRpc();
-  }
-
-  [ClientRpc]
-  private void JumpClientRpc()
-  {
-    isGrounded = false;
-    if (_inAircraft.Value)
+    private void ApplyGravity()
     {
-      StartCoroutine(AirJump());
+        float gravityMultiplier = _inAircraft.Value ? flightGravityScale : 1f;
+        float effectiveGravity = groundGravity * gravityMultiplier;
+
+        // Don't apply extra gravity when grounded
+
+        rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
     }
-    else
+
+    [ServerRpc]
+    private void JumpServerRpc()
     {
-      rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        JumpClientRpc();
     }
-  }
 
-  private IEnumerator AirJump()
-  {
-    float duration = 0.35f; // Total duration of the jump
-    float timeElapsed = 0.0f;
-
-    while (timeElapsed < duration)
+    [ClientRpc]
+    private void JumpClientRpc()
     {
-      FlightController aircraft = FindObjectOfType<FlightController>();
-      if (aircraft != null)
-      {
-        Vector3 jumpDirection = aircraft.transform.up;
-        rigidBody.AddForce(jumpDirection * aircraftJumpForce, ForceMode.Impulse);
-      }
-      timeElapsed += Time.fixedDeltaTime;
-      yield return null; // Wait for the next frame
+        isGrounded = false;
+        if (_inAircraft.Value)
+        {
+            StartCoroutine(AirJump());
+        }
+        else
+        {
+            rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
     }
-  }
 
-  private void SetupCursor()
-  {
-    Cursor.lockState = CursorLockMode.Locked;
-    Cursor.visible = false;
-  }
-
-  public void SetIsPilot(bool r)
-  {
-    if (IsOwner)
+    private IEnumerator AirJump()
     {
-      _isPilot.Value = r;
-      Cursor.lockState = _isPilot.Value ? CursorLockMode.Confined : CursorLockMode.Locked;
-      Cursor.visible = _isPilot.Value;
+        float duration = 0.35f; // Total duration of the jump
+        float timeElapsed = 0.0f;
+
+        while (timeElapsed < duration)
+        {
+            FlightController aircraft = FindObjectOfType<FlightController>();
+            if (aircraft != null)
+            {
+                Vector3 jumpDirection = aircraft.transform.up;
+                rigidBody.AddForce(jumpDirection * aircraftJumpForce, ForceMode.Impulse);
+            }
+            timeElapsed += Time.fixedDeltaTime;
+            yield return null; // Wait for the next frame
+        }
     }
-  }
 
-  public bool GetIsPilot() => _isPilot.Value;
-
-  public bool GetInAircraft() => _inAircraft.Value;
-
-  public Camera GetCamera()
-  {
-    return _camera;
-  }
-
-  public void SetCamera(Camera cam)
-  {
-    _camera = cam;
-  }
-
-  [ServerRpc]
-  private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-  {
-    netPosition.Value = position;
-    netRotation.Value = rotation;
-    netVelocity.Value = velocity;
-  }
-
-  [ServerRpc]
-  private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
-  {
-    netRelativePosition.Value = relativePosition;
-  }
-
-  [ClientRpc]
-  private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-  {
-    if (!IsOwner)
+    private void SetupCursor()
     {
-      transform.position = position;
-      transform.rotation = rotation;
-      rigidBody.velocity = velocity;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
-  }
 
-  public void SetInAircraft(bool r)
-  {
-    if (IsOwner)
+    public void SetIsPilot(bool r)
     {
-      _inAircraft.Value = r;
-
-      // Reset aircraft reference when leaving
-      if (!r)
-      {
-        currentAircraft = null;
-      }
-
-      // Sync the state change
-      UpdateInAircraftStateServerRpc(r);
+        if (IsOwner)
+        {
+            _isPilot.Value = r;
+            Cursor.lockState = _isPilot.Value ? CursorLockMode.Confined : CursorLockMode.Locked;
+            Cursor.visible = _isPilot.Value;
+        }
     }
-  }
 
-  [ServerRpc]
-  private void UpdateInAircraftStateServerRpc(bool inAircraft)
-  {
-    _inAircraft.Value = inAircraft;
-  }
+    public bool GetIsPilot() => _isPilot.Value;
 
-  public Vector3 GetRelativeMovement()
-  {
-    // Return the current movement input as a local space vector
-    return new Vector3(lateralMovement, 0, forwardMovement) * aircraftMoveSpeed;
-  }
+    public bool GetInAircraft() => _inAircraft.Value;
+
+    public Camera GetCamera()
+    {
+        return _camera;
+    }
+
+    public void SetCamera(Camera cam)
+    {
+        _camera = cam;
+    }
+
+    [ServerRpc]
+    private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        netPosition.Value = position;
+        netRotation.Value = rotation;
+        netVelocity.Value = velocity;
+    }
+
+    [ServerRpc]
+    private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
+    {
+        netRelativePosition.Value = relativePosition;
+    }
+
+    [ClientRpc]
+    private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        if (!IsOwner)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+            rigidBody.velocity = velocity;
+        }
+    }
+
+    public void SetInAircraft(bool r)
+    {
+        if (IsOwner)
+        {
+            _inAircraft.Value = r;
+
+            // Reset aircraft reference when leaving
+            if (!r)
+            {
+                currentAircraft = null;
+            }
+
+            // Sync the state change
+            UpdateInAircraftStateServerRpc(r);
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateInAircraftStateServerRpc(bool inAircraft)
+    {
+        _inAircraft.Value = inAircraft;
+    }
+
+    public Vector3 GetRelativeMovement()
+    {
+        // Return the current movement input as a local space vector
+        return new Vector3(lateralMovement, 0, forwardMovement) * aircraftMoveSpeed;
+    }
 }

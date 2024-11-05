@@ -382,7 +382,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5501349854573808692}
   serializedVersion: 4
-  m_Mass: 4
+  m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -450,10 +450,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundMoveSpeed: 9
-  aircraftMoveSpeed: 9
-  jumpForce: 11
-  aircraftJumpForce: 9
+  groundMoveSpeed: 5
+  aircraftMoveSpeed: 3
+  jumpForce: 8
+  aircraftJumpForce: 5
   groundAcceleration: 0.05
   groundDeceleration: 0.75
   aircraftAcceleration: 0.03
