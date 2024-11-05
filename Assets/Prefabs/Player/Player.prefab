@@ -429,7 +429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3641421095
+  GlobalObjectIdHash: 602472223
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -450,10 +450,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b9eeba2238d8a4b8cd4c5bcd1af8c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundMoveSpeed: 5
-  aircraftMoveSpeed: 3
-  jumpForce: 8
-  aircraftJumpForce: 5
+  groundMoveSpeed: 10
+  aircraftMoveSpeed: 10
+  jumpForce: 2
+  aircraftJumpForce: 2
   groundAcceleration: 0.05
   groundDeceleration: 0.75
   aircraftAcceleration: 0.03
@@ -463,10 +463,10 @@ MonoBehaviour:
   groundCheckDistance: 1
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 375
   orientation: {fileID: 5767980992004618246}
   _camera: {fileID: 9010999993974044231}
-  isGrounded: 0
+  isGrounded: 1
   _inAircraft:
     m_InternalValue: 0
   _isPilot:
