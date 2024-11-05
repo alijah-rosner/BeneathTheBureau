@@ -271,6 +271,7 @@ public class FlightController : NetworkBehaviour
 
   private void UpdatePassengers()
   {
+    Debug.Log("Passenger Count:" + _passengers.Count);
     // Calculate the local velocity and its change compared to previous frame
     Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
     Vector3 localAcceleration = (currentLocalVelocity - previousLocalVelocity) / Time.fixedDeltaTime;

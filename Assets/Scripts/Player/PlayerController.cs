@@ -61,7 +61,7 @@ public class PlayerController : NetworkBehaviour
       return;
     }
     _camera.enabled = true;
-
+    rigidBody = GetComponent<Rigidbody>();
     // Initialize network variables
     if (IsServer)
     {
@@ -71,13 +71,24 @@ public class PlayerController : NetworkBehaviour
     }
   }
 
+
+  private void Awake()
+  {
+    // Initialize Rigidbody reference for ALL clients
+    rigidBody = GetComponent<Rigidbody>();
+
+    if (rigidBody == null)
+    {
+      Debug.LogError($"[PlayerController] No Rigidbody component found on {gameObject.name}");
+    }
+  }
+
   private void Start()
   {
     if (!IsOwner) return;
 
 
     SetupCursor();
-    rigidBody = GetComponent<Rigidbody>();
 
   }
 
