@@ -45,12 +45,21 @@ public class FlightController : NetworkBehaviour
 
   //Whether or not to recieve input
   private bool _isControlling = false;
-  [Header("Input")]
-  [SerializeField]
+
   //Container of all rigidbodies inside plane
   private HashSet<Rigidbody> _passengers = new();
 
   private Vector3 previousLocalVelocity;
+
+  // Network variables to sync state
+  private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
+  private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
+  private NetworkVariable<Vector3> netVelocity = new NetworkVariable<Vector3>();
+  private NetworkVariable<float> netThrust = new NetworkVariable<float>();
+  private NetworkVariable<float> netPitch = new NetworkVariable<float>();
+  private NetworkVariable<float> netYaw = new NetworkVariable<float>();
+  private NetworkVariable<float> netRoll = new NetworkVariable<float>();
+
 
   private bool _isMoving => rigid.velocity.magnitude > 0f;
   private bool _hasStartedMoving = false;
@@ -87,6 +96,7 @@ public class FlightController : NetworkBehaviour
 
   private void Update()
   {
+    if (!IsOwner) return;
     // Update altitude based on plane interface tool.
 
     UpdateAltimeter();
@@ -97,30 +107,49 @@ public class FlightController : NetworkBehaviour
     float autoPitch = 0f;
     float autoRoll = 0f;
     if (controller != null)
-      RunAutopilot(controller.MouseAimPos, out autoYaw, out autoPitch, out autoRoll);
+      RunAutopilotRpc(controller.MouseAimPos, out autoYaw, out autoPitch, out autoRoll);
 
     yaw = autoYaw;
     pitch = autoPitch;
     roll = autoRoll;
 
+    UpdateFlightControlsServerRpc(pitch, yaw, roll, thrust);
+
   }
+
   private void FixedUpdate()
   {
-    // Calculate thrust
+    if (!IsOwner)
+    {
+      // Non-owners should interpolate to the networked position/rotation
+      transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
+      transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
+      rigid.velocity = netVelocity.Value;
+      return;
+    }
+
+    // Original physics calculations...
     curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
-    // Smoothing for pitch and roll
-    currentPitch = Mathf.Lerp(currentPitch, pitch, Time.deltaTime * 2f);  // Smooth over 2 seconds
-    currentRoll = Mathf.Lerp(currentRoll, roll, Time.deltaTime * 2f);
+    currentPitch = Mathf.Lerp(currentPitch, netPitch.Value, Time.deltaTime * 2f);
+    currentRoll = Mathf.Lerp(currentRoll, netRoll.Value, Time.deltaTime * 2f);
 
-    // Apply forces with smoothed values
+    // Apply forces
     rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
-    rigid.AddRelativeTorque(new Vector3(turnTorque.x * currentPitch,
-                                        turnTorque.y * yaw,
-                                        -turnTorque.z * currentRoll) * forceMult,
-                            ForceMode.Force);
-
+    rigid.AddRelativeTorque(new Vector3(
+        turnTorque.x * currentPitch,
+        turnTorque.y * netYaw.Value,
+        -turnTorque.z * currentRoll) * forceMult,
+        ForceMode.Force);
 
     ClampRotation();
+
+    if (IsServer)
+    {
+      // Update network variables on the server
+      netPosition.Value = transform.position;
+      netRotation.Value = transform.rotation;
+      netVelocity.Value = rigid.velocity;
+    }
 
     // Check if the aircraft has started moving
     if (!_hasStartedMoving && _isMoving)
@@ -141,11 +170,7 @@ public class FlightController : NetworkBehaviour
 
   }
 
-
-  /// <summary>
-  /// Calculate the yaw, pitch, and roll based off the aircraft position relative to target.
-  /// </summary>
-  private void RunAutopilot(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
+  public void RunAutopilotRpc(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
   {
     // Convert destination to local space.
     var localFlyTarget = transform.InverseTransformPoint(flyTarget).normalized * sensitivity;
@@ -183,9 +208,6 @@ public class FlightController : NetworkBehaviour
     roll = Mathf.Lerp(wingsLevelRoll, agressiveRoll, wingsLevelInfluence);
   }
 
-  /// <summary>
-  /// Set desired altitude of target position.
-  /// </summary>
   private void UpdateAltimeter()
   {
     if (_isControlling)
@@ -203,9 +225,7 @@ public class FlightController : NetworkBehaviour
     }
   }
 
-  /// <summary>
-  /// Adds small random forces to simulate rumble effect .
-  /// </summary>
+
   private void AddRumbleEffect()
   {
     Vector3 rumble = new Vector3(
@@ -217,9 +237,6 @@ public class FlightController : NetworkBehaviour
     rigid.AddForce(rumble, ForceMode.Acceleration);
   }
 
-  /// <summary>
-  /// Calculate the yaw, pitch, and roll based off the aircraft position relative to target.
-  /// </summary>
   private void AddTurbulenceEffect()
   {
     _turbulenceFlag = true;
@@ -239,7 +256,6 @@ public class FlightController : NetworkBehaviour
 
     rigid.AddTorque(turbulenceTorque, ForceMode.Acceleration);
   }
-
 
   private void SetPassengersInAircraft(bool inAircraft)
   {
@@ -300,30 +316,89 @@ public class FlightController : NetworkBehaviour
     transform.localEulerAngles = new Vector3(pitch, currentRotation.y, roll);
   }
 
+  [ServerRpc]
+  private void UpdateFlightControlsServerRpc(float pitch, float yaw, float roll, float thrust)
+  {
+    // Update network variables on the server
+    netPitch.Value = pitch;
+    netYaw.Value = yaw;
+    netRoll.Value = roll;
+    netThrust.Value = thrust;
+  }
+
+  [ServerRpc]
+  private void AddPassengerServerRpc(NetworkObjectReference passengerNetObj)
+  {
+    if (passengerNetObj.TryGet(out NetworkObject networkObject))
+    {
+      var rb = networkObject.GetComponent<Rigidbody>();
+      if (rb != null)
+      {
+        _passengers.Add(rb);
+        AddPassengerClientRpc(passengerNetObj);
+      }
+    }
+  }
+
+  [ClientRpc]
+  private void AddPassengerClientRpc(NetworkObjectReference passengerNetObj)
+  {
+    if (!IsServer && passengerNetObj.TryGet(out NetworkObject networkObject))
+    {
+      var rb = networkObject.GetComponent<Rigidbody>();
+      if (rb != null)
+      {
+        _passengers.Add(rb);
+      }
+    }
+  }
+
+  [ServerRpc]
+  private void RemovePassengerServerRpc(NetworkObjectReference passengerNetObj)
+  {
+    if (passengerNetObj.TryGet(out NetworkObject networkObject))
+    {
+      var rb = networkObject.GetComponent<Rigidbody>();
+      if (rb != null)
+      {
+        _passengers.Add(rb);
+        RemovePassengerClientRpc(passengerNetObj);
+      }
+    }
+  }
+
+  [ClientRpc]
+  private void RemovePassengerClientRpc(NetworkObjectReference passengerNetObj)
+  {
+    if (!IsServer && passengerNetObj.TryGet(out NetworkObject networkObject))
+    {
+      var rb = networkObject.GetComponent<Rigidbody>();
+      if (rb != null)
+      {
+        _passengers.Add(rb);
+      }
+    }
+  }
+
 
   private void OnTriggerEnter(Collider other)
   {
-    if (other.GetComponent<Rigidbody>())
+    if (!IsServer) return;
+
+    if (other.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
+        other.TryGetComponent<Rigidbody>(out Rigidbody rb))
     {
-      _passengers.Add(other.GetComponent<Rigidbody>());
-      if (_isMoving && other.GetComponent<PlayerController>())
-      {
-        other.GetComponent<Rigidbody>().drag = 0;
-        Debug.Log(rigid.velocity.magnitude);
-        other.GetComponent<PlayerController>().SetInAircraft(true);
-      }
+      AddPassengerServerRpc(new NetworkObjectReference(netObj));
     }
   }
   private void OnTriggerExit(Collider other)
   {
-    if (other.GetComponent<Rigidbody>())
+    if (!IsServer) return;
+
+    if (other.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
+        other.TryGetComponent<Rigidbody>(out Rigidbody rb))
     {
-      _passengers.Remove(other.GetComponent<Rigidbody>());
-      other.transform.parent = null;
-      if (other.GetComponent<PlayerController>())
-      {
-        other.GetComponent<PlayerController>().SetInAircraft(false);
-      }
+      RemovePassengerServerRpc(new NetworkObjectReference(netObj));
     }
   }
 }

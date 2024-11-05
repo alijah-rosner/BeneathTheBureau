@@ -64,6 +64,7 @@ public class PlaneInterface : NetworkBehaviour
     aircraftCamera.SetActive(true);
     aircraft.GetComponent<FlightController>().enabled = true;
     aircraft.GetComponent<FlightController>().TriggerController(true);
+    aircraft.GetComponent<FlightController>().NetworkObject.ChangeOwnership(pilot.GetComponent<NetworkObject>().OwnerClientId);
   }
 
   void ActivatePlayerController()
