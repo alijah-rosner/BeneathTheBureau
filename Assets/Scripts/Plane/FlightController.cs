@@ -262,9 +262,9 @@ public class FlightController : NetworkBehaviour
     foreach (Rigidbody passenger in _passengers)
     {
       passenger.drag = 0f;
-      if (passenger.GetComponent<SP_PlayerController>())
+      if (passenger.GetComponent<PlayerController>())
       {
-        passenger.GetComponent<SP_PlayerController>().SetInAircraft(inAircraft);
+        passenger.GetComponent<PlayerController>().SetInAircraft(inAircraft);
       }
     }
   }
