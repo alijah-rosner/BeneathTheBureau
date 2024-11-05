@@ -280,41 +280,6 @@ public class FlightController : NetworkBehaviour
     }
   }
 
-  [ClientRpc]
-  private void ApplyPassengerForcesClientRpc(
-        NetworkObjectReference passengerRef,
-        Vector3 counteractingForce,
-        bool hasTurbulence)
-  {
-    // Try to get the referenced network object
-    if (!passengerRef.TryGet(out NetworkObject passengerObj))
-      return;
-
-    // Get the rigidbody component
-    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
-      return;
-
-    if (!hasTurbulence)
-    {
-      // Apply normal force
-      passengerRb.AddForce(counteractingForce, ForceMode.Acceleration);
-    }
-    else
-    {
-      // Generate synchronized turbulence using a deterministic seed
-      uint seed = (uint)(Time.time * 1000 + passengerObj.NetworkObjectId);
-      Random.InitState((int)seed);
-
-      Vector3 turbulenceJerk = new Vector3(
-          Random.Range(-1f, 1f),
-          Random.Range(-1f, 1f),
-          Random.Range(-1f, 1f)
-      ) * turbulenceForce * 2f;
-
-      passengerRb.AddForce(counteractingForce + turbulenceJerk, ForceMode.Acceleration);
-    }
-  }
-
   private void UpdatePassengers()
   {
     if (!IsServer) return;
@@ -335,7 +300,7 @@ public class FlightController : NetworkBehaviour
       NetworkObject passengerNetObj = passenger.GetComponent<NetworkObject>();
       if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
 
-      // Instead of creating NetworkObjectReference, pass the NetworkObjectId
+      // pass the NetworkObjectId and add turbulence in direction
       SyncPassengerPhysicsClientRpc(
           passengerNetObj.NetworkObjectId,
           transform.TransformDirection(localAcceleration),
@@ -356,7 +321,6 @@ public class FlightController : NetworkBehaviour
     if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
       return;
 
-    // Rest of your physics calculations...
     Vector3 desiredVelocity = netAircraftVelocity.Value;
 
     if (passengerObj.TryGetComponent<PlayerController>(out var playerController))
