@@ -125,6 +125,7 @@ public class PlayerController : NetworkBehaviour
                     transform.rotation = Quaternion.Lerp(transform.rotation, aircraft.transform.rotation, Time.fixedDeltaTime * 15f);
                 }
             }
+            return; // Early return for non-owners
         }
 
         if (_inAircraft.Value)
@@ -138,16 +139,8 @@ public class PlayerController : NetworkBehaviour
 
         ApplyGravity();
 
-        // Update network variables if we're the server
-        if (IsServer)
-        {
-            UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
-        }
-        else
-        {
-            // Request update from server
-            UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
-        }
+        // Only the owner updates network variables
+        UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
     }
 
 
@@ -370,6 +363,7 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
     {
+        if (!IsOwner) return;
         netPosition.Value = position;
         netRotation.Value = rotation;
         netVelocity.Value = velocity;
