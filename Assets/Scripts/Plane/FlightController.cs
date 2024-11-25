@@ -333,33 +333,6 @@ public class FlightController : NetworkBehaviour
         passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));
     }
 
-    //[ClientRpc]
-    //private void SyncPassengerPhysicsClientRpc(
-    // ulong networkObjectId,
-    // Vector3 localAcceleration,
-    // bool hasTurbulence)
-    //{
-    //    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject passengerObj))
-    //        return;
-
-    //    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
-    //        return;
-
-    //    // Calculate the desired position relative to aircraft
-    //    Vector3 relativePos = passengerRb.position - transform.position;
-    //    Vector3 desiredRelativePos = Quaternion.Inverse(transform.rotation) * relativePos;
-
-    //    // Update position directly instead of only using forces
-    //    Vector3 targetPos = transform.position + transform.rotation * desiredRelativePos;
-    //    passengerRb.MovePosition(Vector3.Lerp(passengerRb.position, targetPos, Time.fixedDeltaTime * 20f));
-
-    //    // Apply velocity matching
-    //    Vector3 desiredVelocity = netAircraftVelocity.Value;
-    //    passengerRb.velocity = Vector3.Lerp(passengerRb.velocity, desiredVelocity, Time.fixedDeltaTime * 10f);
-
-    //    // Apply rotation
-    //    passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));
-    //}
 
     // Convert angles greater than 180 to a negative equivalent angle
     // Clamp to keep it from exceeding desired values

@@ -22,7 +22,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private float groundCheckDistance = 0.015f;
 
     [Header("References")]
-    [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
+    [SerializeField] private LayerMask groundLayer; 
     public Transform orientation;
     [SerializeField] private Camera _camera;
 
@@ -86,10 +86,7 @@ public class PlayerController : NetworkBehaviour
     private void Start()
     {
         if (!IsOwner) return;
-
-
         SetupCursor();
-
     }
 
     private void Update()
@@ -98,7 +95,6 @@ public class PlayerController : NetworkBehaviour
         {
             CheckGround();
             HandleInput();
-
         }
     }
 
@@ -350,15 +346,6 @@ public class PlayerController : NetworkBehaviour
 
     public bool GetInAircraft() => _inAircraft.Value;
 
-    public Camera GetCamera()
-    {
-        return _camera;
-    }
-
-    public void SetCamera(Camera cam)
-    {
-        _camera = cam;
-    }
 
     [ServerRpc]
     private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
@@ -413,5 +400,14 @@ public class PlayerController : NetworkBehaviour
     {
         // Return the current movement input as a local space vector
         return new Vector3(lateralMovement, 0, forwardMovement) * aircraftMoveSpeed;
+    }
+    public Camera GetCamera()
+    {
+        return _camera;
+    }
+
+    public void SetCamera(Camera cam)
+    {
+        _camera = cam;
     }
 }
