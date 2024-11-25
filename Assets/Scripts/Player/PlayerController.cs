@@ -22,7 +22,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private float groundCheckDistance = 0.015f;
 
     [Header("References")]
-    [SerializeField] private LayerMask groundLayer; 
+    [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
     public Transform orientation;
     [SerializeField] private Camera _camera;
 
@@ -86,7 +86,10 @@ public class PlayerController : NetworkBehaviour
     private void Start()
     {
         if (!IsOwner) return;
+
+
         SetupCursor();
+
     }
 
     private void Update()
@@ -95,6 +98,7 @@ public class PlayerController : NetworkBehaviour
         {
             CheckGround();
             HandleInput();
+
         }
     }
 
