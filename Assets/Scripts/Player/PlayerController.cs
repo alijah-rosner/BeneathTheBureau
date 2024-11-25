@@ -113,7 +113,18 @@ public class PlayerController : NetworkBehaviour
                 transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
                 rigidBody.velocity = netVelocity.Value;
             }
-            return;
+            else
+            {
+                FlightController aircraft = FindObjectOfType<FlightController>();
+                if (aircraft != null)
+                {
+                    // Use relative position to aircraft for interpolation
+                    Vector3 targetPos = aircraft.transform.position +
+                        aircraft.transform.rotation * netRelativePosition.Value;
+                    transform.position = Vector3.Lerp(transform.position, targetPos, Time.fixedDeltaTime * 15f);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, aircraft.transform.rotation, Time.fixedDeltaTime * 15f);
+                }
+            }
         }
 
         if (_inAircraft.Value)

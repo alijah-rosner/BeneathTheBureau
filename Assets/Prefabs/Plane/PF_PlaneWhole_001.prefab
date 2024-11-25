@@ -939,12 +939,12 @@ MonoBehaviour:
   acceleration: 100
   turnTorque: {x: 90, y: 45, z: 60}
   forceMult: 800
-  rumbleForce: 0
-  turbulenceForce: 0
-  turbulenceTorqueForce: 0
-  turbulenceChance: 0
+  rumbleForce: 2
+  turbulenceForce: 5
+  turbulenceTorqueForce: 2
+  turbulenceChance: 0.005
   sensitivity: 3
-  aggressiveTurnAngle: 1
+  aggressiveTurnAngle: 10
   pitch: 0
   yaw: 0
   roll: 0
@@ -977,9 +977,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7770530565923251601}
   serializedVersion: 4
-  m_Mass: 800
-  m_Drag: 4
-  m_AngularDrag: 4
+  m_Mass: 1500
+  m_Drag: 10
+  m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
