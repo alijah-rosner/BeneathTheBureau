@@ -62,7 +62,7 @@ public class FlightController : NetworkBehaviour
     private NetworkVariable<Vector3> netAngularVelocity = new NetworkVariable<Vector3>();
 
 
-    private bool _isMoving => rigid.velocity.magnitude > 0f;
+    private bool _isMoving => rigid.linearVelocity.magnitude > 0f;
     private bool _hasStartedMoving = false;
     private bool _turbulenceFlag = false;
 
@@ -132,7 +132,7 @@ public class FlightController : NetworkBehaviour
             // Clients interpolate to the networked position/rotation
             transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
             transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
-            rigid.velocity = netVelocity.Value;
+            rigid.linearVelocity = netVelocity.Value;
             return;
         }
 
@@ -157,7 +157,7 @@ public class FlightController : NetworkBehaviour
         // Update network variables on the server
         netPosition.Value = transform.position;
         netRotation.Value = transform.rotation;
-        netVelocity.Value = rigid.velocity;
+        netVelocity.Value = rigid.linearVelocity;
 
         // Check if the aircraft has started moving
         if (!_hasStartedMoving && _isMoving)
@@ -242,7 +242,7 @@ public class FlightController : NetworkBehaviour
     {
         foreach (Rigidbody passenger in _passengers)
         {
-            passenger.drag = 0f;
+            passenger.linearDamping = 0f;
             if (passenger.GetComponent<PlayerController>())
             {
                 passenger.GetComponent<PlayerController>().SetInAircraft(inAircraft);
@@ -255,13 +255,13 @@ public class FlightController : NetworkBehaviour
     {
         if (!IsServer) return;
 
-        Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.velocity);
+        Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.linearVelocity);
         Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
 
         // Update network variables
         netLocalAcceleration.Value = localAcceleration;
         netPreviousLocalVelocity.Value = currentLocalVelocity;
-        netAircraftVelocity.Value = rigid.velocity;
+        netAircraftVelocity.Value = rigid.linearVelocity;
         netAngularVelocity.Value = rigid.angularVelocity;
 
         foreach (Rigidbody passenger in _passengers)
@@ -302,7 +302,7 @@ public class FlightController : NetworkBehaviour
 
         // Apply velocity matching
         Vector3 desiredVelocity = netAircraftVelocity.Value;
-        passengerRb.velocity = Vector3.Lerp(passengerRb.velocity, desiredVelocity, Time.fixedDeltaTime * 10f);
+        passengerRb.linearVelocity = Vector3.Lerp(passengerRb.linearVelocity, desiredVelocity, Time.fixedDeltaTime * 10f);
 
         // Apply rotation
         passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));

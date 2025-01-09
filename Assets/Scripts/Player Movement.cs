@@ -47,11 +47,11 @@ public class DemoPlayerMovement : NetworkBehaviour
 
       if (isGrounded)
       {
-        rigidBody.drag = 4.5f;
+        rigidBody.linearDamping = 4.5f;
       }
       else
       {
-        rigidBody.drag = .75f;
+        rigidBody.linearDamping = .75f;
       }
 
       MovePlayer();
@@ -106,7 +106,7 @@ public class DemoPlayerMovement : NetworkBehaviour
       accelerationFactor = Mathf.Clamp(accelerationFactor /= turnFactor, 0, 1);
       moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
 
-      if (rigidBody.velocity.magnitude < topSpeed && isGrounded)
+      if (rigidBody.linearVelocity.magnitude < topSpeed && isGrounded)
       {
         rigidBody.AddForce(moveDirection * moveSpeed * accelerationFactor, ForceMode.Force);
       }

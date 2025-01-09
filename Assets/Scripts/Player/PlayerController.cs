@@ -111,7 +111,7 @@ public class PlayerController : NetworkBehaviour
             {
                 transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
                 transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
-                rigidBody.velocity = netVelocity.Value;
+                rigidBody.linearVelocity = netVelocity.Value;
             }
             else
             {
@@ -140,7 +140,7 @@ public class PlayerController : NetworkBehaviour
         ApplyGravity();
 
         // Only the owner updates network variables
-        UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.velocity);
+        UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.linearVelocity);
     }
 
 
@@ -192,17 +192,17 @@ public class PlayerController : NetworkBehaviour
         // Apply drag only when grounded
         if (isGrounded)
         {
-            rigidBody.drag = 1f;
+            rigidBody.linearDamping = 1f;
         }
         else
         {
-            rigidBody.drag = 0f;
+            rigidBody.linearDamping = 0f;
         }
     }
 
     private void HandleAircraftMovement()
     {
-        rigidBody.drag = 0f;
+        rigidBody.linearDamping = 0f;
         rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
         FlightController aircraft = FindObjectOfType<FlightController>();
         if (aircraft == null) return;
@@ -247,11 +247,11 @@ public class PlayerController : NetworkBehaviour
         // Update velocity
         if (accelerationFactor < 0.05f && isGrounded)
         {
-            rigidBody.velocity = aircraftRb.velocity;
+            rigidBody.linearVelocity = aircraftRb.linearVelocity;
         }
         else
         {
-            rigidBody.velocity = aircraftRb.velocity + relativeMovement;
+            rigidBody.linearVelocity = aircraftRb.linearVelocity + relativeMovement;
         }
 
         // Store current aircraft transform for next frame
@@ -262,7 +262,7 @@ public class PlayerController : NetworkBehaviour
         if (IsServer)
         {
             netRelativePosition.Value = relativePos;
-            SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.velocity);
+            SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.linearVelocity);
         }
         else
         {
@@ -373,7 +373,7 @@ public class PlayerController : NetworkBehaviour
         {
             transform.position = position;
             transform.rotation = rotation;
-            rigidBody.velocity = velocity;
+            rigidBody.linearVelocity = velocity;
         }
     }
 

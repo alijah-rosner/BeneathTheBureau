@@ -117,11 +117,11 @@ public class SP_PlayerController : MonoBehaviour
     // Apply drag only when grounded
     if (isGrounded)
     {
-      rigidBody.drag = 1f;
+      rigidBody.linearDamping = 1f;
     }
     else
     {
-      rigidBody.drag = 0f;
+      rigidBody.linearDamping = 0f;
     }
   }
 
@@ -150,7 +150,7 @@ public class SP_PlayerController : MonoBehaviour
 
       if (accelerationFactor < 0.05f && isGrounded)
       {
-        rigidBody.velocity = aircraftRb.velocity;
+        rigidBody.linearVelocity = aircraftRb.linearVelocity;
       }
       else
       {
@@ -158,7 +158,7 @@ public class SP_PlayerController : MonoBehaviour
         relativeVelocity = moveDirection * aircraftMoveSpeed * accelerationFactor;
 
         // Combine aircraft velocity with relative movement
-        rigidBody.velocity = aircraftRb.velocity + relativeVelocity;
+        rigidBody.linearVelocity = aircraftRb.linearVelocity + relativeVelocity;
       }
     }
   }
