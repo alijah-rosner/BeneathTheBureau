@@ -59,6 +59,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -197,6 +200,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -253,10 +259,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2057995089246142475, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 183186805
+      value: 287306328
       objectReference: {fileID: 0}
     - target: {fileID: 2137369785585959715, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: f83e03fa11076bf48b6ce03356f65a91, type: 2}
     - target: {fileID: 5501349854573808692, guid: 24b54c19703014341b3bbff9b561e767, type: 3}

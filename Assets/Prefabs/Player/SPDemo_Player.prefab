@@ -10,7 +10,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 417080042839615562, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1864551360
+      value: 2759100937
+      objectReference: {fileID: 0}
+    - target: {fileID: 465924119293298741, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6133352095041660021, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}
       propertyPath: m_Name

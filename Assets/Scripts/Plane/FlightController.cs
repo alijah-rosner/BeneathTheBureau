@@ -359,6 +359,7 @@ public class FlightController : NetworkBehaviour
             var rb = networkObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
+                networkObject.gameObject.transform.parent = transform;
                 _passengers.Add(rb);
             }
         }
@@ -388,6 +389,7 @@ public class FlightController : NetworkBehaviour
             var rb = networkObject.GetComponent<Rigidbody>();
             if (rb != null)
             {
+                networkObject.gameObject.transform.parent = transform;
                 _passengers.Remove(rb);
             }
         }
