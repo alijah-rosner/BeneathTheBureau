@@ -346,7 +346,6 @@ public class FlightController : NetworkBehaviour
         {
             networkObject.gameObject.transform.parent = transform;
             _passengers.Add(rb);
-            AddPassengerClientRpc(networkObjectId);
         }
     }
 
@@ -376,7 +375,6 @@ public class FlightController : NetworkBehaviour
         {
             networkObject.gameObject.transform.parent = null;
             _passengers.Remove(rb);
-            RemovePassengerClientRpc(networkObjectId);
         }
     }
 
@@ -403,8 +401,16 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            AddPassengerServerRpc(netObj.NetworkObjectId);
+            if (!other.GetComponent<NetworkObject>().HasOwnershipStatus(NetworkObject.OwnershipStatus.SessionOwner))
+            {
+                AddPassengerClientRpc(netObj.NetworkObjectId);
+            }
+            else
+            {
+                AddPassengerServerRpc(netObj.NetworkObjectId);
+            }
         }
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -414,7 +420,14 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            RemovePassengerServerRpc(netObj.NetworkObjectId);
+            if (!other.GetComponent<NetworkObject>().HasOwnershipStatus(NetworkObject.OwnershipStatus.SessionOwner))
+            {
+                RemovePassengerClientRpc(netObj.NetworkObjectId);
+            }
+            else
+            {
+                RemovePassengerServerRpc(netObj.NetworkObjectId);
+            }
         }
     }
 }
