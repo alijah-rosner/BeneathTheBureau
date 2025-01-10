@@ -278,6 +278,14 @@ public class FlightController : NetworkBehaviour
                 netTurbulenceFlag.Value
             );
         }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            foreach (Rigidbody pass in _passengers)
+            {
+                Debug.Log("Passenger:" + pass.gameObject.GetComponent<NetworkObject>().name);
+            }
+
+        }
     }
 
     [ClientRpc]
