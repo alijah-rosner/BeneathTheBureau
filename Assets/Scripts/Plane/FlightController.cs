@@ -404,11 +404,11 @@ public class FlightController : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!IsServer)
-        {
-            Debug.Log("Not Server");
-        return;
-        }
+        //if (!IsServer)
+        //{
+        //    Debug.Log("Not Server");
+        //return;
+        //}
 
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
@@ -420,11 +420,11 @@ public class FlightController : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!IsServer)
-        {
-            Debug.Log("Not Server");
-            return;
-        }
+        //if (!IsServer)
+        //{
+        //    Debug.Log("Not Server");
+        //    return;
+        //}
 
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
