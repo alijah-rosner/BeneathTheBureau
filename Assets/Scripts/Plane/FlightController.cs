@@ -253,7 +253,7 @@ public class FlightController : NetworkBehaviour
 
     private void UpdatePassengers()
     {
-        //if (!IsServer) return;
+        if (!IsServer) return;
 
         Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.linearVelocity);
         Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
