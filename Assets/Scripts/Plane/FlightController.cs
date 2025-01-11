@@ -440,7 +440,7 @@ public class FlightController : NetworkBehaviour
     {
         NetworkObject netObj = other.GetComponent<NetworkObject>();
 
-        if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb) && !_passengers.Contains(other.GetComponent<Rigidbody>())
+        if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb) && !_passengers.Contains(other.GetComponent<Rigidbody>()))
         {
             _passengers.Add(other.GetComponent<Rigidbody>());
             if (_isMoving && other.GetComponent<PlayerController>())
