@@ -207,6 +207,12 @@ public class PlayerController : NetworkBehaviour
         {
             rigidBody.linearDamping = 0f;
         }
+        if (_inAircraft.Value)
+        {
+            FlightController aircraft = FindObjectOfType<FlightController>();
+            if (aircraft == null) return;
+            transform.rotation = aircraft.transform.rotation;
+        }
     }
 
 
