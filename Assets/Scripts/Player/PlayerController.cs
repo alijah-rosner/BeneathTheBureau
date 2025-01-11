@@ -354,7 +354,7 @@ public class PlayerController : NetworkBehaviour
     [ServerRpc]
     private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
     {
-        if (!IsOwner) return;
+        //if (!IsOwner) return;
         netPosition.Value = position;
         netRotation.Value = rotation;
         netVelocity.Value = velocity;
