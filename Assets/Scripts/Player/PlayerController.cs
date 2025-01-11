@@ -127,8 +127,8 @@ public class PlayerController : NetworkBehaviour
             }
             return; // Early return for non-owners
         }
-
         HandleGroundMovement();
+
         //if (_inAircraft.Value)
         //{
         //    HandleAircraftMovement();
