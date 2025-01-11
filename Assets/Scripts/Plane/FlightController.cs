@@ -277,7 +277,7 @@ public class FlightController : NetworkBehaviour
             //    transform.TransformDirection(localAcceleration),
             //    netTurbulenceFlag.Value
             //);
-        }
+        }                
         if (Input.GetKeyDown(KeyCode.J))
         {
             foreach (Rigidbody pass in _passengers)
@@ -413,8 +413,6 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            other.GetComponent<Rigidbody>().linearDamping = 0;
-            other.GetComponent<PlayerController>().SetInAircraft(true);
             netObj.gameObject.transform.parent = transform;
             AddPassengerServerRpc(netObj.NetworkObjectId);
         }
@@ -431,31 +429,9 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
-            if (other.TryGetComponent<PlayerController>(out PlayerController pc))
-            {
-                pc.SetInAircraft(false);
-                other.GetComponent<Rigidbody>().linearDamping = 1;
-                pc.transform.parent = null;
-            }
             netObj.gameObject.transform.parent = null;
             RemovePassengerServerRpc(netObj.NetworkObjectId);
         }
     }
 
-    private void OnTriggerStay(Collider other)
-    {
-        NetworkObject netObj = other.GetComponent<NetworkObject>();
-
-        if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb) && !_passengers.Contains(other.GetComponent<Rigidbody>()))
-        {
-            _passengers.Add(other.GetComponent<Rigidbody>());
-            if (_isMoving && other.GetComponent<PlayerController>())
-            {
-                other.GetComponent<Rigidbody>().linearDamping = 0;
-                other.GetComponent<PlayerController>().SetInAircraft(true);
-                netObj.gameObject.transform.parent = transform;
-                AddPassengerServerRpc(netObj.NetworkObjectId);
-            }
-        }
-    }
 }
