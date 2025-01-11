@@ -958,12 +958,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   controller: {fileID: 0}
-  thrust: 500
+  thrust: 750
   pitchModifier: 25
   maxThrust: 100
   acceleration: 100
   turnTorque: {x: 90, y: 45, z: 60}
-  forceMult: 800
+  forceMult: 1000
   rumbleForce: 2
   turbulenceForce: 5
   turbulenceTorqueForce: 2
@@ -1002,7 +1002,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7770530565923251601}
   serializedVersion: 4
-  m_Mass: 1500
+  m_Mass: 3000
   m_Drag: 10
   m_AngularDrag: 3
   m_CenterOfMass: {x: 0, y: 0, z: 0}

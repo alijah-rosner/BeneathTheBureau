@@ -7,14 +7,16 @@ using Unity.Netcode;
 public class PlayerController : NetworkBehaviour
 {
     [Header("Movement Settings")]
-    [SerializeField] private float groundMoveSpeed = 40f;
-    [SerializeField] private float aircraftMoveSpeed = 5f;
+    [SerializeField] private float groundMoveSpeed = 20f;
+    [SerializeField] private float aircraftMoveSpeed = 20f;
     [SerializeField] private float jumpForce = 7f;
     [SerializeField] private float aircraftJumpForce = 9f;
-    [SerializeField] private float groundAcceleration = 0.05f;
-    [SerializeField] private float groundDeceleration = 0.75f;
-    [SerializeField] private float aircraftAcceleration = 0.03f;
-    [SerializeField] private float aircraftDeceleration = 0.5f;
+    [SerializeField] private float groundAcceleration = 2.0f;
+    [SerializeField] private float groundDeceleration = 3.0f;
+    [SerializeField] private float aircraftAcceleration = 2.0f;
+    [SerializeField] private float aircraftDeceleration = 3.0f;
+    [SerializeField] private float groundGravity = 9.81f;
+    [SerializeField] private const float flightGravityScale = 2f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private float groundCheckRadius = 0.5f;
@@ -40,8 +42,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    private const float groundGravity = 9.81f;
-    private const float flightGravityScale = 2f;
+
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
