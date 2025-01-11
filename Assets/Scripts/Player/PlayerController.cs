@@ -233,7 +233,7 @@ public class PlayerController : NetworkBehaviour
 
         // Calculate relative movement within aircraft
         Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-        Vector3 relativeMovement = moveDirection * aircraftMoveSpeed * accelerationFactor;
+        Vector3 relativeMovement = moveDirection /** aircraftMoveSpeed*/ * accelerationFactor;
 
         // Apply rotation with aircraft
         Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
