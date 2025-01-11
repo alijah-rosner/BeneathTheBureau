@@ -128,14 +128,14 @@ public class PlayerController : NetworkBehaviour
             return; // Early return for non-owners
         }
 
-        if (_inAircraft.Value)
-        {
-            HandleAircraftMovement();
-        }
-        else
-        {
-            HandleGroundMovement();
-        }
+        HandleGroundMovement();
+        //if (_inAircraft.Value)
+        //{
+        //    HandleAircraftMovement();
+        //}
+        //else
+        //{
+        //}
 
         ApplyGravity();
 
