@@ -198,7 +198,7 @@ public class PlayerController : NetworkBehaviour
         rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
 
         // Apply drag only when grounded
-        if (isGrounded)
+        if (isGrounded && !_inAircraft.Value)
         {
             rigidBody.linearDamping = 1f;
         }

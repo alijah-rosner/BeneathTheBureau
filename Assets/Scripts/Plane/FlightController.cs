@@ -277,7 +277,7 @@ public class FlightController : NetworkBehaviour
             //    transform.TransformDirection(localAcceleration),
             //    netTurbulenceFlag.Value
             //);
-        }                
+        }
         if (Input.GetKeyDown(KeyCode.J))
         {
             foreach (Rigidbody pass in _passengers)
@@ -401,6 +401,18 @@ public class FlightController : NetworkBehaviour
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        NetworkObject netObj = other.GetComponent<NetworkObject>();
+        if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
+        {
+            if (!_passengers.Contains(rb))
+            {
+                netObj.gameObject.transform.parent = transform;
+                AddPassengerServerRpc(netObj.NetworkObjectId);
+            }
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -433,5 +445,4 @@ public class FlightController : NetworkBehaviour
             RemovePassengerServerRpc(netObj.NetworkObjectId);
         }
     }
-
 }
