@@ -104,29 +104,29 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsOwner)
-        {
-            // Non-owners should interpolate to the networked position
-            if (!_inAircraft.Value)
-            {
-                transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
-                transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
-                rigidBody.linearVelocity = netVelocity.Value;
-            }
-            else
-            {
-                FlightController aircraft = FindObjectOfType<FlightController>();
-                if (aircraft != null)
-                {
-                    // Use relative position to aircraft for interpolation
-                    Vector3 targetPos = aircraft.transform.position +
-                        aircraft.transform.rotation * netRelativePosition.Value;
-                    transform.position = Vector3.Lerp(transform.position, targetPos, Time.fixedDeltaTime * 15f);
-                    transform.rotation = Quaternion.Lerp(transform.rotation, aircraft.transform.rotation, Time.fixedDeltaTime * 15f);
-                }
-            }
-            return; // Early return for non-owners
-        }
+        //if (!IsOwner)
+        //{
+        //    // Non-owners should interpolate to the networked position
+        //    if (!_inAircraft.Value)
+        //    {
+        //        transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
+        //        transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
+        //        rigidBody.linearVelocity = netVelocity.Value;
+        //    }
+        //    else
+        //    {
+        //        FlightController aircraft = FindObjectOfType<FlightController>();
+        //        if (aircraft != null)
+        //        {
+        //            // Use relative position to aircraft for interpolation
+        //            Vector3 targetPos = aircraft.transform.position +
+        //                aircraft.transform.rotation * netRelativePosition.Value;
+        //            transform.position = Vector3.Lerp(transform.position, targetPos, Time.fixedDeltaTime * 15f);
+        //            transform.rotation = Quaternion.Lerp(transform.rotation, aircraft.transform.rotation, Time.fixedDeltaTime * 15f);
+        //        }
+        //    }
+        //    return; // Early return for non-owners
+        //}
         HandleGroundMovement();
 
         //if (_inAircraft.Value)
