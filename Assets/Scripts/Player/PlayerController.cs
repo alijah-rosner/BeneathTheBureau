@@ -98,7 +98,6 @@ public class PlayerController : NetworkBehaviour
         {
             CheckGround();
             HandleInput();
-
         }
     }
 
@@ -139,7 +138,7 @@ public class PlayerController : NetworkBehaviour
 
         ApplyGravity();
 
-        // Only the owner updates network variables
+        // Only the owner updates network variables //getting error clock this
         UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.linearVelocity);
     }
 
@@ -167,12 +166,21 @@ public class PlayerController : NetworkBehaviour
         {
             forwardMovement = Input.GetAxisRaw("Vertical");
             lateralMovement = Input.GetAxisRaw("Horizontal");
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            {
+                JumpServerRpc();
+            }
+        }
+        else
+        {
+            FlightController aircraft = FindFirstObjectByType<FlightController>();
+
+            if (aircraft != null)
+            {
+                transform.rotation = aircraft.transform.rotation;
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            JumpServerRpc();
-        }
     }
 
     private void HandleGroundMovement()
@@ -200,75 +208,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    //private void HandleAircraftMovement()
-    //{
-    //    rigidBody.linearDamping = 0f;
-    //    rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
-    //    FlightController aircraft = FindObjectOfType<FlightController>();
-    //    if (aircraft == null) return;
-
-    //    // Store reference to current aircraft if not already set
-    //    if (currentAircraft != aircraft)
-    //    {
-    //        currentAircraft = aircraft;
-    //        lastAircraftPosition = aircraft.transform.position;
-    //        lastAircraftRotation = aircraft.transform.rotation;
-    //    }
-
-    //    if (!aircraft.GetIsMoving())
-    //    {
-    //        HandleGroundMovement();
-    //        return;
-    //    }
-
-    //    Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
-    //    UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
-
-    //    // Calculate relative position to aircraft
-    //    Vector3 relativePos = transform.position - aircraft.transform.position;
-
-    //    // Update position based on aircraft movement
-    //    Vector3 aircraftDelta = aircraft.transform.position - lastAircraftPosition;
-    //    Vector3 newPosition = transform.position + aircraftDelta;
-
-    //    // Calculate relative movement within aircraft
-    //    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-    //    Vector3 relativeMovement = moveDirection /** aircraftMoveSpeed*/ * accelerationFactor;
-
-    //    // Apply rotation with aircraft
-    //    Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
-    //    Vector3 rotatedRelativePos = rotationDelta * relativePos;
-    //    newPosition = aircraft.transform.position + rotatedRelativePos;
-
-    //    // Update position and rotation
-    //    transform.position = newPosition;
-    //    transform.rotation = aircraft.transform.rotation;
-
-    //    // Update velocity
-    //    if (accelerationFactor < 0.05f && isGrounded)
-    //    {
-    //        rigidBody.linearVelocity = aircraftRb.linearVelocity;
-    //    }
-    //    else
-    //    {
-    //        rigidBody.linearVelocity = aircraftRb.linearVelocity + relativeMovement;
-    //    }
-
-    //    // Store current aircraft transform for next frame
-    //    lastAircraftPosition = aircraft.transform.position;
-    //    lastAircraftRotation = aircraft.transform.rotation;
-
-    //    // Sync across network
-    //    if (IsServer)
-    //    {
-    //        netRelativePosition.Value = relativePos;
-    //        SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.linearVelocity);
-    //    }
-    //    else
-    //    {
-    //        SyncPassengerPositionServerRpc(relativePos);
-    //    }
-    //}
 
     private void UpdateAcceleration(float accelerationRate, float decelerationRate)
     {
@@ -319,7 +258,7 @@ public class PlayerController : NetworkBehaviour
 
         while (timeElapsed < duration)
         {
-            FlightController aircraft = FindObjectOfType<FlightController>();
+            FlightController aircraft = FindFirstObjectByType<FlightController>();
             if (aircraft != null)
             {
                 Vector3 jumpDirection = aircraft.transform.up;
@@ -414,4 +353,74 @@ public class PlayerController : NetworkBehaviour
     {
         _camera = cam;
     }
+
+    //private void HandleAircraftMovement()
+    //{
+    //    rigidBody.linearDamping = 0f;
+    //    rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
+    //    FlightController aircraft = FindObjectOfType<FlightController>();
+    //    if (aircraft == null) return;
+
+    //    // Store reference to current aircraft if not already set
+    //    if (currentAircraft != aircraft)
+    //    {
+    //        currentAircraft = aircraft;
+    //        lastAircraftPosition = aircraft.transform.position;
+    //        lastAircraftRotation = aircraft.transform.rotation;
+    //    }
+
+    //    if (!aircraft.GetIsMoving())
+    //    {
+    //        HandleGroundMovement();
+    //        return;
+    //    }
+
+    //    Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
+    //    UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
+
+    //    // Calculate relative position to aircraft
+    //    Vector3 relativePos = transform.position - aircraft.transform.position;
+
+    //    // Update position based on aircraft movement
+    //    Vector3 aircraftDelta = aircraft.transform.position - lastAircraftPosition;
+    //    Vector3 newPosition = transform.position + aircraftDelta;
+
+    //    // Calculate relative movement within aircraft
+    //    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+    //    Vector3 relativeMovement = moveDirection /** aircraftMoveSpeed*/ * accelerationFactor;
+
+    //    // Apply rotation with aircraft
+    //    Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
+    //    Vector3 rotatedRelativePos = rotationDelta * relativePos;
+    //    newPosition = aircraft.transform.position + rotatedRelativePos;
+
+    //    // Update position and rotation
+    //    transform.position = newPosition;
+    //    transform.rotation = aircraft.transform.rotation;
+
+    //    // Update velocity
+    //    if (accelerationFactor < 0.05f && isGrounded)
+    //    {
+    //        rigidBody.linearVelocity = aircraftRb.linearVelocity;
+    //    }
+    //    else
+    //    {
+    //        rigidBody.linearVelocity = aircraftRb.linearVelocity + relativeMovement;
+    //    }
+
+    //    // Store current aircraft transform for next frame
+    //    lastAircraftPosition = aircraft.transform.position;
+    //    lastAircraftRotation = aircraft.transform.rotation;
+
+    //    // Sync across network
+    //    if (IsServer)
+    //    {
+    //        netRelativePosition.Value = relativePos;
+    //        SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.linearVelocity);
+    //    }
+    //    else
+    //    {
+    //        SyncPassengerPositionServerRpc(relativePos);
+    //    }
+    //}
 }

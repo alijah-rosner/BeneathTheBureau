@@ -992,8 +992,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.5, y: 2.554903, z: 18}
-  m_Center: {x: 0, y: 0.5274515, z: -6}
+  m_Size: {x: 2.8958273, y: 2.7644942, z: 18.141523}
+  m_Center: {x: 0.0483737, y: 0.6322471, z: -5.9292383}
 --- !u!54 &2838466425460961863
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1122,9 +1122,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+      propertyPath: TickSyncChildren
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+      propertyPath: NetworkTransformExpanded
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6294335790709019816, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: m_Name
       value: PF_PlaneInterface
+      objectReference: {fileID: 0}
+    - target: {fileID: 6500679494735933254, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6500679494735933254, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: GlobalObjectIdHash
