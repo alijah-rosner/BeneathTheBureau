@@ -172,7 +172,7 @@ public class PlaneInterface : NetworkBehaviour
 
   private void OnTriggerEnter(Collider other)
   {
-    if (!IsServer) return;
+   // if (!IsServer) return;
 
     if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out _))
     {
@@ -183,7 +183,7 @@ public class PlaneInterface : NetworkBehaviour
 
   private void OnTriggerExit(Collider other)
   {
-    if (!IsServer) return;
+    //if (!IsServer) return;
 
     if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out NetworkObject netObj))
     {

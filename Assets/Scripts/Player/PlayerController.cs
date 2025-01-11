@@ -41,7 +41,7 @@ public class PlayerController : NetworkBehaviour
     private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private const float groundGravity = 9.81f;
-    private const float flightGravityScale = 9f;
+    private const float flightGravityScale = 2f;
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
