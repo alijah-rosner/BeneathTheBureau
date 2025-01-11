@@ -272,12 +272,12 @@ public class FlightController : NetworkBehaviour
             if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
 
             // pass the NetworkObjectId and add turbulence in direction
-            SyncPassengerPhysicsClientRpc(
-                passengerNetObj.NetworkObjectId,
-                transform.TransformDirection(localAcceleration),
-                netTurbulenceFlag.Value
-            );
-        }
+            //SyncPassengerPhysicsClientRpc(
+            //    passengerNetObj.NetworkObjectId,
+            //    transform.TransformDirection(localAcceleration),
+            //    netTurbulenceFlag.Value
+            //);
+        }                
         if (Input.GetKeyDown(KeyCode.J))
         {
             foreach (Rigidbody pass in _passengers)
