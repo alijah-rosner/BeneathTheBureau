@@ -188,6 +188,7 @@ public class PlayerController : NetworkBehaviour
 
     }
 
+
     private void UpdateAcceleration(float accelerationRate, float decelerationRate)
     {
         if (Mathf.Abs(forwardMovement) > 0.1f || Mathf.Abs(lateralMovement) > 0.1f)
@@ -278,12 +279,43 @@ public class PlayerController : NetworkBehaviour
     public bool GetInAircraft() => _inAircraft.Value;
 
 
+    [ServerRpc]
+    private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        if (!IsOwner) return;
+        netPosition.Value = position;
+        netRotation.Value = rotation;
+        netVelocity.Value = velocity;
+    }
+
+    [ServerRpc]
+    private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
+    {
+        netRelativePosition.Value = relativePosition;
+    }
+
+    [ClientRpc]
+    private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        if (!IsOwner)
+        {
+            transform.position = position;
+            transform.rotation = rotation;
+            rigidBody.linearVelocity = velocity;
+        }
+    }
 
     public void SetInAircraft(bool r)
     {
         if (IsOwner)
         {
             _inAircraft.Value = r;
+
+            // Reset aircraft reference when leaving
+            if (!r)
+            {
+                currentAircraft = null;
+            }
 
             // Sync the state change
             UpdateInAircraftStateServerRpc(r);
@@ -310,32 +342,6 @@ public class PlayerController : NetworkBehaviour
     {
         _camera = cam;
     }
-
-    //[ServerRpc]
-    //private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-    //{
-    //    if (!IsOwner) return;
-    //    netPosition.Value = position;
-    //    netRotation.Value = rotation;
-    //    netVelocity.Value = velocity;
-    //}
-
-    //[ServerRpc]
-    //private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
-    //{
-    //    netRelativePosition.Value = relativePosition;
-    //}
-
-    //[ClientRpc]
-    //private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-    //{
-    //    if (!IsOwner)
-    //    {
-    //        transform.position = position;
-    //        transform.rotation = rotation;
-    //        rigidBody.linearVelocity = velocity;
-    //    }
-    //}
 
     //private void HandleAircraftMovement()
     //{
