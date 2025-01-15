@@ -9,14 +9,18 @@ public class PlayerController : NetworkBehaviour
     [Header("Movement Settings")]
     [SerializeField] private float groundMoveSpeed = 20f;
     [SerializeField] private float aircraftMoveSpeed = 20f;
-    [SerializeField] private float jumpForce = 7f;
+    [SerializeField] private float jumpForce = 9f;
     [SerializeField] private float aircraftJumpForce = 9f;
+
+    [Space]
     [SerializeField] private float groundAcceleration = 2.0f;
     [SerializeField] private float groundDeceleration = 3.0f;
     [SerializeField] private float aircraftAcceleration = 2.0f;
     [SerializeField] private float aircraftDeceleration = 3.0f;
-    [SerializeField] private float groundGravity = 9.81f;
-    [SerializeField] private const float flightGravityScale = 2f;
+
+    [Space]
+    [SerializeField] private float groundGravity = 2f;
+    [SerializeField] private float flightGravityScale = 2f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private float groundCheckRadius = 0.5f;
@@ -157,16 +161,6 @@ public class PlayerController : NetworkBehaviour
     {
         UpdateAcceleration(groundAcceleration, groundDeceleration);
 
-        // Update turn factor based on mouse movement
-        turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
-        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
-
-        // Calculate move direction
-        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-
-        // Apply movement force
-        rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
-
         // Apply drag only when grounded
         if (isGrounded && !_inAircraft.Value)
         {
@@ -182,6 +176,16 @@ public class PlayerController : NetworkBehaviour
             if (aircraft == null) return;
             transform.rotation = aircraft.transform.rotation;
         }
+        // Update turn factor based on mouse movement
+        turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
+        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
+
+        // Calculate move direction
+        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+
+        // Apply movement force
+        rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+
     }
 
 
@@ -203,8 +207,17 @@ public class PlayerController : NetworkBehaviour
         float effectiveGravity = groundGravity * gravityMultiplier;
 
         // Don't apply extra gravity when grounded
-
         rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
+        if (_inAircraft.Value)
+        {
+            FlightController aircraft = FindFirstObjectByType<FlightController>();
+            rigidBody.AddForce(-aircraft.transform.up * effectiveGravity, ForceMode.Acceleration);
+
+        }
+        else
+        {
+            rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
+        }
     }
 
     [ServerRpc]
