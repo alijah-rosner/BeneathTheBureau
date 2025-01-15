@@ -61,19 +61,19 @@ public class PlayerController : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        if (!IsOwner)
-        {
-            return;
-        }
+        //if (!IsOwner)
+        //{
+        //    return;
+        //}
         _camera.enabled = true;
         rigidBody = GetComponent<Rigidbody>();
         // Initialize network variables
-        if (IsServer)
-        {
+        //if (IsServer)
+        //{
             netPosition.Value = transform.position;
             netRotation.Value = transform.rotation;
             netVelocity.Value = Vector3.zero;
-        }
+        //}
     }
 
 
