@@ -459,12 +459,14 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   groundMoveSpeed: 10
   aircraftMoveSpeed: 4
-  jumpForce: 2
-  aircraftJumpForce: 2
+  jumpForce: 5
+  aircraftJumpForce: 5
   groundAcceleration: 0.05
   groundDeceleration: 0.75
   aircraftAcceleration: 0.01
   aircraftDeceleration: 0.5
+  groundGravity: 2
+  flightGravityScale: 2
   groundCheckRadius: 0
   groundCheckHeight: 1
   groundCheckDistance: 1
