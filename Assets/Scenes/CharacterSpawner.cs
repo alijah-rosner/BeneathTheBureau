@@ -19,7 +19,7 @@ public class CharacterSpawner : NetworkBehaviour
 
             if (character != null)
             {
-                var spawnPos = new Vector3(Random.Range(-1f, 1f), 3f, Random.Range(-3f, 3f));
+                var spawnPos = transform.position + new Vector3(Random.Range(-1f, 1f), 3f, Random.Range(-1f, 1f));
                 var characterInstance = Instantiate(character.GameplayPrefab, spawnPos, Quaternion.identity);
                 characterInstance.SpawnAsPlayerObject(client.Value.ClientID);
             }

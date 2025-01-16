@@ -68,14 +68,25 @@ public class PlayerController : NetworkBehaviour
         _camera.enabled = true;
         rigidBody = GetComponent<Rigidbody>();
         // Initialize network variables
-        //if (IsServer)
-        //{
+        if (IsServer)
+        {
             netPosition.Value = transform.position;
             netRotation.Value = transform.rotation;
             netVelocity.Value = Vector3.zero;
-        //}
+        }
+        else
+        {
+            ClientSpawnRpc();
+        }
     }
 
+    [Rpc(SendTo.Everyone)]
+    private void ClientSpawnRpc()
+    {
+        netPosition.Value = transform.position;
+        netRotation.Value = transform.rotation;
+        netVelocity.Value = Vector3.zero;
+    }
 
     private void Awake()
     {
@@ -207,7 +218,7 @@ public class PlayerController : NetworkBehaviour
         float effectiveGravity = groundGravity * gravityMultiplier;
 
         // Don't apply extra gravity when grounded
-        rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
+        //rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
         if (_inAircraft.Value)
         {
             FlightController aircraft = FindFirstObjectByType<FlightController>();

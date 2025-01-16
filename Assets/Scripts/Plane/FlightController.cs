@@ -167,7 +167,7 @@ public class FlightController : NetworkBehaviour
         }
 
         AddTurbulenceEffect();
-        UpdatePassengers();
+        //UpdatePassengers();
     }
 
     public void RunAutopilotRpc(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
