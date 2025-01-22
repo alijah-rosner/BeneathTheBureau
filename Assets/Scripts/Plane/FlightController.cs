@@ -8,6 +8,7 @@ public class FlightController : NetworkBehaviour
 
     [Header("Components")]
     [SerializeField] private MouseFlightController controller = null;
+    [SerializeField] public GameObject planeInterface = null;
 
     [Header("Physics")]
     [Tooltip("Force to push plane forwards with")] public float thrust = 100f;
@@ -250,71 +251,6 @@ public class FlightController : NetworkBehaviour
         }
     }
 
-
-    private void UpdatePassengers()
-    {
-        if (!IsServer) return;
-
-        Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.linearVelocity);
-        Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
-
-        // Update network variables
-        netLocalAcceleration.Value = localAcceleration;
-        netPreviousLocalVelocity.Value = currentLocalVelocity;
-        netAircraftVelocity.Value = rigid.linearVelocity;
-        netAngularVelocity.Value = rigid.angularVelocity;
-
-        foreach (Rigidbody passenger in _passengers)
-        {
-            if (passenger == null) continue;
-
-            NetworkObject passengerNetObj = passenger.GetComponent<NetworkObject>();
-            if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
-
-            // pass the NetworkObjectId and add turbulence in direction
-            //SyncPassengerPhysicsClientRpc(
-            //    passengerNetObj.NetworkObjectId,
-            //    transform.TransformDirection(localAcceleration),
-            //    netTurbulenceFlag.Value
-            //);
-        }
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            foreach (Rigidbody pass in _passengers)
-            {
-                Debug.Log("Passenger:" + pass.gameObject.GetComponent<NetworkObject>().name);
-            }
-
-        }
-    }
-
-    [ClientRpc]
-    private void SyncPassengerPhysicsClientRpc(
-     ulong networkObjectId,
-     Vector3 localAcceleration,
-     bool hasTurbulence)
-    {
-        if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject passengerObj))
-            return;
-
-        if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
-            return;
-
-        // Calculate the desired position relative to aircraft
-        Vector3 relativePos = passengerRb.position - transform.position;
-        Vector3 desiredRelativePos = Quaternion.Inverse(transform.rotation) * relativePos;
-
-        // Update position directly instead of only using forces
-        Vector3 targetPos = transform.position + transform.rotation * desiredRelativePos;
-        passengerRb.MovePosition(Vector3.Lerp(passengerRb.position, targetPos, Time.fixedDeltaTime * 20f));
-
-        // Apply velocity matching
-        Vector3 desiredVelocity = netAircraftVelocity.Value;
-        passengerRb.linearVelocity = Vector3.Lerp(passengerRb.linearVelocity, desiredVelocity, Time.fixedDeltaTime * 10f);
-
-        // Apply rotation
-        passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));
-    }
     // Convert angles greater than 180 to a negative equivalent angle
     // Clamp to keep it from exceeding desired values
     private void ClampRotation()
@@ -416,11 +352,6 @@ public class FlightController : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        //if (!IsServer)
-        //{
-        //    Debug.Log("Not Server");
-        //return;
-        //}
 
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
@@ -432,11 +363,6 @@ public class FlightController : NetworkBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        //if (!IsServer)
-        //{
-        //    Debug.Log("Not Server");
-        //    return;
-        //}
 
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
@@ -448,3 +374,70 @@ public class FlightController : NetworkBehaviour
         }
     }
 }
+
+
+
+    //private void UpdatePassengers()
+    //{
+    //    if (!IsServer) return;
+
+    //    Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.linearVelocity);
+    //    Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
+
+    //    // Update network variables
+    //    netLocalAcceleration.Value = localAcceleration;
+    //    netPreviousLocalVelocity.Value = currentLocalVelocity;
+    //    netAircraftVelocity.Value = rigid.linearVelocity;
+    //    netAngularVelocity.Value = rigid.angularVelocity;
+
+    //    foreach (Rigidbody passenger in _passengers)
+    //    {
+    //        if (passenger == null) continue;
+
+    //        NetworkObject passengerNetObj = passenger.GetComponent<NetworkObject>();
+    //        if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
+
+    //        // pass the NetworkObjectId and add turbulence in direction
+    //        //SyncPassengerPhysicsClientRpc(
+    //        //    passengerNetObj.NetworkObjectId,
+    //        //    transform.TransformDirection(localAcceleration),
+    //        //    netTurbulenceFlag.Value
+    //        //);
+    //    }
+    //    if (Input.GetKeyDown(KeyCode.J))
+    //    {
+    //        foreach (Rigidbody pass in _passengers)
+    //        {
+    //            Debug.Log("Passenger:" + pass.gameObject.GetComponent<NetworkObject>().name);
+    //        }
+
+    //    }
+    //}
+
+    //[ClientRpc]
+    //private void SyncPassengerPhysicsClientRpc(
+    // ulong networkObjectId,
+    // Vector3 localAcceleration,
+    // bool hasTurbulence)
+    //{
+    //    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject passengerObj))
+    //        return;
+
+    //    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
+    //        return;
+
+    //    // Calculate the desired position relative to aircraft
+    //    Vector3 relativePos = passengerRb.position - transform.position;
+    //    Vector3 desiredRelativePos = Quaternion.Inverse(transform.rotation) * relativePos;
+
+    //    // Update position directly instead of only using forces
+    //    Vector3 targetPos = transform.position + transform.rotation * desiredRelativePos;
+    //    passengerRb.MovePosition(Vector3.Lerp(passengerRb.position, targetPos, Time.fixedDeltaTime * 20f));
+
+    //    // Apply velocity matching
+    //    Vector3 desiredVelocity = netAircraftVelocity.Value;
+    //    passengerRb.linearVelocity = Vector3.Lerp(passengerRb.linearVelocity, desiredVelocity, Time.fixedDeltaTime * 10f);
+
+    //    // Apply rotation
+    //    passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));
+    //}
