@@ -4,212 +4,212 @@ using System.Collections.Generic;
 
 public class PlaneInterface : NetworkBehaviour
 {
-  [Header("Components")]
-  [SerializeField] private GameObject aircraft = null;
-  [SerializeField] private GameObject aircraftCamera = null;
+    [Header("Components")]
+    [SerializeField] private GameObject aircraft = null;
+    [SerializeField] private GameObject aircraftCamera = null;
 
-  // Network Variables
-  private NetworkVariable<ulong> currentPilotId = new NetworkVariable<ulong>(
-      ulong.MaxValue,
-      NetworkVariableReadPermission.Everyone,
-      NetworkVariableWritePermission.Server
-  );
+    // Network Variables
+    private NetworkVariable<ulong> currentPilotId = new NetworkVariable<ulong>(
+        ulong.MaxValue,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
 
-  private HashSet<GameObject> players = new HashSet<GameObject>();
-  private NetworkVariable<bool> isActive = new NetworkVariable<bool>(false);
+    private HashSet<GameObject> players = new HashSet<GameObject>();
+    private NetworkVariable<bool> isActive = new NetworkVariable<bool>(false);
 
-  public override void OnNetworkSpawn()
-  {
-    base.OnNetworkSpawn();
-
-    // Subscribe to pilot ID changes
-    currentPilotId.OnValueChanged += OnPilotChanged;
-
-    if (aircraft == null || aircraftCamera == null)
+    public override void OnNetworkSpawn()
     {
-      Debug.LogError("[PlaneInterface] Missing required component references!");
-    }
-  }
+        base.OnNetworkSpawn();
 
-  public override void OnNetworkDespawn()
-  {
-    base.OnNetworkDespawn();
-    currentPilotId.OnValueChanged -= OnPilotChanged;
-  }
+        // Subscribe to pilot ID changes
+        currentPilotId.OnValueChanged += OnPilotChanged;
 
-  private void Update()
-  {
-    if (!IsSpawned) return;
-
-    // Handle local player input
-    if (Input.GetKeyDown(KeyCode.E))
-    {
-      foreach (var player in players)
-      {
-        if (!player.TryGetComponent<NetworkObject>(out NetworkObject playerNetObj))
-          continue;
-
-        if (!playerNetObj.IsLocalPlayer)
-          continue;
-
-        // If no pilot, try to become pilot
-        if (currentPilotId.Value == ulong.MaxValue)
+        if (aircraft == null || aircraftCamera == null)
         {
-          RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
+            Debug.LogError("[PlaneInterface] Missing required component references!");
         }
-        // If we're the pilot, release control
-        else if (currentPilotId.Value == playerNetObj.OwnerClientId)
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        currentPilotId.OnValueChanged -= OnPilotChanged;
+    }
+
+    private void Update()
+    {
+        if (!IsSpawned) return;
+
+        // Handle local player input
+        if (Input.GetKeyDown(KeyCode.E))
         {
-          ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
+            foreach (var player in players)
+            {
+                if (!player.TryGetComponent<NetworkObject>(out NetworkObject playerNetObj))
+                    continue;
+
+                if (!playerNetObj.IsLocalPlayer)
+                    continue;
+
+                // If no pilot, try to become pilot
+                if (currentPilotId.Value == ulong.MaxValue)
+                {
+                    RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
+                }
+                // If we're the pilot, release control
+                else if (currentPilotId.Value == playerNetObj.OwnerClientId)
+                {
+                    ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
+                }
+            }
         }
-      }
     }
-  }
 
-  [ServerRpc(RequireOwnership = false)]
-  private void RequestPilotControlServerRpc(ulong requestingPlayerId)
-  {
-    if (currentPilotId.Value != ulong.MaxValue)
-      return;
-
-    // Set the new pilot
-    currentPilotId.Value = requestingPlayerId;
-    isActive.Value = true;
-
-    // Transfer aircraft ownership to the new pilot
-    if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestPilotControlServerRpc(ulong requestingPlayerId)
     {
-      aircraftNetObj.ChangeOwnership(requestingPlayerId);
+        if (currentPilotId.Value != ulong.MaxValue)
+            return;
+
+        // Set the new pilot
+        currentPilotId.Value = requestingPlayerId;
+        isActive.Value = true;
+
+        // Transfer aircraft ownership to the new pilot
+        if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
+        {
+            aircraftNetObj.ChangeOwnership(requestingPlayerId);
+        }
+
+        // Notify all clients about the pilot change
+        UpdatePilotStateClientRpc(requestingPlayerId, true);
     }
 
-    // Notify all clients about the pilot change
-    UpdatePilotStateClientRpc(requestingPlayerId, true);
-  }
-
-  [ServerRpc(RequireOwnership = false)]
-  private void ReleasePilotControlServerRpc(ulong pilotId)
-  {
-    if (currentPilotId.Value != pilotId)
-      return;
-
-    // Clear the pilot
-    currentPilotId.Value = ulong.MaxValue;
-    isActive.Value = false;
-
-    // Return aircraft ownership to server
-    if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
+    [ServerRpc(RequireOwnership = false)]
+    private void ReleasePilotControlServerRpc(ulong pilotId)
     {
-      aircraftNetObj.ChangeOwnership(NetworkManager.ServerClientId);
+        if (currentPilotId.Value != pilotId)
+            return;
+
+        // Clear the pilot
+        currentPilotId.Value = ulong.MaxValue;
+        isActive.Value = false;
+
+        // Return aircraft ownership to server
+        if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
+        {
+            aircraftNetObj.ChangeOwnership(NetworkManager.ServerClientId);
+        }
+
+        // Notify all clients about the pilot change
+        UpdatePilotStateClientRpc(pilotId, false);
     }
 
-    // Notify all clients about the pilot change
-    UpdatePilotStateClientRpc(pilotId, false);
-  }
-
-  [ClientRpc]
-  private void UpdatePilotStateClientRpc(ulong pilotId, bool isPilot)
-  {
-    GameObject pilotObj = GetPlayerObjectById(pilotId);
-    if (pilotObj == null) return;
-
-    PlayerController playerController = pilotObj.GetComponent<PlayerController>();
-    if (playerController == null) return;
-
-    Camera pilotCamera = playerController.GetCamera();
-
-    if (isPilot)
+    [ClientRpc]
+    private void UpdatePilotStateClientRpc(ulong pilotId, bool isPilot)
     {
-      // Activate pilot mode
-      playerController.SetIsPilot(true);
-      if (pilotCamera) pilotCamera.gameObject.SetActive(false);
-      if (aircraftCamera) aircraftCamera.SetActive(true);
+        GameObject pilotObj = GetPlayerObjectById(pilotId);
+        if (pilotObj == null) return;
 
-      if (aircraft.TryGetComponent<FlightController>(out var flightController))
-      {
-        flightController.enabled = true;
-        flightController.TriggerController(true);
-      }
+        PlayerController playerController = pilotObj.GetComponent<PlayerController>();
+        if (playerController == null) return;
+
+        Camera pilotCamera = playerController.GetCamera();
+
+        if (isPilot)
+        {
+            // Activate pilot mode
+            playerController.SetIsPilot(true);
+            if (pilotCamera) pilotCamera.gameObject.SetActive(false);
+            if (aircraftCamera) aircraftCamera.SetActive(true);
+
+            if (aircraft.TryGetComponent<FlightController>(out var flightController))
+            {
+                flightController.enabled = true;
+                flightController.TriggerController(true);
+            }
+        }
+        else
+        {
+            // Deactivate pilot mode
+            playerController.SetIsPilot(false);
+            if (aircraftCamera) aircraftCamera.SetActive(false);
+            if (pilotCamera) pilotCamera.gameObject.SetActive(true);
+
+            if (aircraft.TryGetComponent<FlightController>(out var flightController))
+            {
+                flightController.TriggerController(false);
+            }
+        }
     }
-    else
+
+    private void OnPilotChanged(ulong previousPilotId, ulong newPilotId)
     {
-      // Deactivate pilot mode
-      playerController.SetIsPilot(false);
-      if (aircraftCamera) aircraftCamera.SetActive(false);
-      if (pilotCamera) pilotCamera.gameObject.SetActive(true);
-
-      if (aircraft.TryGetComponent<FlightController>(out var flightController))
-      {
-        flightController.TriggerController(false);
-      }
+        // Handle any necessary state cleanup when pilot changes
+        if (previousPilotId != ulong.MaxValue)
+        {
+            GameObject previousPilot = GetPlayerObjectById(previousPilotId);
+            if (previousPilot != null)
+            {
+                previousPilot.GetComponent<PlayerController>()?.SetIsPilot(false);
+            }
+        }
     }
-  }
 
-  private void OnPilotChanged(ulong previousPilotId, ulong newPilotId)
-  {
-    // Handle any necessary state cleanup when pilot changes
-    if (previousPilotId != ulong.MaxValue)
+    private GameObject GetPlayerObjectById(ulong clientId)
     {
-      GameObject previousPilot = GetPlayerObjectById(previousPilotId);
-      if (previousPilot != null)
-      {
-        previousPilot.GetComponent<PlayerController>()?.SetIsPilot(false);
-      }
+        foreach (var player in players)
+        {
+            if (player.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
+                netObj.OwnerClientId == clientId)
+            {
+                return player;
+            }
+        }
+        return null;
     }
-  }
 
-  private GameObject GetPlayerObjectById(ulong clientId)
-  {
-    foreach (var player in players)
+    private void OnTriggerEnter(Collider other)
     {
-      if (player.TryGetComponent<NetworkObject>(out NetworkObject netObj) &&
-          netObj.OwnerClientId == clientId)
-      {
-        return player;
-      }
+        // if (!IsServer) return;
+
+        if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out _))
+        {
+            players.Add(other.gameObject);
+            SyncPlayersClientRpc(other.gameObject.GetComponent<NetworkObject>().NetworkObjectId, true);
+        }
     }
-    return null;
-  }
 
-  private void OnTriggerEnter(Collider other)
-  {
-   // if (!IsServer) return;
-
-    if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out _))
+    private void OnTriggerExit(Collider other)
     {
-      players.Add(other.gameObject);
-      SyncPlayersClientRpc(other.gameObject.GetComponent<NetworkObject>().NetworkObjectId, true);
+        //if (!IsServer) return;
+
+        if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+        {
+            players.Remove(other.gameObject);
+            SyncPlayersClientRpc(netObj.NetworkObjectId, false);
+
+            // Reset control if current pilot exited trigger area
+            if (netObj.OwnerClientId == currentPilotId.Value)
+            {
+                ReleasePilotControlServerRpc(netObj.OwnerClientId);
+            }
+        }
     }
-  }
 
-  private void OnTriggerExit(Collider other)
-  {
-    //if (!IsServer) return;
-
-    if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out NetworkObject netObj))
+    [ClientRpc]
+    private void SyncPlayersClientRpc(ulong networkObjectId, bool isEntering)
     {
-      players.Remove(other.gameObject);
-      SyncPlayersClientRpc(netObj.NetworkObjectId, false);
+        if (IsServer) return; // Server already handled this
 
-      // Reset control if current pilot exited trigger area
-      if (netObj.OwnerClientId == currentPilotId.Value)
-      {
-        ReleasePilotControlServerRpc(netObj.OwnerClientId);
-      }
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject playerNetObj);
+        if (playerNetObj != null)
+        {
+            if (isEntering)
+                players.Add(playerNetObj.gameObject);
+            else
+                players.Remove(playerNetObj.gameObject);
+        }
     }
-  }
-
-  [ClientRpc]
-  private void SyncPlayersClientRpc(ulong networkObjectId, bool isEntering)
-  {
-    if (IsServer) return; // Server already handled this
-
-    NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject playerNetObj);
-    if (playerNetObj != null)
-    {
-      if (isEntering)
-        players.Add(playerNetObj.gameObject);
-      else
-        players.Remove(playerNetObj.gameObject);
-    }
-  }
 }
