@@ -457,13 +457,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  groundMoveSpeed: 7
+  groundMoveSpeed: 4
   aircraftMoveSpeed: 4
   jumpForce: 5
   aircraftJumpForce: 5
   groundAcceleration: 0.05
   groundDeceleration: 0.75
-  aircraftAcceleration: 0.01
+  aircraftAcceleration: 0.1
   aircraftDeceleration: 0.5
   groundGravity: 4
   flightGravityScale: 2

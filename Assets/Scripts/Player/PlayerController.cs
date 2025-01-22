@@ -120,7 +120,7 @@ public class PlayerController : NetworkBehaviour
     private void FixedUpdate()
     {
 
-        HandleGroundMovement();
+        HandleMovement();
 
         ApplyGravity();
         // Only the owner updates network variables //getting error clock this
@@ -168,7 +168,7 @@ public class PlayerController : NetworkBehaviour
 
     }
 
-    private void HandleGroundMovement()
+    private void HandleMovement()
     {
         UpdateAcceleration(groundAcceleration, groundDeceleration);
 
@@ -181,21 +181,28 @@ public class PlayerController : NetworkBehaviour
         {
             rigidBody.linearDamping = 0f;
         }
-        if (_inAircraft.Value)
-        {
-            FlightController aircraft = FindObjectOfType<FlightController>();
-            if (aircraft == null) return;
-            transform.rotation = aircraft.transform.rotation;
-        }
-        // Update turn factor based on mouse movement
         turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
         accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
 
         // Calculate move direction
         Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
+        if (_inAircraft.Value)
+        {
+            FlightController aircraft = FindObjectOfType<FlightController>();
+            if (aircraft == null) return;
+            transform.rotation = aircraft.transform.rotation;
 
+            // Project the input direction onto the aircraft's local horizontal plane
+            Vector3 projectedDirection = Vector3.ProjectOnPlane(moveDirection, aircraft.transform.up).normalized;
+            rigidBody.AddForce(projectedDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+
+        }
+        // Update turn factor based on mouse movement
+        else
+        {
+            rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+        }
         // Apply movement force
-        rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
 
     }
 
@@ -299,22 +306,22 @@ public class PlayerController : NetworkBehaviour
         netVelocity.Value = velocity;
     }
 
-    [ServerRpc]
-    private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
-    {
-        netRelativePosition.Value = relativePosition;
-    }
+    //[ServerRpc]
+    //private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
+    //{
+    //    netRelativePosition.Value = relativePosition;
+    //}
 
-    [ClientRpc]
-    private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-    {
-        if (!IsOwner)
-        {
-            transform.position = position;
-            transform.rotation = rotation;
-            rigidBody.linearVelocity = velocity;
-        }
-    }
+    //[ClientRpc]
+    //private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
+    //{
+    //    if (!IsOwner)
+    //    {
+    //        transform.position = position;
+    //        transform.rotation = rotation;
+    //        rigidBody.linearVelocity = velocity;
+    //    }
+    //}
 
     public void SetInAircraft(bool r)
     {

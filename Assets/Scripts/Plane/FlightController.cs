@@ -441,6 +441,8 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
+            netObj.TryGetComponent<PlayerController>(out PlayerController localPlayer);
+            localPlayer.SetInAircraft(false);
             netObj.gameObject.transform.parent = null;
             RemovePassengerServerRpc(netObj.NetworkObjectId);
         }
