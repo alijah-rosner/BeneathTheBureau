@@ -13,12 +13,12 @@ public class PlayerRaycast : MonoBehaviour
     [SerializeField] private GameObject _cameraGameObj;
     private Camera _camera;
     private Ray _raycast;
-    private NetworkBehaviour _localPlayer; 
-    void Start()
+    public NetworkBehaviour _localPlayer; 
+    void Awake()
     {
         _interactables = new();
         _camera = _cameraGameObj.GetComponent<Camera>();
-        _localPlayer = transform.parent.GetComponent<NetworkBehaviour>();
+        //_localPlayer = transform.parent.GetComponent<NetworkBehaviour>();
     }
 
     // Update is called once per frame
@@ -32,9 +32,9 @@ public class PlayerRaycast : MonoBehaviour
         RaycastHit hit; 
         if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                hit.collider.gameObject.GetComponent<PlaneButton>().Interact();
+                hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
             }
         }
         Debug.DrawRay(_camera.transform.position, _camera.transform.forward * 1);

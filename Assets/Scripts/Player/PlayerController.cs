@@ -325,6 +325,7 @@ public class PlayerController : NetworkBehaviour
 
     public void SetInAircraft(bool r)
     {
+     
         if (IsOwner)
         {
             _inAircraft.Value = r;
@@ -333,15 +334,20 @@ public class PlayerController : NetworkBehaviour
             if (!r)
             {
                 currentAircraft = null;
+                transform.parent = null;
+            }
+            else
+            {
+                transform.parent = GameObject.FindWithTag("Aircraft").transform;
             }
 
             // Sync the state change
-            UpdateInAircraftStateServerRpc(r);
         }
+        UpdateInAircraftStateRpc(r);
     }
 
-    [ServerRpc]
-    private void UpdateInAircraftStateServerRpc(bool inAircraft)
+    [Rpc(SendTo.Everyone)]
+    private void UpdateInAircraftStateRpc(bool inAircraft)
     {
         _inAircraft.Value = inAircraft;
     }

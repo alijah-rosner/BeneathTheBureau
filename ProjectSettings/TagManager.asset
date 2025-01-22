@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Projectile
   - PlayerCamera
+  - Aircraft
   layers:
   - Default
   - TransparentFX

@@ -570,6 +570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraGameObj: {fileID: 2432884893416196454}
+  _localPlayer: {fileID: 4861580037806051612}
 --- !u!1 &6994807786656674940
 GameObject:
   m_ObjectHideFlags: 0

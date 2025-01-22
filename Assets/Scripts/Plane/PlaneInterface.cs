@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PlaneInterface : NetworkBehaviour
+public class PlaneInterface : NetworkBehaviour, I_Interactable
 {
     [Header("Components")]
     [SerializeField] private GameObject aircraft = null;
@@ -14,6 +14,7 @@ public class PlaneInterface : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server
     );
+
 
     private HashSet<GameObject> players = new HashSet<GameObject>();
     private NetworkVariable<bool> isActive = new NetworkVariable<bool>(false);
@@ -41,29 +42,14 @@ public class PlaneInterface : NetworkBehaviour
     {
         if (!IsSpawned) return;
 
-        // Handle local player input
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            foreach (var player in players)
-            {
-                if (!player.TryGetComponent<NetworkObject>(out NetworkObject playerNetObj))
-                    continue;
+        //// Handle local player input
+        //if (Input.GetKeyDown(KeyCode.E))
+        //{
+        //    foreach (var player in players)
+        //    {
 
-                if (!playerNetObj.IsLocalPlayer)
-                    continue;
-
-                // If no pilot, try to become pilot
-                if (currentPilotId.Value == ulong.MaxValue)
-                {
-                    RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
-                }
-                // If we're the pilot, release control
-                else if (currentPilotId.Value == playerNetObj.OwnerClientId)
-                {
-                    ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
-                }
-            }
-        }
+        //    }
+        //}
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -95,6 +81,8 @@ public class PlaneInterface : NetworkBehaviour
         // Clear the pilot
         currentPilotId.Value = ulong.MaxValue;
         isActive.Value = false;
+
+
 
         // Return aircraft ownership to server
         if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
@@ -134,6 +122,7 @@ public class PlaneInterface : NetworkBehaviour
         {
             // Deactivate pilot mode
             playerController.SetIsPilot(false);
+            //playerController.SetInAircraft(true);
             if (aircraftCamera) aircraftCamera.SetActive(false);
             if (pilotCamera) pilotCamera.gameObject.SetActive(true);
 
@@ -188,6 +177,7 @@ public class PlaneInterface : NetworkBehaviour
         if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out NetworkObject netObj))
         {
             players.Remove(other.gameObject);
+            netObj.TryGetComponent<PlayerController>(out PlayerController player);
             SyncPlayersClientRpc(netObj.NetworkObjectId, false);
 
             // Reset control if current pilot exited trigger area
@@ -201,7 +191,7 @@ public class PlaneInterface : NetworkBehaviour
     [ClientRpc]
     private void SyncPlayersClientRpc(ulong networkObjectId, bool isEntering)
     {
-        if (IsServer) return; // Server already handled this
+        //if (IsServer) return; // Server already handled this
 
         NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject playerNetObj);
         if (playerNetObj != null)
@@ -209,7 +199,31 @@ public class PlaneInterface : NetworkBehaviour
             if (isEntering)
                 players.Add(playerNetObj.gameObject);
             else
+            {
                 players.Remove(playerNetObj.gameObject);
+            }
         }
+    }
+
+    public void Interact(ulong netObjId)
+    {
+        NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(netObjId, out NetworkObject playerNetObj);
+        if (playerNetObj.IsLocalPlayer)
+        {
+            SyncPlayersClientRpc(netObjId, true);
+            if (currentPilotId.Value == ulong.MaxValue)
+            {
+                RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
+                playerNetObj.GetComponent<PlayerController>().SetInAircraft(true);
+            }
+            // If we're the pilot, release control
+            else if (currentPilotId.Value == playerNetObj.OwnerClientId)
+            {
+                SyncPlayersClientRpc(netObjId, false);
+                ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
+            }
+        }
+
+        // If no pilot, try to become pilot
     }
 }
