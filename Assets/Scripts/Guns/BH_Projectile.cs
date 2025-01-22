@@ -13,7 +13,7 @@ public class BH_Projectile : MonoBehaviour
     {
         rh = GetComponent<Rigidbody>();
 
-        Vector3 vec = transform.rotation.normalized * Vector3.forward;
+        Vector3 vec = _turretHost.transform.forward;
 
         //Vector3 quat = _turretHost.transform.position * _turretHost.transform.rotation;
 
