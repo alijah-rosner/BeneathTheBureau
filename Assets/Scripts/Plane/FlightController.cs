@@ -167,7 +167,7 @@ public class FlightController : NetworkBehaviour
         }
 
         AddTurbulenceEffect();
-        UpdatePassengers();
+        //UpdatePassengers();
     }
 
     public void RunAutopilotRpc(Vector3 flyTarget, out float yaw, out float pitch, out float roll)
@@ -441,6 +441,8 @@ public class FlightController : NetworkBehaviour
         NetworkObject netObj = other.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned && other.TryGetComponent<Rigidbody>(out Rigidbody rb))
         {
+            netObj.TryGetComponent<PlayerController>(out PlayerController localPlayer);
+            localPlayer.SetInAircraft(false);
             netObj.gameObject.transform.parent = null;
             RemovePassengerServerRpc(netObj.NetworkObjectId);
         }
