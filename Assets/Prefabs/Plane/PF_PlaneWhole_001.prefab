@@ -1012,7 +1012,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1253,6 +1253,10 @@ PrefabInstance:
     - target: {fileID: 5607789976551328281, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
       propertyPath: m_LocalPosition.y
       value: 35.127
+      objectReference: {fileID: 0}
+    - target: {fileID: 5634368723499932976, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5845195205572281337, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
       propertyPath: m_Layer

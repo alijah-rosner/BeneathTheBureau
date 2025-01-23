@@ -289,6 +289,11 @@ public class FlightController : NetworkBehaviour
         if (rb != null)
         {
             _passengers.Add(rb);
+            rb.TryGetComponent<PlayerController>(out PlayerController pc);
+            if (pc)
+            {
+                pc.SetInAircraft(true);
+            }
             AddPassengerClientRpc(networkObjectId);
         }
     }
