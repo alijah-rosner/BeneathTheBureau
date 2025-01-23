@@ -40,31 +40,7 @@ public class PlaneInterface : NetworkBehaviour, I_Interactable
 
     private void Update()
     {
-        if (!IsSpawned) return;
 
-        // Handle local player input
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            foreach (var player in players)
-            {
-                if (!player.TryGetComponent<NetworkObject>(out NetworkObject playerNetObj))
-                    continue;
-
-                if (!playerNetObj.IsLocalPlayer)
-                    continue;
-
-                // If no pilot, try to become pilot
-                if (currentPilotId.Value == ulong.MaxValue)
-                {
-                    RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
-                }
-                // If we're the pilot, release control
-                else if (currentPilotId.Value == playerNetObj.OwnerClientId)
-                {
-                    ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
-                }
-            }
-        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -84,7 +60,7 @@ public class PlaneInterface : NetworkBehaviour, I_Interactable
         }
 
         // Notify all clients about the pilot change
-        UpdatePilotStateClientRpc(requestingPlayerId, true);
+        UpdatePilotStateRpc(requestingPlayerId, true);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -106,11 +82,11 @@ public class PlaneInterface : NetworkBehaviour, I_Interactable
         }
 
         // Notify all clients about the pilot change
-        UpdatePilotStateClientRpc(pilotId, false);
+        UpdatePilotStateRpc(pilotId, false);
     }
 
-    [ClientRpc]
-    private void UpdatePilotStateClientRpc(ulong pilotId, bool isPilot)
+    [Rpc(SendTo.Everyone)]
+    private void UpdatePilotStateRpc(ulong pilotId, bool isPilot)
     {
         GameObject pilotObj = GetPlayerObjectById(pilotId);
         if (pilotObj == null) return;
@@ -174,34 +150,6 @@ public class PlaneInterface : NetworkBehaviour, I_Interactable
         return null;
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    // if (!IsServer) return;
-
-    //    if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out _))
-    //    {
-    //        players.Add(other.gameObject);
-    //        SyncPlayersClientRpc(other.gameObject.GetComponent<NetworkObject>().NetworkObjectId, true);
-    //    }
-    //}
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    //if (!IsServer) return;
-
-    //    if (other.CompareTag("Player") && other.TryGetComponent<NetworkObject>(out NetworkObject netObj))
-    //    {
-    //        players.Remove(other.gameObject);
-    //        netObj.TryGetComponent<PlayerController>(out PlayerController player);
-    //        SyncPlayersClientRpc(netObj.NetworkObjectId, false);
-
-    //        // Reset control if current pilot exited trigger area
-    //        if (netObj.OwnerClientId == currentPilotId.Value)
-    //        {
-    //            ReleasePilotControlServerRpc(netObj.OwnerClientId);
-    //        }
-    //    }
-    //}
 
     [ClientRpc]
     private void SyncPlayersClientRpc(ulong networkObjectId, bool isEntering)
@@ -230,17 +178,17 @@ public class PlaneInterface : NetworkBehaviour, I_Interactable
             {
                 isEntering = true;
                 players.Add(playerNetObj.gameObject);
-                SyncPlayersClientRpc(playerNetObj.NetworkObjectId, isEntering);
 
                 RequestPilotControlServerRpc(playerNetObj.OwnerClientId);
+                SyncPlayersClientRpc(playerNetObj.NetworkObjectId, isEntering);
                 playerNetObj.GetComponent<PlayerController>().SetInAircraft(true);
             }
             // If we're the pilot, release control
             else if (currentPilotId.Value == playerNetObj.OwnerClientId)
             {
-                players.Remove(playerNetObj.gameObject); 
                 ReleasePilotControlServerRpc(playerNetObj.OwnerClientId);
                 SyncPlayersClientRpc(playerNetObj.NetworkObjectId, isEntering);
+                players.Remove(playerNetObj.gameObject); 
             }
         }
         // If no pilot, try to become pilot
