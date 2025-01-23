@@ -1157,7 +1157,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: TickSyncChildren
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: NetworkTransformExpanded
