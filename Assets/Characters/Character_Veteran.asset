@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _id: 1
   _displayName: The Veteran
-  _characterBio: '- Squeamish overthinker. - Fast learner, easily frightened. - Recovers
-    through dealing with difficult problems.'
+  _characterBio: '- Stoic, keeps things bottled up. - Keeps his cool in combat, waits
+    till things are over to lose his mind. - Thrives on stress, self-destructive.'
   _icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  _mesh: {fileID: 284349330848693672, guid: 26433c6cafa539d4ba8b4fc7ad143897, type: 3}
   _gameplayPrefab: {fileID: 417080042839615562, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}

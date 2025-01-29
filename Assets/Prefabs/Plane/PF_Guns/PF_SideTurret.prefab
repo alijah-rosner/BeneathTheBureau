@@ -121,14 +121,13 @@ GameObject:
   - component: {fileID: 2849575974868134327}
   - component: {fileID: 6783196028579933013}
   - component: {fileID: 2880899706583370589}
-  - component: {fileID: 5036694738103031737}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &657860340678250769
 Transform:
   m_ObjectHideFlags: 0
@@ -137,13 +136,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893203738799992307}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0.7025001, y: 0.6575, z: 0.01000005}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.023, y: 0.853, z: -0.459}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8072646268500595971}
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &2849575974868134327
 Camera:
   m_ObjectHideFlags: 0
@@ -247,21 +246,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &5036694738103031737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1893203738799992307}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 723da169f78d7c240af51c42d46fd1ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSensitivity: 1000
-  orientation: {fileID: 2131090540420202137}
-  player: {fileID: 8668113851941031780}
 --- !u!1 &4635616915827099780
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,7 +379,7 @@ Transform:
   m_GameObject: {fileID: 4834788737984500103}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.2319999, y: 0, z: 0}
+  m_LocalPosition: {x: 0.04, y: 0.27, z: 3.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -429,8 +413,8 @@ Transform:
   m_GameObject: {fileID: 6307059872130741759}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.5, y: 0.03999996, z: 0}
-  m_LocalScale: {x: 2, y: 0.4, z: 0.4}
+  m_LocalPosition: {x: 0.04, y: 0.03999996, z: 1.5}
+  m_LocalScale: {x: 0.47746, y: 0.4, z: 2.19384}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2001437913054407721}
@@ -537,7 +521,7 @@ Transform:
   m_GameObject: {fileID: 8668113851941031780}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.19, y: 0.625, z: 0.01}
+  m_LocalPosition: {x: -0.002, y: 0.625, z: 0.01}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -629,7 +613,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8072646268500595971}
   - component: {fileID: 272096371426323353}
+  - component: {fileID: 3835192068974844865}
   - component: {fileID: 1815547140080219429}
+  - component: {fileID: 1827044282164485843}
   m_Layer: 0
   m_Name: PF_SideTurret
   m_TagString: Untagged
@@ -645,7 +631,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8953161961487735585}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.0333954, y: 0.5, z: -0.66641384}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -655,7 +641,7 @@ Transform:
   - {fileID: 657860340678250769}
   - {fileID: 2001437913054407721}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &272096371426323353
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -677,6 +663,31 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 1.5, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3835192068974844865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8953161961487735585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3296550671
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &1815547140080219429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -689,7 +700,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b5f52bac16d8d94cb6045a03bf97875, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   _projectile: {fileID: 6001854935645031192, guid: 00b9cf83692c21e4ba0df34a9825846c, type: 3}
   _origin: {fileID: 2131090540420202137}
   _head: {fileID: 8668113851941031780}
   TurretCamera: {fileID: 2849575974868134327}
+--- !u!114 &1827044282164485843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8953161961487735585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 1
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0

@@ -11,6 +11,7 @@ public class SO_Character : ScriptableObject
     [SerializeField] private string _displayName = "Display Name Not Set";
     [SerializeField] private string _characterBio = "Character Bio Not Set";
     [SerializeField] private Sprite _icon;
+    [SerializeField] private GameObject _mesh; 
 
     [SerializeField] private NetworkObject _gameplayPrefab; 
 
@@ -18,6 +19,7 @@ public class SO_Character : ScriptableObject
     public string DisplayName => _displayName;
     public Sprite Icon => _icon;
 
+    public GameObject Mesh => _mesh; 
     public string CharacterBio => _characterBio;
 
     public NetworkObject GameplayPrefab => _gameplayPrefab; 

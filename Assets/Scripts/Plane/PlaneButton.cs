@@ -52,7 +52,7 @@ public class PlaneButton : NetworkBehaviour, I_Interactable
     public void Interact(ulong netObjId)
     {
         Debug.Log("playing animation...");
-        _animator.SetTrigger("InteractedWith"); 
+        _animator.SetTrigger("InteractedWith");
         IsOn = !IsOn;
     }
 }
