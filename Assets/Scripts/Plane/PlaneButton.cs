@@ -1,13 +1,14 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlaneButton : MonoBehaviour, I_Interactable
+public class PlaneButton : NetworkBehaviour, I_Interactable
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public bool IsOn;
     [SerializeField] private GameObject[] _objectToEnable;
     private Animator _animator;
-    [SerializeField] string _animationTriggerName; 
-    
+    [SerializeField] string _animationTriggerName;
+
 
 
     void Start()
@@ -20,28 +21,38 @@ public class PlaneButton : MonoBehaviour, I_Interactable
     {
         if (_objectToEnable.Length == 0)
         {
-            return; 
+            return;
         }
 
         if (IsOn)
         {
-            foreach (var obj in _objectToEnable)
+            if (IsOwner)
             {
-                obj.GetComponent<Animator>().SetTrigger(_animationTriggerName);
+                UpdateAnimationsRpc();
+                IsOn = false;
             }
-            IsOn = false; 
         }
 
     }
+
+    [Rpc(SendTo.Everyone)]
+    void UpdateAnimationsRpc()
+    {
+        foreach (var obj in _objectToEnable)
+        {
+            obj.GetComponent<Animator>().SetTrigger(_animationTriggerName);
+        }
+    }
+
     public bool CanInteractWith()
     {
-        return true; 
+        return true;
     }
 
     public void Interact()
     {
         Debug.Log("playing animation...");
-        _animator.SetTrigger("InteractedWith"); 
+        _animator.SetTrigger("InteractedWith");
         IsOn = !IsOn;
     }
 }

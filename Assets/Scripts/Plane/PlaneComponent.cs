@@ -29,12 +29,13 @@ public class PlaneComponent : MonoBehaviour
         if (_durability - damage > 0)
         {
             _durability -= damage;
-            OnDamaged?.Invoke();
+            //OnDamaged?.Invoke();
         }
         else
         {
             _durability = 0;
-            OnDestruction?.Invoke();
+            Destroy(gameObject);
+            //OnDestruction?.Invoke();
         }
     }
 
@@ -46,6 +47,11 @@ public class PlaneComponent : MonoBehaviour
             Mathf.Clamp(_durability, 0, 100);
             OnRepaired?.Invoke();
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Damage(50f); 
     }
 
 }

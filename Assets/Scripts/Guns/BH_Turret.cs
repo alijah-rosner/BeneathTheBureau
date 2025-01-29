@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Multiplayer.Samples.Utilities;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BH_Turret : MonoBehaviour
+public class BH_Turret : NetworkBehaviour
 {
     // Start is called before the first frame update
     private bool _canInteract = false;
@@ -29,9 +31,13 @@ public class BH_Turret : MonoBehaviour
     private bool _timeToShoot = true;
 
     private Camera _playerCam;
-    [SerializeField] Camera TurretCamera; 
+    [SerializeField] Camera TurretCamera;
 
-    private bool _newShooter = false; 
+    private bool _newShooter = false;
+
+    private Vector2 mouseMove = Vector2.zero;
+    private Rigidbody playerRigidbody;
+    private Quaternion targetRotation;
 
     void Start()
     {
@@ -41,24 +47,32 @@ public class BH_Turret : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner)
+        {
+            return; 
+        }
+
         if (_canInteract && !_hasShooter)
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
                 _hasShooter = true;
                 Debug.Log("Piloting turret");
+                PlayerController playerControl = _host.gameObject.GetComponent<PlayerController>();
+                _playerCam = playerControl.GetCamera();
+                _playerCam.gameObject.SetActive(false);
+                TurretCamera.gameObject.SetActive(true);
             }
 
         }
         else if (_hasShooter && _canInteract)
         {
+            UpdateCamera();
 
             if (Input.GetKey(KeyCode.Mouse0) && _timeToShoot)
             {
-                GameObject proj = Instantiate(_projectile, _origin.position, _head.transform.rotation);
-
-
-                proj.GetComponent<BH_Projectile>()._turretHost = _head;
+                ShootProjectileRpc();
+                
 
                 Debug.Log("Attempting to shoot");
                 _timeToShoot = false;
@@ -66,7 +80,7 @@ public class BH_Turret : MonoBehaviour
 
             nextFire += Time.deltaTime;
 
-            if (nextFire > 0.5f)
+            if (nextFire > 0.25f)
             {
                 _timeToShoot = true;
                 nextFire = 0.0f;
@@ -77,46 +91,48 @@ public class BH_Turret : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    [Rpc(SendTo.Everyone)]
+    private void ShootProjectileRpc()
     {
-        if ( _hasShooter && _newShooter)
-        {
-            PlayerController playerControl = _host.gameObject.GetComponent<PlayerController>();
-            _playerCam = playerControl.GetCamera();
-            _playerCam.gameObject.SetActive(false);
-            TurretCamera.gameObject.SetActive(true);
-            _newShooter = false; 
-        }
+        GameObject proj = Instantiate(_projectile, _origin.position, _head.transform.rotation);
+        var netProj = proj.GetComponent<NetworkObject>();
+        netProj.Spawn();
 
-        if (_hasShooter && !_newShooter)
-        {
-            Ray ray = _playerCam.ScreenPointToRay(Input.mousePosition);
 
-            // Create a plane at the turret's height
-            Plane horizontalPlane = new Plane(Vector3.up, _head.transform.position);
-
-            if (horizontalPlane.Raycast(ray, out float distance))
-            {
-                Vector3 targetPoint = ray.GetPoint(distance);
-
-                // Calculate direction to target
-                Vector3 directionToTarget = targetPoint - _head.transform.position;
-                directionToTarget.y = 0; // Keep rotation horizontal
-
-                if (directionToTarget != Vector3.zero)
-                {
-                    // Use LookRotation instead of Euler angles
-                    Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
-
-                    // Apply smooth rotation
-                    _head.transform.rotation = Quaternion.Slerp(_head.transform.rotation, targetRotation, 5f * Time.deltaTime);
-                }
-            }
-        }
-
+        proj.GetComponent<BH_Projectile>()._turretHost = _head;
     }
 
+    private void UpdateCamera()
+    {
+        // Get mouse input for looking around
+        mouseMove.y = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * 1000;
+        mouseMove.x = Input.GetAxisRaw("Mouse X") * Time.deltaTime * 1000;
 
+        // Update look angles
+        xLook -= mouseMove.y;
+        yLook += mouseMove.x;
+
+        // Clamp vertical look
+        xLook = Mathf.Clamp(xLook, -90f, 90f);
+        //yLook = Mathf.Clamp(yLook, -90, 90f);
+
+        // Get the head's up vector in world space
+        Vector3 playerUp = _host.transform.up;
+
+        // Create a rotation that aligns with the player's up direction
+        Quaternion alignRotation = Quaternion.FromToRotation(Vector3.up, playerUp);
+
+        // Create the base camera rotation (pitch and yaw)
+        Quaternion lookRotation = Quaternion.Euler(xLook, yLook, 0);
+
+        // Combine the rotations in the correct order
+        targetRotation = alignRotation * lookRotation;
+
+        // Apply the final rotation
+        _head.transform.rotation = targetRotation;
+        TurretCamera.transform.rotation = targetRotation;
+
+    }
 
     private void OnTriggerEnter(UnityEngine.Collider other)
     {
@@ -125,7 +141,8 @@ public class BH_Turret : MonoBehaviour
             _canInteract = true;
             _host = other.gameObject;
             Debug.Log("Can interact: true");
-            _newShooter = true; 
+            _newShooter = true;
+            GetComponent<NetworkObject>().ChangeOwnership(other.GetComponent<NetworkObject>().OwnerClientId);
         }
     }
 
@@ -133,9 +150,19 @@ public class BH_Turret : MonoBehaviour
     {
         if (other.transform.tag == "Player")
         {
-            _canInteract = false;
-            _host = null;
-            Debug.Log("Can interact: false");
+            if (_playerCam)
+            {
+                if (!_playerCam.isActiveAndEnabled)
+                {
+                    _playerCam.gameObject.SetActive(true);
+                    TurretCamera.gameObject.SetActive(false);
+                }
+                _canInteract = false;
+                _hasShooter = !_hasShooter; 
+                //_host = null;
+                Debug.Log("Can interact: false");
+
+            }
         }
 
     }
