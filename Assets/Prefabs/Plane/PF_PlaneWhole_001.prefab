@@ -1241,7 +1241,7 @@ GameObject:
   - component: {fileID: 232224799872875416}
   m_Layer: 0
   m_Name: PF_PlaneWhole_001
-  m_TagString: Untagged
+  m_TagString: Aircraft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1335,9 +1335,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   controller: {fileID: 0}
-  thrust: 750
+  planeInterface: {fileID: 6089121747928558672}
+  thrust: 250
   pitchModifier: 25
-  maxThrust: 100
+  maxThrust: 1000
   acceleration: 100
   turnTorque: {x: 90, y: 45, z: 60}
   forceMult: 1000
@@ -1360,7 +1361,7 @@ BoxCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1505,7 +1506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: TickSyncChildren
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5769998702269537165, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: NetworkTransformExpanded
@@ -1514,6 +1515,10 @@ PrefabInstance:
     - target: {fileID: 6294335790709019816, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: m_Name
       value: PF_PlaneInterface
+      objectReference: {fileID: 0}
+    - target: {fileID: 6294335790709019816, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 6500679494735933254, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
       propertyPath: m_Enabled
@@ -1535,6 +1540,11 @@ PrefabInstance:
 --- !u!4 &3941062754687821409 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3848441654712114841, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
+  m_PrefabInstance: {fileID: 277286912717109496}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6089121747928558672 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6294335790709019816, guid: c6078eeb3f6c9e34a8829b143a3edc3c, type: 3}
   m_PrefabInstance: {fileID: 277286912717109496}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &540077085061127498
@@ -1592,6 +1602,10 @@ PrefabInstance:
     - target: {fileID: 5607789976551328281, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
       propertyPath: m_LocalPosition.y
       value: 35.127
+      objectReference: {fileID: 0}
+    - target: {fileID: 5634368723499932976, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5845195205572281337, guid: bf6c9570ba17f444089ef039dd986679, type: 3}
       propertyPath: m_Layer

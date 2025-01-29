@@ -49,7 +49,7 @@ public class PlaneButton : NetworkBehaviour, I_Interactable
         return true;
     }
 
-    public void Interact()
+    public void Interact(ulong netObjId)
     {
         Debug.Log("playing animation...");
         _animator.SetTrigger("InteractedWith");

@@ -7,7 +7,8 @@ public interface I_Interactable
     //void AddObserver(I_Observer observer);
    // void NotifyObservers();
    // void RemoveObserver(I_Observer observer); 
-    void Interact();
+    //void Interact();
+    void Interact(ulong netObjId);
 }
 
 public interface I_Observer
