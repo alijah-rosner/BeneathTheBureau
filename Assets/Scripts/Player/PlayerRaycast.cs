@@ -13,7 +13,7 @@ public class PlayerRaycast : MonoBehaviour
     [SerializeField] private GameObject _cameraGameObj;
     private Camera _camera;
     private Ray _raycast;
-    public NetworkBehaviour _localPlayer; 
+    [SerializeField] NetworkBehaviour _localPlayer; 
     void Awake()
     {
         _interactables = new();
@@ -24,10 +24,10 @@ public class PlayerRaycast : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (!_localPlayer.IsOwner)
-        //{
-        //    return; 
-        //}
+        if (!_localPlayer.IsOwner)
+        {
+            return;
+        }
 
         RaycastHit hit; 
         if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))

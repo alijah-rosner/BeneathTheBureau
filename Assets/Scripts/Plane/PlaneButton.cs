@@ -4,16 +4,23 @@ using UnityEngine;
 public class PlaneButton : NetworkBehaviour, I_Interactable
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public bool IsOn;
+    public enum ButtonState
+    {
+        ToggledOn,
+        ToggledOff
+    }
+
     [SerializeField] private GameObject[] _objectToEnable;
     private Animator _animator;
     [SerializeField] string _animationTriggerName;
-
+    private ButtonState _state;
+    private bool _performingAction = false; 
 
 
     void Start()
     {
         _animator = GetComponentInChildren<Animator>();
+        _state = ButtonState.ToggledOff;
     }
 
     // Update is called once per frame
@@ -24,23 +31,39 @@ public class PlaneButton : NetworkBehaviour, I_Interactable
             return;
         }
 
-        if (IsOn)
+        if (_state == ButtonState.ToggledOn)
         {
             if (IsOwner)
             {
-                UpdateAnimationsRpc();
-                IsOn = false;
+                if (_performingAction)
+                {
+                    UpdateAnimationsRpc("Off");
+                    _state = ButtonState.ToggledOff;
+                    _performingAction = false;
+                }
+            }
+        }
+        if (_state == ButtonState.ToggledOff)
+        {
+            if (IsOwner)
+            {
+                if (_performingAction)
+                {
+                    UpdateAnimationsRpc("On");
+                    _state = ButtonState.ToggledOn;
+                    _performingAction = false;
+                }
             }
         }
 
     }
 
     [Rpc(SendTo.Everyone)]
-    void UpdateAnimationsRpc()
+    void UpdateAnimationsRpc(string triggerWord)
     {
         foreach (var obj in _objectToEnable)
         {
-            obj.GetComponent<Animator>().SetTrigger(_animationTriggerName);
+            obj.GetComponent<Animator>().SetTrigger(triggerWord);
         }
     }
 
@@ -53,6 +76,6 @@ public class PlaneButton : NetworkBehaviour, I_Interactable
     {
         Debug.Log("playing animation...");
         _animator.SetTrigger("InteractedWith");
-        IsOn = !IsOn;
+        _performingAction = true;
     }
 }
