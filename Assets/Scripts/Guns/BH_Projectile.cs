@@ -7,7 +7,7 @@ using UnityEngine;
 public class BH_Projectile : NetworkBehaviour
 {
     // Start is called before the first frame update
-    private float _speed = 1000f;
+    private float _speed = 2000f;
     private Rigidbody rh;
     public GameObject _turretHost;
 
