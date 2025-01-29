@@ -459,9 +459,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   groundMoveSpeed: 4
-  aircraftMoveSpeed: 4
+  aircraftMoveSpeed: 8
   jumpForce: 5
-  aircraftJumpForce: 5
+  aircraftJumpForce: 3
   groundAcceleration: 0.05
   groundDeceleration: 0.75
   aircraftAcceleration: 0.1
@@ -520,7 +520,7 @@ MonoBehaviour:
   NetworkTransformExpanded: 1
   AuthorityMode: 1
   TickSyncChildren: 1
-  UseUnreliableDeltas: 0
+  UseUnreliableDeltas: 1
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
@@ -534,9 +534,9 @@ MonoBehaviour:
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
-  UseQuaternionCompression: 1
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 1
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 1
+  InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 1
   Interpolate: 1
   SlerpPosition: 1
@@ -554,8 +554,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 0
+  UseRigidBodyForMotion: 1
+  AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &2206097604985657935
 MonoBehaviour:

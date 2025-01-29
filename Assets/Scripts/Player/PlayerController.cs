@@ -194,7 +194,7 @@ public class PlayerController : NetworkBehaviour
 
             // Project the input direction onto the aircraft's local horizontal plane
             Vector3 projectedDirection = Vector3.ProjectOnPlane(moveDirection, aircraft.transform.up).normalized;
-            rigidBody.AddForce(projectedDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+            rigidBody.AddForce(projectedDirection * aircraftMoveSpeed * accelerationFactor, ForceMode.Acceleration);
 
         }
         // Update turn factor based on mouse movement
@@ -230,6 +230,7 @@ public class PlayerController : NetworkBehaviour
         {
             FlightController aircraft = FindFirstObjectByType<FlightController>();
             rigidBody.AddForce(-aircraft.transform.up * effectiveGravity, ForceMode.Acceleration);
+            Debug.Log(aircraft.transform.up);
 
         }
         else
@@ -295,7 +296,7 @@ public class PlayerController : NetworkBehaviour
     public bool GetIsPilot() => _isPilot.Value;
 
     public bool GetInAircraft() => _inAircraft.Value;
-
+     
 
     [ServerRpc]
     private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
@@ -305,23 +306,6 @@ public class PlayerController : NetworkBehaviour
         netRotation.Value = rotation;
         netVelocity.Value = velocity;
     }
-
-    //[ServerRpc]
-    //private void SyncPassengerPositionServerRpc(Vector3 relativePosition)
-    //{
-    //    netRelativePosition.Value = relativePosition;
-    //}
-
-    //[ClientRpc]
-    //private void SyncPassengerPositionClientRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
-    //{
-    //    if (!IsOwner)
-    //    {
-    //        transform.position = position;
-    //        transform.rotation = rotation;
-    //        rigidBody.linearVelocity = velocity;
-    //    }
-    //}
 
     public void SetInAircraft(bool r)
     {
@@ -367,6 +351,7 @@ public class PlayerController : NetworkBehaviour
         _camera = cam;
     }
 
+}
     //private void HandleAircraftMovement()
     //{
     //    rigidBody.linearDamping = 0f;
@@ -436,4 +421,3 @@ public class PlayerController : NetworkBehaviour
     //        SyncPassengerPositionServerRpc(relativePos);
     //    }
     //}
-}
