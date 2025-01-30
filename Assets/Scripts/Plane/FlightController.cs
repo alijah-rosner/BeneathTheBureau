@@ -131,8 +131,8 @@ public class FlightController : NetworkBehaviour
         if (!IsServer)
         {
             // Clients interpolate to the networked position/rotation
-            transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
-            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);
+//transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
+//            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);            
             rigid.linearVelocity = netVelocity.Value;
             return;
         }

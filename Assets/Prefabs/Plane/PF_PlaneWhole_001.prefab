@@ -1381,8 +1381,8 @@ Rigidbody:
   m_GameObject: {fileID: 7770530565923251601}
   serializedVersion: 4
   m_Mass: 3000
-  m_Drag: 10
-  m_AngularDrag: 3
+  m_Drag: 20
+  m_AngularDrag: 20
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
