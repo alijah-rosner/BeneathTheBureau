@@ -7,7 +7,7 @@ public class FlightController : NetworkBehaviour
 {
 
     [Header("Components")]
-    [SerializeField] private MouseFlightController controller = null;
+    [SerializeField] public MouseFlightController controller = null;
     [SerializeField] public GameObject planeInterface = null;
 
     [Header("Physics")]
