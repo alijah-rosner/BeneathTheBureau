@@ -1239,7 +1239,7 @@ GameObject:
   - component: {fileID: 6059514869798921170}
   - component: {fileID: 232224799872875416}
   m_Layer: 0
-  m_Name: PF_PlaneWhole_001
+  m_Name: PF_SimPlane
   m_TagString: Aircraft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

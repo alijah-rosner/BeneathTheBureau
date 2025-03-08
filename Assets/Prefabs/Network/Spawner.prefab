@@ -72,4 +72,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _dataBase: {fileID: 11400000, guid: f5c83b1e067de0e4a89fe7bf2ffd4783, type: 2}
-  PlanePrefab: {fileID: 7770530565923251601, guid: 66abaf9204c0b3144be391058ab6c58a, type: 3}
+  GroundPlane: {fileID: 7770530565923251601, guid: 66abaf9204c0b3144be391058ab6c58a, type: 3}
+  SimPlane: {fileID: 7770530565923251601, guid: b1d33f79e9f414541a7f48eb87efaf2a, type: 3}

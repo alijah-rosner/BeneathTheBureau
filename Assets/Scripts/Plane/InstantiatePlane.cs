@@ -5,7 +5,8 @@ using UnityEngine;
 public class InstantiatePlane : NetworkBehaviour
 {
     [SerializeField] private SO_CharacterDatabase _dataBase;
-    [SerializeField] private GameObject PlanePrefab;
+    [SerializeField] private GameObject GroundPlane;
+    [SerializeField] private GameObject SimPlane;
 
     public override void OnNetworkSpawn()
     {
@@ -13,8 +14,8 @@ public class InstantiatePlane : NetworkBehaviour
         {
             return;
         }
-        GameObject basePlane = Instantiate(PlanePrefab, new Vector3(0f, 0f, 0f), Quaternion.identity);
-        GameObject simPlane = Instantiate(PlanePrefab, new Vector3(0f, 10f, 10f), Quaternion.identity);
+        GameObject basePlane = Instantiate(GroundPlane, new Vector3(0f, 0f, 0f), Quaternion.identity);
+        GameObject simPlane = Instantiate(SimPlane, new Vector3(0f, 10f, 10f), Quaternion.identity);
 
         float xOffset = 0;
         float zOffset = 0;

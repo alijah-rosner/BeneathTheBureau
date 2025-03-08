@@ -127,7 +127,7 @@ public class MouseFlightController : MonoBehaviour
     {
         if (aircraft == null)
         {
-            aircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+            aircraft = GameObject.FindGameObjectWithTag("Aircraft").transform;
         }
         _isEnabled = aircraft.GetComponent<FlightController>().GetController();
         if (useFixed == false)
