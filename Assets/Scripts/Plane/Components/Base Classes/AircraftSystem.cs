@@ -60,11 +60,11 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
     [SerializeField] protected float _structuralIntregity = 100.0f; 
     [SerializeField] protected float _structuralFailureThreshold = 60.0f;
 
-    // Events
-    [SerializeField] GameEvent<AircraftSystem> OnDamage;
-    [SerializeField] GameEvent<AircraftSystem> OnRepair;
-    [SerializeField] GameEvent<AircraftSystem> OnInputValueChange; 
-    [SerializeField] GameEvent<AircraftSystem> OnOutputValueChange; 
+    //// Events
+    //[SerializeField] GameEvent<AircraftSystem> OnDamage;
+    //[SerializeField] GameEvent<AircraftSystem> OnRepair;
+    //[SerializeField] GameEvent<AircraftSystem> OnInputValueChange; 
+    //[SerializeField] GameEvent<AircraftSystem> OnOutputValueChange; 
 
     protected AircraftSystem powerSource;
     //private List<GameEventListener> _listeners; 

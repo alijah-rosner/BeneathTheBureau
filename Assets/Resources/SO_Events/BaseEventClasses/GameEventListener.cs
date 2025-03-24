@@ -47,13 +47,6 @@ public class GameEventListener<T> : MonoBehaviour, I_EventListener<T>
     }
 }
 
-// public class IntGameEventListener : GameEventListener<int>
-// {
-//     public IntGameEventListener(Action<int> response) : base(response)
-//     {
-//     }
-// }
-
 // public class Vector3GameEventListener : GameEventListener<Vector3>
 // {
 //     public Vector3GameEventListener(Action<Vector3> response) : base(response)
