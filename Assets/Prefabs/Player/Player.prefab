@@ -475,12 +475,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 375
   orientation: {fileID: 5767980992004618246}
-  _camera: {fileID: 9010999993974044231}
+  SimPlayer: {fileID: 0}
   isGrounded: 1
   _inAircraft:
-    m_InternalValue: 0
+    m_InternalValue: 1
   _isPilot:
     m_InternalValue: 0
+  rotationSpeed: 5
+  mouseSensitivity: 1000
+  maxVerticalAngle: 90
+  simLocalPosition:
+    m_InternalValue: {x: 0, y: 0, z: 0}
+  simLocalRotation:
+    m_InternalValue: {x: 0, y: 0, z: 0, w: 0}
+  remoteSimPlayer: {fileID: 0}
 --- !u!136 &3286813656955529644
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -494,7 +502,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -530,7 +538,7 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.5
+  PositionThreshold: 0.1
   RotAngleThreshold: 0.00001
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 1
@@ -569,7 +577,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a67e4577e837e7c4db81dd9fd977894b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cameraGameObj: {fileID: 2432884893416196454}
   _localPlayer: {fileID: 4861580037806051612}
 --- !u!1 &6994807786656674940
 GameObject:
@@ -626,7 +633,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7546200453101626892}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

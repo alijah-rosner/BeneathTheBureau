@@ -5,7 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class BH_Turret : NetworkBehaviour
+public class BH_Turret : AircraftSystem
 {
     // Start is called before the first frame update
     private bool _canInteract = false;

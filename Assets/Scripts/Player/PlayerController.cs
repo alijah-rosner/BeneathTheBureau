@@ -30,7 +30,8 @@ public class PlayerController : NetworkBehaviour
     [Header("References")]
     [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
     public Transform orientation;
-    [SerializeField] private Camera _camera;
+    private Camera _camera;
+    [SerializeField] public GameObject SimPlayer;
 
     private Rigidbody rigidBody;
     private float forwardMovement;
@@ -46,7 +47,11 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private NetworkVariable<bool> _isPilot = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-
+    [Header("Rotation Settings")]
+    [SerializeField] private float rotationSpeed = 5f;
+    [SerializeField] private float mouseSensitivity = 1000f;
+    [SerializeField] private float maxVerticalAngle = 90f;
+    private Transform _cameraTransform;
 
     private NetworkVariable<Vector3> netPosition = new NetworkVariable<Vector3>();
     private NetworkVariable<Quaternion> netRotation = new NetworkVariable<Quaternion>();
@@ -54,9 +59,14 @@ public class PlayerController : NetworkBehaviour
     private NetworkVariable<Vector3> netRelativePosition = new NetworkVariable<Vector3>();
 
     // Reference to the current aircraft
-    private FlightController currentAircraft;
+    private FlightController2 currentAircraft;
     private Vector3 lastAircraftPosition;
     private Quaternion lastAircraftRotation;
+
+    private float verticalRotation = 0f;
+
+    private static Dictionary<ulong, GameObject> allSimPlayers = new Dictionary<ulong, GameObject>();
+    private bool simPlayerSetupComplete = false;
 
     public override void OnNetworkSpawn()
     {
@@ -65,7 +75,15 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        _camera.enabled = true;
+
+        currentAircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft").GetComponent<FlightController2>();
+        SimPlayer = Instantiate(SimPlayer, GameObject.FindGameObjectWithTag("SimulatedAircraft").transform);
+        // SimPlayer.GetComponent<NetworkObject>().Spawn();
+        SimPlayer.GetComponent<SimCharacter>().SetSimNetworkController(this);
+        SimPlayer.transform.parent = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+        SimPlayer.GetComponentInChildren<Camera>().enabled = true;
+        _camera = SimPlayer.GetComponentInChildren<Camera>();
+        _cameraTransform = _camera.transform;
         rigidBody = GetComponent<Rigidbody>();
         // Initialize network variables
         if (IsServer)
@@ -78,6 +96,56 @@ public class PlayerController : NetworkBehaviour
         {
             ClientSpawnRpc();
         }
+
+        NotifySimPlayerCreatedServerRpc(OwnerClientId);
+    }
+
+    public NetworkVariable<Vector3> simLocalPosition = new NetworkVariable<Vector3>();
+    public NetworkVariable<Quaternion> simLocalRotation = new NetworkVariable<Quaternion>();
+
+    [ServerRpc]
+    private void NotifySimPlayerCreatedServerRpc(ulong playerId)
+    {
+        // Server tells all clients to create a copy of this player's SimPlayer
+        NotifySimPlayerCreatedClientRpc(playerId);
+    }
+
+    [ClientRpc]
+    private void NotifySimPlayerCreatedClientRpc(ulong playerId)
+    {
+        // Skip if this is our own SimPlayer - we already created it
+        if (IsOwner && playerId == OwnerClientId) return;
+
+        // Find the corresponding PlayerController
+        PlayerController targetController = null;
+        foreach (PlayerController pc in FindObjectsOfType<PlayerController>())
+        {
+            if (pc.OwnerClientId == playerId)
+            {
+                targetController = pc;
+                break;
+            }
+        }
+
+        if (targetController == null) return;
+
+        // Find the aircraft
+        GameObject simAircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft");
+        if (simAircraft == null) return;
+
+        // Create a SimPlayer instance for this remote player
+        GameObject remoteSimPlayer = Instantiate(SimPlayer, simAircraft.transform);
+
+        // Set up the SimCharacter with reference to its controller
+        SimCharacter simChar = remoteSimPlayer.GetComponent<SimCharacter>();
+        simChar.SetSimNetworkController(targetController);
+
+        // Disable camera and input components
+        Camera cam = remoteSimPlayer.GetComponentInChildren<Camera>();
+        if (cam != null) cam.enabled = false;
+
+        // Store reference in the PlayerController
+        targetController.SimPlayer = remoteSimPlayer;
     }
 
     [Rpc(SendTo.Everyone)]
@@ -119,15 +187,66 @@ public class PlayerController : NetworkBehaviour
 
     private void FixedUpdate()
     {
-
         HandleMovement();
-
         ApplyGravity();
         // Only the owner updates network variables //getting error clock this
         //UpdateNetworkVariablesServerRpc(transform.position, transform.rotation, rigidBody.linearVelocity);
     }
 
+    private void LateUpdate()
+    {
+        if (IsOwner && SimPlayer != null)
+        {
+            // Get the aircraft
+            GameObject simAircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft");
+            if (simAircraft != null)
+            {
+                // Update SimPlayer position based on ground position
+                // Convert world position to aircraft's local space
+                Vector3 localPos = simAircraft.transform.InverseTransformPoint(transform.position);
 
+                // Update NetworkVariable (will be synced to all clients)
+                UpdateSimPositionServerRpc(localPos);
+            }
+        }
+
+        // If we have remote SimPlayers to update
+        UpdateRemoteSimPlayers();
+    }
+
+    // Helper field to store remote SimPlayer references
+    public GameObject remoteSimPlayer;
+
+    private void UpdateRemoteSimPlayers()
+    {
+        // Update all remote SimPlayers' positions
+        foreach (PlayerController pc in FindObjectsOfType<PlayerController>())
+        {
+            // Skip our own player
+            if (pc.IsOwner) continue;
+
+            // If this controller has a remote SimPlayer and network position
+            if (pc.remoteSimPlayer != null)
+            {
+                // Find the aircraft
+                GameObject simAircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft");
+                if (simAircraft == null) continue;
+
+                // Update position from NetworkVariable in local space
+                pc.remoteSimPlayer.transform.localPosition = pc.simLocalPosition.Value;
+                pc.remoteSimPlayer.transform.localRotation = pc.simLocalRotation.Value;
+            }
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateSimPositionServerRpc(Vector3 localPos)
+    {
+        simLocalPosition.Value = localPos;
+
+        // You can also update rotation if needed
+        // simLocalRotation.Value = localRot;
+    }
     private void CheckGround()
     {
         int playerLayerMask = 1 << LayerMask.NameToLayer("isPlayer");
@@ -156,53 +275,46 @@ public class PlayerController : NetworkBehaviour
                 JumpServerRpc();
             }
         }
-        else
-        {
-            FlightController aircraft = FindFirstObjectByType<FlightController>();
-
-            if (aircraft != null)
-            {
-                transform.rotation = aircraft.transform.rotation;
-            }
-        }
-
     }
 
     private void HandleMovement()
     {
-        UpdateAcceleration(groundAcceleration, groundDeceleration);
 
-        // Apply drag only when grounded
-        if (isGrounded && !_inAircraft.Value)
+        if (_inAircraft.Value && !_isPilot.Value)
         {
-            rigidBody.linearDamping = 1f;
+            UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
+
+            // Get the active camera's directions
+            FlightController2 aircraft = FindFirstObjectByType<FlightController2>();
+
+            if (_camera != null && aircraft != null)
+            {
+                // Get camera's forward and right, flattened to aircraft's local XZ plane
+                Vector3 camForward = Vector3.ProjectOnPlane(_camera.transform.forward, aircraft.transform.up).normalized;
+                Vector3 camRight = Vector3.ProjectOnPlane(_camera.transform.right, aircraft.transform.up).normalized;
+
+                // Create movement direction using camera orientation instead of orientation object
+                Vector3 moveDirection = (camForward * forwardMovement + camRight * lateralMovement).normalized;
+
+                // Apply movement force
+                rigidBody.AddForce(moveDirection * aircraftMoveSpeed * accelerationFactor, ForceMode.Acceleration);
+            }
+
         }
         else
         {
-            rigidBody.linearDamping = 0f;
-        }
-        turnFactor = Mathf.Max(1f, Mathf.Abs(Input.GetAxis("Mouse X")) + 1f);
-        accelerationFactor = Mathf.Clamp(accelerationFactor / turnFactor, 0f, 1f);
-
-        // Calculate move direction
-        Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-        if (_inAircraft.Value)
-        {
-            FlightController aircraft = FindObjectOfType<FlightController>();
-            if (aircraft == null) return;
-            transform.rotation = aircraft.transform.rotation;
-
-            // Project the input direction onto the aircraft's local horizontal plane
-            Vector3 projectedDirection = Vector3.ProjectOnPlane(moveDirection, aircraft.transform.up).normalized;
-            rigidBody.AddForce(projectedDirection * aircraftMoveSpeed * accelerationFactor, ForceMode.Acceleration);
-
-        }
-        // Update turn factor based on mouse movement
-        else
-        {
+            // Ground movement (unchanged)
+            UpdateAcceleration(groundAcceleration, groundDeceleration);
+            Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
             rigidBody.AddForce(moveDirection * groundMoveSpeed * accelerationFactor, ForceMode.Acceleration);
         }
-        // Apply movement force
+
+        if (SimPlayer != null)
+        {
+            // Set SimPlayer position relative to aircraft in local space
+            SimPlayer.transform.localPosition = transform.localPosition;
+
+        }
 
     }
 
@@ -224,17 +336,23 @@ public class PlayerController : NetworkBehaviour
         float gravityMultiplier = _inAircraft.Value ? flightGravityScale : 1f;
         float effectiveGravity = groundGravity * gravityMultiplier;
 
-        // Don't apply extra gravity when grounded
-        //rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
         if (_inAircraft.Value)
         {
-            FlightController aircraft = FindFirstObjectByType<FlightController>();
-            rigidBody.AddForce(-aircraft.transform.up * effectiveGravity, ForceMode.Acceleration);
-            Debug.Log(aircraft.transform.up);
-
+            FlightController2 aircraft = FindFirstObjectByType<FlightController2>();
+            if (aircraft != null)
+            {
+                // Simply apply gravity in aircraft's down direction
+                rigidBody.AddForce(-aircraft.transform.up * effectiveGravity, ForceMode.Acceleration);
+            }
+            else
+            {
+                // Fallback to world down if aircraft not found
+                rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
+            }
         }
         else
         {
+            // Standard gravity when on ground
             rigidBody.AddForce(Vector3.down * effectiveGravity, ForceMode.Acceleration);
         }
     }
@@ -266,7 +384,7 @@ public class PlayerController : NetworkBehaviour
 
         while (timeElapsed < duration)
         {
-            FlightController aircraft = FindFirstObjectByType<FlightController>();
+            FlightController2 aircraft = FindFirstObjectByType<FlightController2>();
             if (aircraft != null)
             {
                 Vector3 jumpDirection = aircraft.transform.up;
@@ -296,7 +414,7 @@ public class PlayerController : NetworkBehaviour
     public bool GetIsPilot() => _isPilot.Value;
 
     public bool GetInAircraft() => _inAircraft.Value;
-     
+
 
     [ServerRpc]
     private void UpdateNetworkVariablesServerRpc(Vector3 position, Quaternion rotation, Vector3 velocity)
@@ -309,21 +427,21 @@ public class PlayerController : NetworkBehaviour
 
     public void SetInAircraft(bool r)
     {
-     
+
         if (IsOwner)
         {
-            _inAircraft.Value = r;
+            // _inAircraft.Value = r;
 
-            // Reset aircraft reference when leaving
-            if (!r)
-            {
-                currentAircraft = null;
-                transform.parent = null;
-            }
-            else
-            {
-                transform.parent = GameObject.FindWithTag("Aircraft").transform;
-            }
+            //// Reset aircraft reference when leaving
+            //if (!r)
+            //{
+            //    currentAircraft = null;
+            //    transform.parent = null;
+            //}
+            //else
+            //{
+            //   // transform.parent = GameObject.FindWithTag("Aircraft").transform;
+            //}
 
             // Sync the state change
         }
@@ -352,72 +470,4 @@ public class PlayerController : NetworkBehaviour
     }
 
 }
-    //private void HandleAircraftMovement()
-    //{
-    //    rigidBody.linearDamping = 0f;
-    //    rigidBody.interpolation = RigidbodyInterpolation.Interpolate;
-    //    FlightController aircraft = FindObjectOfType<FlightController>();
-    //    if (aircraft == null) return;
 
-    //    // Store reference to current aircraft if not already set
-    //    if (currentAircraft != aircraft)
-    //    {
-    //        currentAircraft = aircraft;
-    //        lastAircraftPosition = aircraft.transform.position;
-    //        lastAircraftRotation = aircraft.transform.rotation;
-    //    }
-
-    //    if (!aircraft.GetIsMoving())
-    //    {
-    //        HandleGroundMovement();
-    //        return;
-    //    }
-
-    //    Rigidbody aircraftRb = aircraft.GetComponent<Rigidbody>();
-    //    UpdateAcceleration(aircraftAcceleration, aircraftDeceleration);
-
-    //    // Calculate relative position to aircraft
-    //    Vector3 relativePos = transform.position - aircraft.transform.position;
-
-    //    // Update position based on aircraft movement
-    //    Vector3 aircraftDelta = aircraft.transform.position - lastAircraftPosition;
-    //    Vector3 newPosition = transform.position + aircraftDelta;
-
-    //    // Calculate relative movement within aircraft
-    //    Vector3 moveDirection = (orientation.forward * forwardMovement + orientation.right * lateralMovement).normalized;
-    //    Vector3 relativeMovement = moveDirection /** aircraftMoveSpeed*/ * accelerationFactor;
-
-    //    // Apply rotation with aircraft
-    //    Quaternion rotationDelta = aircraft.transform.rotation * Quaternion.Inverse(lastAircraftRotation);
-    //    Vector3 rotatedRelativePos = rotationDelta * relativePos;
-    //    newPosition = aircraft.transform.position + rotatedRelativePos;
-
-    //    // Update position and rotation
-    //    transform.position = newPosition;
-    //    transform.rotation = aircraft.transform.rotation;
-
-    //    // Update velocity
-    //    if (accelerationFactor < 0.05f && isGrounded)
-    //    {
-    //        rigidBody.linearVelocity = aircraftRb.linearVelocity;
-    //    }
-    //    else
-    //    {
-    //        rigidBody.linearVelocity = aircraftRb.linearVelocity + relativeMovement;
-    //    }
-
-    //    // Store current aircraft transform for next frame
-    //    lastAircraftPosition = aircraft.transform.position;
-    //    lastAircraftRotation = aircraft.transform.rotation;
-
-    //    // Sync across network
-    //    if (IsServer)
-    //    {
-    //        netRelativePosition.Value = relativePos;
-    //        SyncPassengerPositionClientRpc(newPosition, aircraft.transform.rotation, rigidBody.linearVelocity);
-    //    }
-    //    else
-    //    {
-    //        SyncPassengerPositionServerRpc(relativePos);
-    //    }
-    //}

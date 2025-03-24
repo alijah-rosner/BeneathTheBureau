@@ -26,6 +26,7 @@ public class PlaneComponent : MonoBehaviour
     
     public void Damage(float damage)
     {
+        Debug.Log("damaging");
         if (_durability - damage > 0)
         {
             _durability -= damage;
@@ -47,11 +48,6 @@ public class PlaneComponent : MonoBehaviour
             Mathf.Clamp(_durability, 0, 100);
             OnRepaired?.Invoke();
         }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Damage(50f); 
     }
 
 }

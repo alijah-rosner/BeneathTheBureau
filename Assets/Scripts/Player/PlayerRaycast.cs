@@ -10,15 +10,14 @@ public class PlayerRaycast : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Dictionary<GameObject, System.Action> _raycastInteractables;
     List<I_Interactable> _interactables;
-    [SerializeField] private GameObject _cameraGameObj;
-    private Camera _camera;
+    private GameObject _camera;
     private Ray _raycast;
     [SerializeField] NetworkBehaviour _localPlayer; 
-    void Awake()
+
+    void Start()
     {
         _interactables = new();
-        _camera = _cameraGameObj.GetComponent<Camera>();
-        //_localPlayer = transform.parent.GetComponent<NetworkBehaviour>();
+        _camera = GameObject.FindGameObjectWithTag("PlayerCamera");
     }
 
     // Update is called once per frame

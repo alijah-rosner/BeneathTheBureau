@@ -1,7 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlaneButton : NetworkBehaviour, I_Interactable
+public class PlaneButton : MonoBehaviour, I_Interactable
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public enum ButtonState
@@ -26,35 +26,35 @@ public class PlaneButton : NetworkBehaviour, I_Interactable
     // Update is called once per frame
     void Update()
     {
-        if (_objectToEnable.Length == 0)
-        {
-            return;
-        }
+        //if (_objectToEnable.Length == 0)
+        //{
+        //    return;
+        //}
 
-        if (_state == ButtonState.ToggledOn)
-        {
-            if (IsOwner)
-            {
-                if (_performingAction)
-                {
-                    UpdateAnimationsRpc("Off");
-                    _state = ButtonState.ToggledOff;
-                    _performingAction = false;
-                }
-            }
-        }
-        if (_state == ButtonState.ToggledOff)
-        {
-            if (IsOwner)
-            {
-                if (_performingAction)
-                {
-                    UpdateAnimationsRpc("On");
-                    _state = ButtonState.ToggledOn;
-                    _performingAction = false;
-                }
-            }
-        }
+        //if (_state == ButtonState.ToggledOn)
+        //{
+        //    if (IsOwner)
+        //    {
+        //        if (_performingAction)
+        //        {
+        //            UpdateAnimationsRpc("Off");
+        //            _state = ButtonState.ToggledOff;
+        //            _performingAction = false;
+        //        }
+        //    }
+        //}
+        //if (_state == ButtonState.ToggledOff)
+        //{
+        //    if (IsOwner)
+        //    {
+        //        if (_performingAction)
+        //        {
+        //            UpdateAnimationsRpc("On");
+        //            _state = ButtonState.ToggledOn;
+        //            _performingAction = false;
+        //        }
+        //    }
+        //}
 
     }
 

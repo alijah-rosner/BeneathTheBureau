@@ -18,4 +18,4 @@ MonoBehaviour:
     till things are over to lose his mind. - Thrives on stress, self-destructive.'
   _icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   _mesh: {fileID: 284349330848693672, guid: 26433c6cafa539d4ba8b4fc7ad143897, type: 3}
-  _gameplayPrefab: {fileID: 417080042839615562, guid: 0c99d555d2ffcc14ab4a37f891eb6366, type: 3}
+  _gameplayPrefab: {fileID: 2841045046612361982, guid: fd1f239b8dc123548aedb7e77ad078f6, type: 3}

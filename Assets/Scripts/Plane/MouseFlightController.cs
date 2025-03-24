@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class MouseFlightController : MonoBehaviour
@@ -16,7 +17,7 @@ public class MouseFlightController : MonoBehaviour
     private Transform cameraRig = null;
     [SerializeField]
     [Tooltip("Transform of the camera itself")]
-    private Transform cam = null;
+    public Transform cam = null;
 
     [Header("Options")]
     [SerializeField]
@@ -38,6 +39,10 @@ public class MouseFlightController : MonoBehaviour
     [SerializeField]
     [Tooltip("Altitude set by pilot")]
     private float destinationAltitude = 50; // Default height
+
+    [SerializeField]
+    [Tooltip("Player's Cinemachine Camera")]
+    private CinemachineCamera cinemachineCam; 
 
 
 
@@ -127,9 +132,9 @@ public class MouseFlightController : MonoBehaviour
     {
         if (aircraft == null)
         {
-            aircraft = GameObject.FindGameObjectWithTag("Aircraft").transform;
+            aircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
         }
-        _isEnabled = aircraft.GetComponent<FlightController>().GetController();
+        _isEnabled = aircraft.GetComponent<FlightController2>().GetController();
         if (useFixed == false)
             UpdateCameraPos();
 

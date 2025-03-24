@@ -5,98 +5,99 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-  [Header("Mouse Settings")]
-  [SerializeField] private float mouseSensitivity = 1000f;
+    [Header("Mouse Settings")]
+    [SerializeField] private float mouseSensitivity = 1000f;
 
-  [Header("References")]
-  public Transform orientation;
-  public GameObject player;
+    [Header("References")]
+    public Transform orientation;
+    public GameObject player;
 
-  private Vector2 mouseMove = Vector2.zero;
-  private float xLook;
-  private float yLook;
-  private Rigidbody playerRigidbody;
-  private Quaternion targetRotation;
+    private Vector2 mouseMove = Vector2.zero;
+    private float xLook;
+    private float yLook;
+    private Quaternion targetRotation;
 
-  private void Start()
-  {
-    playerRigidbody = player.GetComponent<Rigidbody>();
-    // Initialize rotation to match current camera orientation
-    targetRotation = transform.rotation;
-  }
+    private PlayerController playerController;
+    private bool wasInAircraft = false;
 
-  private void Update()
-  {
-    HandleMouseInput();
-    UpdateCameraRotation();
-    UpdateOrientation();
-  }
+    private void Start()
+    {
+        playerController = player.GetComponent<SimCharacter>().Controller; 
+        // Initialize rotation to match current camera orientation
+        targetRotation = transform.rotation;
+    }
 
-  private void HandleMouseInput()
-  {
-    // Get mouse input for looking around
-    mouseMove.y = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * mouseSensitivity;
-    mouseMove.x = Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseSensitivity;
+    private void Update()
+    {
+        if (!playerController.IsOwner)
+        {
+            return;
+        }
+        HandleMouseInput();
+        UpdateCameraRotation();
+        UpdateOrientation();
+    }
 
-    // Update look angles
-    xLook -= mouseMove.y;
-    yLook += mouseMove.x;
+    private void HandleMouseInput()
+    {
+        // Get mouse input for looking around
+        mouseMove.y = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * mouseSensitivity;
+        mouseMove.x = Input.GetAxisRaw("Mouse X") * Time.deltaTime * mouseSensitivity;
 
-    // Clamp vertical look
-    xLook = Mathf.Clamp(xLook, -90f, 90f);
-  }
+        // Update look angles
+        xLook -= mouseMove.y;
+        yLook += mouseMove.x;
 
-  private void UpdateCameraRotation()
-  {
-    // Get the player's up vector in world space
-    Vector3 playerUp = player.transform.up;
+        // Clamp vertical look
+        xLook = Mathf.Clamp(xLook, -90f, 90f);
+    }
 
-    // Create a rotation that aligns with the player's up direction
-    Quaternion alignRotation = Quaternion.FromToRotation(Vector3.up, playerUp);
+    private void UpdateCameraRotation()
+    {
+        // Get the player's up vector in world space
+        Vector3 playerUp = player.transform.up;
 
-    // Create the base camera rotation (pitch and yaw)
-    Quaternion lookRotation = Quaternion.Euler(xLook, yLook, 0);
+        // Create a rotation that aligns with the player's up direction
+        Quaternion alignRotation = Quaternion.FromToRotation(Vector3.up, playerUp);
 
-    // Combine the rotations in the correct order
-    targetRotation = alignRotation * lookRotation;
+        // Create the base camera rotation (pitch and yaw)
+        Quaternion lookRotation = Quaternion.Euler(xLook, yLook, 0);
 
-    // Apply the final rotation
-    transform.rotation = targetRotation;
-  }
+        // Combine the rotations in the correct order
+        targetRotation = alignRotation * lookRotation;
 
-  private void UpdateOrientation()
-  {
-    // Update orientation for player direction (yaw only)
-    orientation.rotation = Quaternion.Euler(0, yLook, 0);
-  }
+        // Apply the final rotation
+        transform.rotation = targetRotation;
+
+    }
+
+    private void UpdateOrientation()
+    {
+        if (!playerController)
+        {
+            return;
+        }
+        if (playerController.GetInAircraft())
+        {
+            // When in aircraft, align orientation with aircraft's coordinate system
+            FlightController2 aircraft = FindFirstObjectByType<FlightController2>();
+            if (aircraft != null)
+            {
+                // Get the aircraft's up vector and forward vector
+                Vector3 aircraftUp = aircraft.transform.up;
+
+                // Create a rotation that points forward in aircraft's local space
+                // but respects the player's yLook value
+                Quaternion aircraftWorldRotation = aircraft.transform.rotation;
+                Quaternion playerLocalRotation = Quaternion.Euler(0, yLook, 0);
+
+                // Combine rotations to get final orientation
+                orientation.rotation = aircraftWorldRotation * playerLocalRotation;
+            }
+        }
+        else
+        {
+            orientation.rotation = Quaternion.Euler(0, yLook, 0);
+        }
+    }
 }
-
-            //if (Physics.Raycast(transform.position, transform.forward, out lookHit, maxDistance))
-            //{
-            //    intObj = lookHit.collider.GetComponent<InteractableObject>();
-            //    if (intObj && Input.GetMouseButtonDown(0))
-            //    {
-            //        intObj.OnObjectClicked();
-            //    }
-            //    else if (intObj)
-            //    {
-            //        intObj.OnObjectHover();
-            //    }
-            //}
-            //else
-            //{
-            //    if (intObj)
-            //    {
-            //        timer += Time.deltaTime;
-            //        if (timer > 3f)
-            //        {
-            //            intObj.OnLookAway();
-            //            intObj = null;
-            //            timer = 0;
-            //        }
-            //    }
-            //}
-
-
-
-        //}

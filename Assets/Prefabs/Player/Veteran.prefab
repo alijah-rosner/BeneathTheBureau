@@ -265,6 +265,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: f83e03fa11076bf48b6ce03356f65a91, type: 2}
+    - target: {fileID: 4861580037806051612, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: SimPlayer
+      value: 
+      objectReference: {fileID: 6133352095041660021, guid: 20db6e55be3c2d843b46a7609b884d48, type: 3}
     - target: {fileID: 5501349854573808692, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
       propertyPath: m_Name
       value: Veteran

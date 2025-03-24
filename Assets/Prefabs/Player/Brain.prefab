@@ -273,6 +273,26 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 8d519107c778c234f83969785116b09b, type: 2}
+    - target: {fileID: 2206097604985657935, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: _cameraGameObj
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4861580037806051612, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: SimPlayer
+      value: 
+      objectReference: {fileID: 6133352095041660021, guid: 1840e7c1a8fee7540ba88f4e6d0d4518, type: 3}
+    - target: {fileID: 4861580037806051612, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: aircraftMoveSpeed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4861580037806051612, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: aircraftAcceleration
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4861580037806051612, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
+      propertyPath: aircraftDeceleration
+      value: 0.75
+      objectReference: {fileID: 0}
     - target: {fileID: 5501349854573808692, guid: 24b54c19703014341b3bbff9b561e767, type: 3}
       propertyPath: m_Name
       value: Brain

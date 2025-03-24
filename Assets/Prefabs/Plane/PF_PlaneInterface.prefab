@@ -165,7 +165,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 1
   AuthorityMode: 1
-  TickSyncChildren: 0
+  TickSyncChildren: 1
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -199,5 +199,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  _systemName: PlaneInterface
+  _resourceSettings: []
+  _structuralIntregity: 100
+  _structuralFailureThreshold: 60
+  OnDamage: {fileID: 0}
+  OnRepair: {fileID: 0}
+  OnInputValueChange: {fileID: 0}
+  OnOutputValueChange: {fileID: 0}
   aircraft: {fileID: 0}
-  aircraftCamera: {fileID: 0}
+  _cameraTarget: {fileID: 0}
+  _cameraRequestData:
+    NewTarget: {fileID: 6294335790709019816}
+    CameraSettings: {fileID: 11400000, guid: f2f150d35f7519d498bc47766273527e, type: 2}
+    ResetRotation: 1
+    SmoothTransition: 0
+    TransitionTime: 0
+  _cameraTargetEvent: {fileID: 11400000, guid: 36d1e58617d234d46b92e1b78462a79c, type: 2}
+  _onExitCameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
