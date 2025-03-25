@@ -30,16 +30,16 @@ public class FirstPersonController : MonoBehaviour
 
     [SerializeField] private InputSystems_NetworkActions inputActions;
     private PlayerInput _playerInput;
-    private bool isGrounded; 
-    private bool isPilot = false; 
+    private bool isGrounded;
+    private bool isPilot = false;
 
     [Header("References")]
     [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
     //private Camera _camera;
     [SerializeField] public GameObject SimPlayer;
 
-    [SerializeField] SO_CameraSettings _cameraSettings; 
-    [SerializeField] GameObject CameraTarget; 
+    [SerializeField] SO_CameraSettings _cameraSettings;
+    [SerializeField] GameObject CameraTarget;
 
     // player
     private float _speed;
@@ -64,27 +64,28 @@ public class FirstPersonController : MonoBehaviour
     private Rigidbody _rigidBody;
     private bool _inAircraft;
     private float _accelerationFactor;
-   // List<IntGameEventListener> listeningList;
+    // List<IntGameEventListener> listeningList;
 
     private void Awake()
     {
-       Debug.Log("Awake called!");
+        Debug.Log("Awake called!");
     }
 
 
     void OnEnable()
     {
         _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+        _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
         //_controller = GetComponent<CharacterController>();
-              
 
-      //  listeningList.Add(new IntGameEventListener(OnInt));
-       // CameraTarget = GetComponent<SimulatedPlaneVisual>().GetVisualObj; 
+
+        //  listeningList.Add(new IntGameEventListener(OnInt));
+        // CameraTarget = GetComponent<SimulatedPlaneVisual>().GetVisualObj; 
         _cameraSettings.SetCameraSettingsTarget(CameraTarget);
         _cameraSettings.CinemachineTargetYaw = _cameraSettings.CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
         inputActions = new InputSystems_NetworkActions();
-        inputActions.Player.Enable(); 
+        inputActions.Player.Enable();
 
         movement = inputActions.Player.Movement;
         jump = inputActions.Player.Jump;
@@ -112,12 +113,7 @@ public class FirstPersonController : MonoBehaviour
             ApplyMovement();
         }
         ApplyGravity();
-    }
-
-    private void LateUpdate()
-    {
-        // Camera rotation
-         CameraRotation();
+        CameraRotation();
     }
 
     private void PerformJump(InputAction.CallbackContext context)
@@ -125,7 +121,7 @@ public class FirstPersonController : MonoBehaviour
         if (isGrounded /* && _jumpTimeoutDelta <= 0.0f */)
         {
             _rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false; 
+            isGrounded = false;
         }
     }
 
@@ -136,12 +132,13 @@ public class FirstPersonController : MonoBehaviour
 
         if (moveVal == Vector2.zero)
         {
-            targetSpeed = 0.0f; 
+            targetSpeed = 0.0f;
         }
 
         UpdateAcceleration(acceleration, deceleration);
         Vector3 moveDirection = (transform.forward * moveVal.y + transform.right * moveVal.x).normalized;
-        _rigidBody.AddForce(moveDirection * targetSpeed * _accelerationFactor, ForceMode.Acceleration);
+        transform.localPosition += moveDirection * acceleration * Time.deltaTime;
+       // _rigidBody.AddForce(moveDirection * targetSpeed * _accelerationFactor, ForceMode.Acceleration);
     }
 
     private void UpdateAcceleration(float accelerationRate, float decelerationRate)
@@ -175,54 +172,61 @@ public class FirstPersonController : MonoBehaviour
         //}
         //else
         //{
-            // Standard gravity when on ground
-            _rigidBody.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
-      //  }
+        // Standard gravity when on ground
+        _rigidBody.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
+        //  }
     }
 
     private void CameraRotation()
     {
-        // if there is an input and camera position is not fixed
-        if (look.GetControlMagnitude() >= _cameraSettings.Threshold)
-        {
-            //don't multiply mouse input by time.deltatime;
-            float deltatimemultiplier = 1f;
+        //// if there is an input and camera position is not fixed
+        //if (look.GetControlMagnitude() >= _cameraSettings.Threshold)
+        //{
+        //    //don't multiply mouse input by time.deltatime;
+        //    float deltatimemultiplier = 1f;
 
-            Vector2 lookVal = look.ReadValue<Vector2>();
+        //    Vector2 lookVal = look.ReadValue<Vector2>();
 
-            _cameraSettings.CinemachineTargetYaw += lookVal.x * deltatimemultiplier;
-            _cameraSettings.CinemachineTargetPitch += lookVal.y * deltatimemultiplier;
-        }
+        //    _cameraSettings.CinemachineTargetYaw += lookVal.x * deltatimemultiplier;
+        //    _cameraSettings.CinemachineTargetPitch += lookVal.y * deltatimemultiplier;
+        //}
 
-        // clamp our rotations so our values are limited 360 degrees
-        _cameraSettings.CinemachineTargetYaw = ClampAngle(_cameraSettings.CinemachineTargetYaw, float.MinValue, float.MaxValue);
-        _cameraSettings.CinemachineTargetPitch = ClampAngle(_cameraSettings.CinemachineTargetPitch, _cameraSettings.BottomClamp, _cameraSettings.TopClamp);
+        //// clamp our rotations so our values are limited 360 degrees
+        //_cameraSettings.CinemachineTargetYaw = ClampAngle(_cameraSettings.CinemachineTargetYaw, float.MinValue, float.MaxValue);
+        //_cameraSettings.CinemachineTargetPitch = ClampAngle(_cameraSettings.CinemachineTargetPitch, _cameraSettings.BottomClamp, _cameraSettings.TopClamp);
 
-        // cinemachine will follow this target
-        _cameraSettings.CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cameraSettings.CinemachineTargetPitch + _cameraSettings.CameraAngleOverride,
-            _cameraSettings.CinemachineTargetYaw, 0.0f);
+        //// cinemachine will follow this target
+        //_cameraSettings.CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cameraSettings.CinemachineTargetPitch + _cameraSettings.CameraAngleOverride,
+        //    0.0f, 0.0f);
 
-       Vector3 cameraForward = _mainCamera.transform.forward;
-        cameraForward.y = 0f;
+        //_rigidBody.rotation = Quaternion.Euler(0.0f, _rigidBody.rotation.eulerAngles.y, 0.0f);
 
-        if (cameraForward.magnitude > 0.01f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(cameraForward);
+        //transform.localRotation = Quaternion.Euler(0, _playerCamera.transform.rotation.y, 0);
+        float cameraYRotation = _playerCamera.transform.localRotation.eulerAngles.y;
 
-            float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
+        // Create a new rotation that only rotates around the Y axis
+        Quaternion targetRotation = Quaternion.Euler(0, cameraYRotation, 0);
+
+        // Apply the rotation to your character
+        transform.localRotation = targetRotation;
+        //if (cameraForward.magnitude > 0.01f)
+        //{
+        //    Quaternion targetRotation = Quaternion.LookRotation(cameraForward);
+
+        //    float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
 
 
-            float rotationThreshold = 5.0f;
-            if (angleDifference > rotationThreshold)
-            {
-                // Apply rotation smoothly
-                float rotationSmoothTime = 0.2f;
-                transform.rotation = Quaternion.Slerp(
-                    transform.rotation,
-                    targetRotation,
-                    Time.deltaTime / rotationSmoothTime);
-            }
-        }
+        //    float rotationThreshold = 5.0f;
+        //    if (angleDifference > rotationThreshold)
+        //    {
+        //        // Apply rotation smoothly
+        //        float rotationSmoothTime = 0.2f;
+        //        transform.rotation = Quaternion.Slerp(
+        //            transform.rotation,
+        //            targetRotation,
+        //            Time.deltaTime / rotationSmoothTime);
+        //    }
+        //}
     }
 
 
@@ -252,6 +256,6 @@ public class FirstPersonController : MonoBehaviour
 
     public void SetIsPilot(bool truthval)
     {
-        isPilot = truthval; 
+        isPilot = truthval;
     }
 }
