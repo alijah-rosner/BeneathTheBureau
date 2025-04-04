@@ -14,6 +14,11 @@ public class GameEventListener<T> : MonoBehaviour, I_EventListener<T>
     [Tooltip("Action to perform when the event is raised")]
     [SerializeField] public Action<T> _response;
 
+    public GameEventListener(Action<T> response, GameEvent<T> gameEvent)
+    {
+        _response = response;
+        _gameEvent = gameEvent;
+    }
     public GameEventListener(Action<T> response)
     {
         _response = response;

@@ -9,7 +9,7 @@ public class FirstPersonController : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 20f;
+    [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float jumpHeight = 1.2f;
     [SerializeField] private float jumpForce = 9f;
 
@@ -19,7 +19,7 @@ public class FirstPersonController : MonoBehaviour
 
 
     [Space]
-    [SerializeField] private float gravity = -15.0f;
+    [SerializeField] private float gravity = -9f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private float groundCheckRadius = 0.5f;
@@ -57,6 +57,7 @@ public class FirstPersonController : MonoBehaviour
     private InputAction jump;
     private InputAction interact;
     private InputAction look;
+    private Vector3 velocity; 
 
     private CharacterController _controller;
     private GameObject _mainCamera;
@@ -65,18 +66,11 @@ public class FirstPersonController : MonoBehaviour
     private bool _inAircraft;
     private float _accelerationFactor;
     // List<IntGameEventListener> listeningList;
-
-    private void Awake()
-    {
-        Debug.Log("Awake called!");
-    }
-
-
     void OnEnable()
     {
         _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
-        //_controller = GetComponent<CharacterController>();
+        _controller = GetComponent<CharacterController>();
 
 
         //  listeningList.Add(new IntGameEventListener(OnInt));
@@ -104,10 +98,6 @@ public class FirstPersonController : MonoBehaviour
     void Update()
     {
         CheckGround();
-    }
-
-    private void FixedUpdate()
-    {
         if (!isPilot)
         {
             ApplyMovement();
@@ -116,29 +106,37 @@ public class FirstPersonController : MonoBehaviour
         CameraRotation();
     }
 
+    private void FixedUpdate()
+    {
+
+    }
+
     private void PerformJump(InputAction.CallbackContext context)
     {
-        if (isGrounded /* && _jumpTimeoutDelta <= 0.0f */)
-        {
-            _rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
-        }
+        
+        //if (isGrounded /* && _jumpTimeoutDelta <= 0.0f */)
+        //{
+        //    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        //}
     }
 
     private void ApplyMovement()
     {
         float targetSpeed = moveSpeed;
-        Vector2 moveVal = movement.ReadValue<Vector2>();
+        Vector2 targetDirection = movement.ReadValue<Vector2>();
 
-        if (moveVal == Vector2.zero)
+        if (targetDirection ==  Vector2.zero)
         {
-            targetSpeed = 0.0f;
+            targetSpeed = 0.0f; 
         }
+        targetDirection.Normalize();
 
-        UpdateAcceleration(acceleration, deceleration);
-        Vector3 moveDirection = (transform.forward * moveVal.y + transform.right * moveVal.x).normalized;
-        transform.localPosition += moveDirection * acceleration * Time.deltaTime;
-       // _rigidBody.AddForce(moveDirection * targetSpeed * _accelerationFactor, ForceMode.Acceleration);
+        // Vector3 moveVec3 = new Vector3(moveVal.x, 0f, moveVal.y);
+
+        //UpdateAcceleration(acceleration, deceleration);
+        Vector3 moveDirection = (transform.forward * targetDirection.y + transform.right * targetDirection.x) * targetSpeed + Vector3.up * velocity.y;
+
+        _controller.Move(moveDirection * Time.deltaTime);
     }
 
     private void UpdateAcceleration(float accelerationRate, float decelerationRate)
@@ -156,52 +154,16 @@ public class FirstPersonController : MonoBehaviour
 
     private void ApplyGravity()
     {
-        //if (_inAircraft)
-        //{
-        //    FlightController2 aircraft = FindFirstObjectByType<FlightController2>();
-        //    if (aircraft != null)
-        //    {
-        //        // Simply apply gravity in aircraft's down direction
-        //        _rigidBody.AddForce(-aircraft.transform.up * gravity, ForceMode.Acceleration);
-        //    }
-        //    else
-        //    {
-        //        // Fallback to world down if aircraft not found
-        //        _rigidBody.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
-        //    }
-        //}
-        //else
-        //{
-        // Standard gravity when on ground
-        _rigidBody.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
-        //  }
+        if (!isGrounded/* && velocity.y < 0*/)
+        {
+            Debug.Log("should be moving down");
+            velocity.y = -9f; 
+        }
+        velocity.y += gravity * Time.deltaTime;
     }
 
     private void CameraRotation()
     {
-        //// if there is an input and camera position is not fixed
-        //if (look.GetControlMagnitude() >= _cameraSettings.Threshold)
-        //{
-        //    //don't multiply mouse input by time.deltatime;
-        //    float deltatimemultiplier = 1f;
-
-        //    Vector2 lookVal = look.ReadValue<Vector2>();
-
-        //    _cameraSettings.CinemachineTargetYaw += lookVal.x * deltatimemultiplier;
-        //    _cameraSettings.CinemachineTargetPitch += lookVal.y * deltatimemultiplier;
-        //}
-
-        //// clamp our rotations so our values are limited 360 degrees
-        //_cameraSettings.CinemachineTargetYaw = ClampAngle(_cameraSettings.CinemachineTargetYaw, float.MinValue, float.MaxValue);
-        //_cameraSettings.CinemachineTargetPitch = ClampAngle(_cameraSettings.CinemachineTargetPitch, _cameraSettings.BottomClamp, _cameraSettings.TopClamp);
-
-        //// cinemachine will follow this target
-        //_cameraSettings.CinemachineCameraTarget.transform.localRotation = Quaternion.Euler(_cameraSettings.CinemachineTargetPitch + _cameraSettings.CameraAngleOverride,
-        //    0.0f, 0.0f);
-
-        //_rigidBody.rotation = Quaternion.Euler(0.0f, _rigidBody.rotation.eulerAngles.y, 0.0f);
-
-        //transform.localRotation = Quaternion.Euler(0, _playerCamera.transform.rotation.y, 0);
         float cameraYRotation = _playerCamera.transform.localRotation.eulerAngles.y;
 
         // Create a new rotation that only rotates around the Y axis
@@ -209,24 +171,6 @@ public class FirstPersonController : MonoBehaviour
 
         // Apply the rotation to your character
         transform.localRotation = targetRotation;
-        //if (cameraForward.magnitude > 0.01f)
-        //{
-        //    Quaternion targetRotation = Quaternion.LookRotation(cameraForward);
-
-        //    float angleDifference = Quaternion.Angle(transform.rotation, targetRotation);
-
-
-        //    float rotationThreshold = 5.0f;
-        //    if (angleDifference > rotationThreshold)
-        //    {
-        //        // Apply rotation smoothly
-        //        float rotationSmoothTime = 0.2f;
-        //        transform.rotation = Quaternion.Slerp(
-        //            transform.rotation,
-        //            targetRotation,
-        //            Time.deltaTime / rotationSmoothTime);
-        //    }
-        //}
     }
 
 

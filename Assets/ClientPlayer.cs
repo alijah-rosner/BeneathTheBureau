@@ -14,6 +14,8 @@ public class ClientPlayer : NetworkBehaviour
 
     [SerializeField] PlayerInput _playerInput;
 
+    [SerializeField] CharacterController _charController;
+
     private Transform _playerFollow; 
 
     void Awake()
@@ -22,6 +24,7 @@ public class ClientPlayer : NetworkBehaviour
         Cursor.visible = false;
 
         _firstPersonController.enabled = false;
+        _charController.enabled = false;
         _capsuleCollider.enabled = false;
     }
 
@@ -35,10 +38,12 @@ public class ClientPlayer : NetworkBehaviour
         {
             enabled = false;
             _capsuleCollider.enabled = false;
+            _charController.enabled = false;
             _raycast.enabled = false; 
             return; 
         }
         _capsuleCollider.enabled = true;
+        _charController.enabled = true;
         _playerInput.enabled = true;
         _firstPersonController.enabled = true;
         _raycast.enabled = true; 
