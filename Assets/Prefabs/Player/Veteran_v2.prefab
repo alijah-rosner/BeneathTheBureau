@@ -286,6 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  _visual: {fileID: 6910769661143464073}
   _firstPersonController: {fileID: 7395397698263986064}
   _raycast: {fileID: 652071734761198897}
   _capsuleCollider: {fileID: 4467526814126832626}
