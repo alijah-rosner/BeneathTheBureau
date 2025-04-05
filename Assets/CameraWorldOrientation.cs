@@ -10,7 +10,7 @@ public class CameraWorldOrientation : MonoBehaviour
 
     private GameObjectEventListener _gameObjectEventListener; 
     
-    void Start()
+    void Awake()
     {
         _gameObjectEventListener = new GameObjectEventListener(SetWorldUp, _onSimPlaneSpawn);
     }
@@ -19,5 +19,4 @@ public class CameraWorldOrientation : MonoBehaviour
     {
         _brain.WorldUpOverride = gameObject.transform; 
     }
-
 }

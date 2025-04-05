@@ -18,7 +18,7 @@ public class AircraftSystemManager : NetworkBehaviour
 
     [Header("Network Children")]
     [SerializeField] private List<NetworkSystemInfo> _systems = new List<NetworkSystemInfo>();
-
+    [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent; 
 
     public override void OnNetworkSpawn()
     {
@@ -28,8 +28,12 @@ public class AircraftSystemManager : NetworkBehaviour
         {
             SpawnNetworkChildren();
             ConnectElectricalSystems();
-        }
-        
+        }        
+    }
+
+    private void Start()
+    {
+        _onAircraftSpawnEvent?.TriggerEvent(gameObject);
     }
 
     private void SpawnNetworkChildren()

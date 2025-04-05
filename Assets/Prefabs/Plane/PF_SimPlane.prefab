@@ -1567,6 +1567,7 @@ MonoBehaviour:
     spawnPos: {fileID: 3707703150795323606}
   - systemObj: {fileID: -6781944729994175167, guid: 0e02f5aa4dd1a08409b337e15759857f, type: 3}
     spawnPos: {fileID: 8501865768066559986}
+  _onAircraftSpawnEvent: {fileID: 11400000, guid: 73be6d4719cc2e449a786c334da558ec, type: 2}
 --- !u!114 &3441606231693661584
 MonoBehaviour:
   m_ObjectHideFlags: 0
