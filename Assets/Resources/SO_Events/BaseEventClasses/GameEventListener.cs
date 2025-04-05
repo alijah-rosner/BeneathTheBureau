@@ -4,11 +4,11 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [Serializable]
-public class GameEventListener<T> : MonoBehaviour, I_EventListener<T>
+public class GameEventListener<T> : I_EventListener<T>
 {
     [Header("Game Event Settings")]
     [Tooltip("Event to register with")]
-    [SerializeField] private GameEvent<T> _gameEvent;
+    [SerializeField] public GameEvent<T> _gameEvent;
 
     [Header("Game Event Response")]
     [Tooltip("Action to perform when the event is raised")]
@@ -16,14 +16,24 @@ public class GameEventListener<T> : MonoBehaviour, I_EventListener<T>
 
     public GameEventListener(Action<T> response, GameEvent<T> gameEvent)
     {
-        _response = response;
+
         _gameEvent = gameEvent;
+        _response = response;
+        _gameEvent.RegisterListener(this);
+    }
+    ~GameEventListener()
+    {
+        _gameEvent.UnregisterListener(this);
     }
     public GameEventListener(Action<T> response)
     {
         _response = response;
     }
 
+    private void Start()
+    {
+
+    }
 
     public void Initialize(Action<T> action)
     {

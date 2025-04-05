@@ -9,9 +9,9 @@ using NUnit.Framework;
 public class FungusReactorSystem : AircraftSystem
 {
     [Tooltip("Debug Values - Don't assign")]
-    [SerializeField] private NetworkVariable<float> fungalCharge;
-    [SerializeField] private NetworkVariable<float> organicModifier;
-    [SerializeField] private NetworkVariable<float> electricityThroughput;
+    [SerializeField] private NetworkVariable<float> fungalCharge = new NetworkVariable<float>();
+    [SerializeField] private NetworkVariable<float> organicModifier = new NetworkVariable<float>();
+    [SerializeField] private NetworkVariable<float> electricityThroughput = new NetworkVariable<float>();
 
     private float prevElectricity;
 
@@ -26,14 +26,17 @@ public class FungusReactorSystem : AircraftSystem
     [SerializeField] Float_GameEvent onOutputElectricityChanged;
 
     [Header("Event that Fungus System is listening for")]
-    Float_GameEventListener onFungusAdded;
-    Float_GameEventListener onOrganicMaterialAdded;
+    [SerializeField] Float_GameEventListener onFungusAdded;
+    [SerializeField] Float_GameEventListener onOrganicMaterialAdded;
 
     // Attach functions that correspond to events the reactor is listening to
     private void Start()
     {
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
+        prevElectricity = 0f;
+        organicModifier.Value = 1f;
+        fungalCharge.Value = 100f;
     }
 
 
@@ -56,6 +59,8 @@ public class FungusReactorSystem : AircraftSystem
         electricityThroughput.Value = fungalCharge.Value * organicModifier.Value;
         if (electricityThroughput.Value != prevElectricity)
         {
+            Debug.Log("Changing Electricity.");
+            Debug.Log("Previous: " + prevElectricity + "\nNew: " + electricityThroughput.Value);
             onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
             prevElectricity = electricityThroughput.Value;
         }

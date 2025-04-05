@@ -15,7 +15,7 @@ public class IntakeChamber : NetworkBehaviour, I_Interactable
     [SerializeField] private float IntakeMax;
     [SerializeField] private float DecayRate;
 
-    private NetworkVariable<float> _intakeValue;
+    private NetworkVariable<float> _intakeValue = new NetworkVariable<float>();
     private float _lastIntakeValue;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
