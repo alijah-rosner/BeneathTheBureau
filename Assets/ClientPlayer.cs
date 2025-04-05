@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class ClientPlayer : NetworkBehaviour
 {
+    [SerializeField] SimulatedPlaneVisual _visual;
+
     [SerializeField] FirstPersonController _firstPersonController;
 
     [SerializeField] PlayerRaycast _raycast;
@@ -26,6 +28,7 @@ public class ClientPlayer : NetworkBehaviour
         _firstPersonController.enabled = false;
         _charController.enabled = false;
         _capsuleCollider.enabled = false;
+        _visual.enabled = false;
     }
 
     public override void OnNetworkSpawn()
@@ -39,14 +42,16 @@ public class ClientPlayer : NetworkBehaviour
             enabled = false;
             _capsuleCollider.enabled = false;
             _charController.enabled = false;
-            _raycast.enabled = false; 
+            _raycast.enabled = false;
+            _visual.enabled = false;
             return; 
         }
         _capsuleCollider.enabled = true;
         _charController.enabled = true;
         _playerInput.enabled = true;
         _firstPersonController.enabled = true;
-        _raycast.enabled = true; 
+        _raycast.enabled = true;
+        _visual.enabled = true;
 
     }
 
