@@ -30,8 +30,8 @@ public class AircraftSystemManager : NetworkBehaviour
             SpawnNetworkChildren();
             ConnectElectricalSystems();
         }
-            _onAircraftSpawnEvent?.TriggerEvent(gameObject);
-        }        
+        _onAircraftSpawnEvent?.TriggerEvent(gameObject);
+                
     }
 
     private void Start()
