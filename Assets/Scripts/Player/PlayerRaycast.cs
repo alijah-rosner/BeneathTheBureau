@@ -28,15 +28,23 @@ public class PlayerRaycast : MonoBehaviour
             return;
         }
 
-        RaycastHit hit; 
-        if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
+        if (_camera)
         {
-            if (Input.GetKeyDown(KeyCode.E))
+            RaycastHit hit; 
+            if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
             {
-                hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
+                }
             }
+            Debug.DrawRay(_camera.transform.position, _camera.transform.forward * 1);
         }
-        Debug.DrawRay(_camera.transform.position, _camera.transform.forward * 1);
+        else
+        {
+            _camera = GameObject.FindGameObjectWithTag("PlayerCamera");
+        }
+
     }
 
     void InformListeners()

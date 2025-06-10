@@ -61,8 +61,12 @@ public class FlightController2 : AircraftSystem
         base.OnNetworkSpawn();
         rigid = GetComponent<Rigidbody>();
         _isControlling = false;
-        controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
         engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
+    }
+
+    private void Start()
+    {
+        controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
     }
 
     private void CalculateTotalCurrentThrust(float oldValue, float newValue)
@@ -95,11 +99,6 @@ public class FlightController2 : AircraftSystem
 
     private void FixedUpdate()
     {
-        if (!IsServer)
-        {    
-            return;
-        }
-
         // Server-side physics calculations
         if (IsOwner)
         {
@@ -121,6 +120,12 @@ public class FlightController2 : AircraftSystem
         }
 
         AddTurbulenceEffect();
+        
+        if (!IsServer)
+        {    
+            return;
+        }
+
         //UpdatePassengers();
     }
 

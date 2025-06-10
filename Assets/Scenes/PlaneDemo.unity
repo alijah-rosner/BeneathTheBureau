@@ -119,6 +119,17 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &97349594 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 119995603913187547, guid: a24b832b9d8af0847871c662768c353a, type: 3}
+  m_PrefabInstance: {fileID: 766950286660066212}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766950286660066214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &233312189
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,7 +468,7 @@ MonoBehaviour:
   mouseSensitivity: 3
   aimDistance: 500
   destinationAltitude: 50
-  cinemachineCam: {fileID: 0}
+  cinemachineCam: {fileID: 97349594}
   showDebugInfo: 0
   _isEnabled: 0
 --- !u!1 &706119356
@@ -1760,9 +1771,7 @@ PrefabInstance:
       propertyPath: m_ControllerManager.Controllers.Array.data[4].Input.InputAction
       value: 
       objectReference: {fileID: -423771258819551211, guid: 1d6e640e716dc4ff6989b73d02023f2b, type: 3}
-    m_RemovedComponents:
-    - {fileID: 2902750347157775146, guid: a24b832b9d8af0847871c662768c353a, type: 3}
-    - {fileID: 3427654414350090602, guid: a24b832b9d8af0847871c662768c353a, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

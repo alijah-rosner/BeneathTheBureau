@@ -27,13 +27,15 @@ public class AircraftSystemManager : NetworkBehaviour
         if (IsServer)
         {
             SpawnNetworkChildren();
-            ConnectElectricalSystems();
+            _onAircraftSpawnEvent?.TriggerEvent(gameObject);
         }        
     }
 
     private void Start()
     {
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
+        ConnectElectricalSystems();
+
     }
 
     private void SpawnNetworkChildren()
@@ -42,7 +44,18 @@ public class AircraftSystemManager : NetworkBehaviour
         {
             _systems[i].systemObj = Instantiate(_systems[i].systemObj, _systems[i].spawnPos.transform.position, _systems[i].spawnPos.transform.rotation);
             _systems[i].systemObj.Spawn();
-            _systems[i].systemObj.transform.parent = transform;
+            //_systems[i].systemObj.TrySetParent(transform, false);
+        } 
+        SetSystemParentRpc(NetworkManager.ServerClientId);
+        ConnectElectricalSystems();
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SetSystemParentRpc(ulong requestingPlayerId)
+    {
+        for (int i = 0; i < _systems.Count; i++)
+        {
+            _systems[i].systemObj.TrySetParent(transform, false);
         }
     }
 
@@ -52,6 +65,7 @@ public class AircraftSystemManager : NetworkBehaviour
         {
             if (_systems[i].Name == "PlaneInterface")
             {
+                Debug.Log("Grabbing Plane Interface");
                 GetComponent<FlightController2>().planeInterface = _systems[i].systemObj.gameObject;
                 _systems[i].systemObj.GetComponent<PlaneInterface>().SetAircraftIncludingCamera(gameObject, GameObject.FindGameObjectWithTag("MouseFlightManager"));
             }

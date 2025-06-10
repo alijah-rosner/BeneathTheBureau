@@ -23,6 +23,7 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Start()
     {
+
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         //onInputValueChanged = gameObject.AddComponent<Float_GameEventListener>();
         prevInputVal = 0f;

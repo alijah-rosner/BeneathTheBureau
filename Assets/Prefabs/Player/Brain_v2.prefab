@@ -338,7 +338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 1
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -393,6 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   visualPrefab: {fileID: 4675333941576112517, guid: 0cb83eec8fe47e645a69960d3e748bff, type: 3}
+  CamPosition: {fileID: 0}
 --- !u!136 &4467526814126832626
 CapsuleCollider:
   m_ObjectHideFlags: 0

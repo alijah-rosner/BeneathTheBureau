@@ -701,6 +701,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  _systemName: 
+  _resourceSettings: []
+  _structuralIntregity: 100
+  _structuralFailureThreshold: 60
   _projectile: {fileID: 6001854935645031192, guid: 00b9cf83692c21e4ba0df34a9825846c, type: 3}
   _origin: {fileID: 2131090540420202137}
   _head: {fileID: 8668113851941031780}
@@ -719,7 +723,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
-  AuthorityMode: 1
+  AuthorityMode: 0
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1

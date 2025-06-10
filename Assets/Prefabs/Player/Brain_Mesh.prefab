@@ -152,8 +152,6 @@ GameObject:
   - component: {fileID: 7559842839944912588}
   - component: {fileID: 647325544364525324}
   - component: {fileID: 181524249205972469}
-  - component: {fileID: 2179352065519870916}
-  - component: {fileID: 885106819829159615}
   - component: {fileID: 3372848092652846452}
   m_Layer: 7
   m_Name: Brain_Mesh
@@ -232,51 +230,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &2179352065519870916
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4675333941576112517}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1.97
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!195 &885106819829159615
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4675333941576112517}
-  m_Enabled: 0
-  m_AgentTypeID: 0
-  m_Radius: 0.49
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 0
-  m_AutoBraking: 1
-  m_AutoRepath: 0
-  m_Height: 1
-  m_BaseOffset: 0.5
-  m_WalkableMask: 0
-  m_ObstacleAvoidanceType: 4
 --- !u!114 &3372848092652846452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,13 +246,9 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   simLocalRotation:
     m_InternalValue: {x: 0, y: 0, z: 0, w: 0}
+  _cameraTarget: {fileID: 1083863539987993129}
+  _cameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
   _cameraTargetEvent: {fileID: 11400000, guid: 36d1e58617d234d46b92e1b78462a79c, type: 2}
-  _cameraRequestData:
-    NewTarget: {fileID: 1083863539987993129}
-    CameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
-    ResetRotation: 1
-    SmoothTransition: 0
-    TransitionTime: 0
 --- !u!1 &8331879129506020618
 GameObject:
   m_ObjectHideFlags: 0
