@@ -105,13 +105,9 @@ MonoBehaviour:
     m_InternalValue: {x: 0, y: 0, z: 0}
   simLocalRotation:
     m_InternalValue: {x: 0, y: 0, z: 0, w: 0}
+  _cameraTarget: {fileID: 3558311940895508734}
+  _cameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
   _cameraTargetEvent: {fileID: 11400000, guid: 36d1e58617d234d46b92e1b78462a79c, type: 2}
-  _cameraRequestData:
-    NewTarget: {fileID: 3558311940895508734}
-    CameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
-    ResetRotation: 1
-    SmoothTransition: 0
-    TransitionTime: 0
 --- !u!1 &2787285063765292101
 GameObject:
   m_ObjectHideFlags: 0

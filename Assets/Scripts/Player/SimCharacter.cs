@@ -8,17 +8,15 @@ public class SimCharacter : MonoBehaviour
     private PlayerController _controller;
     public NetworkVariable<Vector3> simLocalPosition = new NetworkVariable<Vector3>();
     public NetworkVariable<Quaternion> simLocalRotation = new NetworkVariable<Quaternion>();
-    public PlayerController Controller => _controller; 
+    public PlayerController Controller => _controller;
+    [SerializeField] private GameObject _cameraTarget;
+    [SerializeField] private SO_CameraSettings _cameraSettings;
 
     [Header("Triggers the following events")]
     [SerializeField] private CameraTargetEvent _cameraTargetEvent;
 
-    [Header("Camera Event Information")]
-    [SerializeField] private CameraTargetEventData _cameraRequestData; 
-
     private void Start()
     {
-        _cameraTargetEvent?.TriggerEvent(_cameraRequestData); 
     }
 
     public void SetSimNetworkController(PlayerController obj)
@@ -28,7 +26,7 @@ public class SimCharacter : MonoBehaviour
 
     public GameObject GetCameraPosition()
     {
-        return _cameraRequestData.NewTarget; 
+        return _cameraTarget;
     }
 
     public PlayerController GetSimNetworkController()
@@ -36,5 +34,11 @@ public class SimCharacter : MonoBehaviour
         return _controller; 
     }
     
-    // NEW
+    public void TriggerInitialCameraSpawn()
+    {
+        var eventData = new CameraTargetEventData(_cameraTarget, _cameraSettings);
+        //GlobalGameEvents.CameraTargetEvent.TriggerEvent(eventData);
+        _cameraTargetEvent?.TriggerEvent(eventData);
+    }
+
 }

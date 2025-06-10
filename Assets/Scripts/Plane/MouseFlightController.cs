@@ -128,22 +128,32 @@ public class MouseFlightController : MonoBehaviour
         transform.parent = null;
     }
 
+    private void Start()
+    {
+        mouseAim = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+    }
+
     private void Update()
     {
-        if (aircraft == null)
+        if (aircraft)
+        {
+            _isEnabled = aircraft.GetComponent<FlightController2>().GetController();
+            if (useFixed == false)
+                UpdateCameraPos();
+
+            RotateRig();
+        }
+        else
         {
             aircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+            Debug.LogError("MouseFlightController: Aircraft not found");
         }
-        _isEnabled = aircraft.GetComponent<FlightController2>().GetController();
-        if (useFixed == false)
-            UpdateCameraPos();
-
-        RotateRig();
+        
     }
 
     private void FixedUpdate()
     {
-        if (useFixed == true)
+        if (useFixed == true && _isEnabled)
             UpdateCameraPos();
     }
 

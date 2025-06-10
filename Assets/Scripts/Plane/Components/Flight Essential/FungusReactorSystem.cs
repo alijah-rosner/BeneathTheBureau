@@ -14,7 +14,7 @@ public class FungusReactorSystem : AircraftSystem
     [SerializeField] private NetworkVariable<float> electricityThroughput = new NetworkVariable<float>();
 
     private float prevElectricity;
-
+    
     public enum ReactorState
     {
         Underfed,
@@ -58,7 +58,11 @@ public class FungusReactorSystem : AircraftSystem
     // Update output and trigger event if output has changed
     private void Update()
     {
-
+        if (!IsServer)
+        {
+            return;
+        }
+        
         electricityThroughput.Value = fungalCharge.Value * organicModifier.Value;
         if (electricityThroughput.Value != prevElectricity)
         {

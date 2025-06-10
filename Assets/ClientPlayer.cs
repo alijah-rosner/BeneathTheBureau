@@ -35,12 +35,12 @@ public class ClientPlayer : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
-        enabled = IsClient;
+        //enabled = IsClient;
 
         if (!IsOwner)
         {
             enabled = false;
-            _capsuleCollider.enabled = false;
+            _capsuleCollider.enabled = true;
             _charController.enabled = false;
             _raycast.enabled = false;
             _visual.enabled = false;

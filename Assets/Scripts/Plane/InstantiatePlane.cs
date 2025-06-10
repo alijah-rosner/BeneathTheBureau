@@ -16,14 +16,13 @@ public class InstantiatePlane : NetworkBehaviour
         {
             return;
         }
+
         GameObject basePlane = Instantiate(GroundPlane, new Vector3(0f, 0f, 0f), Quaternion.identity);
         basePlane.GetComponent<NetworkObject>().Spawn();
 
         GameObject simPlane = Instantiate(SimPlane, new Vector3(0f, 10f, 10f), Quaternion.identity);
         simPlane.GetComponent<NetworkObject>().Spawn();
         //simPlane.tag = "SimulatedAircraft";
-
-
         foreach (var client in HostManager.Instance.ClientData)
         {
             var player = _dataBase.GetCharacterByID(client.Value.CharacterID);
@@ -43,6 +42,8 @@ public class InstantiatePlane : NetworkBehaviour
             }
 
         }
+
+
         GameObject mouseFlightManager = GameObject.FindGameObjectWithTag("MouseFlightManager");
         mouseFlightManager.GetComponent<MouseFlightController>().aircraft = simPlane.transform;
 

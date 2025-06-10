@@ -108,6 +108,11 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
         }
     }
 
+    private void Start()
+    {
+        transform.parent = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+    }
+
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();

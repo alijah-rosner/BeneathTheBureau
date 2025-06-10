@@ -25,6 +25,12 @@ public class PlaneInterface : AircraftSystem, I_Interactable
         NetworkVariableWritePermission.Server
     );
 
+    private void Start()
+    {
+        aircraft = GameObject.FindGameObjectWithTag("SimulatedAircraft");
+        _cameraRequestData.NewTarget = GameObject.FindWithTag("AircraftCameraPosition");
+    }
+
     private void Update()
     {
         if (!IsOwner)
@@ -55,12 +61,6 @@ public class PlaneInterface : AircraftSystem, I_Interactable
 
         // Subscribe to pilot ID changes
         currentPilotId.OnValueChanged += OnPilotChanged;
-
-        if (aircraft == null)
-        {
-            Debug.LogError("[PlaneInterface] Missing required component references!");
-        }
-        _cameraRequestData.NewTarget = GameObject.FindWithTag("AircraftCameraPosition");
     }
 
     public override void OnNetworkDespawn()
@@ -70,7 +70,7 @@ public class PlaneInterface : AircraftSystem, I_Interactable
     }
 
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server)]
     private void RequestPilotControlServerRpc(ulong requestingPlayerId)
     {
         if (currentPilotId.Value != ulong.MaxValue)
@@ -84,13 +84,14 @@ public class PlaneInterface : AircraftSystem, I_Interactable
         if (aircraft.TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
         {
             aircraftNetObj.ChangeOwnership(requestingPlayerId);
+            GetComponent<NetworkObject>().ChangeOwnership(requestingPlayerId);
         }
 
         // Notify all clients about the pilot change
         UpdatePilotState(requestingPlayerId, true);
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server)]
     private void ReleasePilotControlServerRpc(ulong pilotId)
     {
         if (currentPilotId.Value != pilotId)
@@ -111,7 +112,7 @@ public class PlaneInterface : AircraftSystem, I_Interactable
 
     private void UpdatePilotState(ulong pilotId, bool isPilot)
     {
-        if (!IsLocalPlayer && !IsOwner)
+        if (NetworkManager.Singleton.LocalClientId != pilotId)
         {
             return; 
         }
@@ -121,7 +122,6 @@ public class PlaneInterface : AircraftSystem, I_Interactable
 
         _playerController = pilotObj.GetComponent<FirstPersonController>();
         simObj = _playerController.GetComponent<SimulatedPlaneVisual>().GetVisual();
-        simObj = simObj.GetComponent<SimCharacter>().GetCameraPosition();
         if (_playerController == null) return;
 
         //Camera pilotCamera = playerController.GetCamera();
@@ -192,10 +192,11 @@ public class PlaneInterface : AircraftSystem, I_Interactable
         }
         // If no pilot, try to become pilot
     }
-
+    
     public void SetAircraftIncludingCamera(GameObject Aircraft, GameObject Camera)
     {
         aircraft = Aircraft;
-       // aircraftCamera = Camera.GetComponent<MouseFlightController>().cam.gameObject; 
+        Debug.Log("Aircraft set up correctly");
+        // aircraftCamera = Camera.GetComponent<MouseFlightController>().cam.gameObject; 
     }
 }

@@ -1,11 +1,13 @@
 using System.Collections;
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTargetEventData>
 {
-    [Header("Events")]
+    //[Header("Events")]
     [SerializeField] private CameraTargetEvent _cameraTargetEvent;
+    
     
     [Header("Default Settings")]
     [SerializeField] private GameObject _defaultCameraTarget;
@@ -30,26 +32,30 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
     
     private void OnEnable()
     {
+        // _cameraTargetEvent = GlobalGameEvents.CameraTargetEvent;
+        // _cameraTargetEvent.RegisterListener(this);
         // Register for events
         if (_cameraTargetEvent != null)
         {
             _cameraTargetEvent.RegisterListener(this);
+            Debug.Log("Registered event listener");
         }
         
         // Set up default camera settings
-        if (_defaultCameraTarget != null && _defaultCameraSettings != null)
-        {
-            _currentTarget = _defaultCameraTarget;
-            _currentSettings = _defaultCameraSettings;
-            
-            _currentSettings.SetCameraSettingsTarget(_currentTarget);
-            _virtualCamera.Follow = _currentTarget.transform;
-            
-            // Initialize yaw/pitch from the target orientation
-            _currentSettings.CinemachineTargetYaw = _currentTarget.transform.rotation.eulerAngles.y;
-            _currentSettings.CinemachineTargetPitch = 0f;
-            //_virtualCamera.GetCinemachineComponent<Cinem>
-        }
+        // if (_defaultCameraTarget != null && _defaultCameraSettings != null)
+        // {
+        //     _currentTarget = _defaultCameraTarget;
+        //     _currentSettings = _defaultCameraSettings;
+        //     
+        //     _currentSettings.SetCameraSettingsTarget(_currentTarget);
+        //     _virtualCamera.Follow = _currentTarget.transform;
+        //     
+        //     // Initialize yaw/pitch from the target orientation
+        //     _currentSettings.CinemachineTargetYaw = _currentTarget.transform.rotation.eulerAngles.y;
+        //     _currentSettings.CinemachineTargetPitch = 0f;
+        //     Debug.Log("Camera set up correctly");
+        //     //_virtualCamera.GetCinemachineComponent<Cinem>
+        // }
     }
     
     private void OnDisable()

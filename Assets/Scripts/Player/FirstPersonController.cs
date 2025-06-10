@@ -66,7 +66,7 @@ public class FirstPersonController : MonoBehaviour
     private bool _inAircraft;
     private float _accelerationFactor;
     // List<IntGameEventListener> listeningList;
-    void OnEnable()
+    void Start()
     {
         _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
@@ -97,13 +97,22 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckGround();
-        if (!isPilot)
+        if (_playerCamera)
         {
-            ApplyMovement();
+            CheckGround();
+            if (!isPilot)
+            {
+                ApplyMovement();
+            }
+            ApplyGravity();
+            CameraRotation();
         }
-        ApplyGravity();
-        CameraRotation();
+        else
+        {
+            _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+        }
+        
+
     }
 
     private void FixedUpdate()
@@ -156,7 +165,6 @@ public class FirstPersonController : MonoBehaviour
     {
         if (!isGrounded/* && velocity.y < 0*/)
         {
-           // Debug.Log("should be moving down");
             velocity.y = -9f; 
         }
         velocity.y += gravity * Time.deltaTime;

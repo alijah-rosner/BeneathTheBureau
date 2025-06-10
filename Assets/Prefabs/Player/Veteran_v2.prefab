@@ -228,7 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 1
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -319,6 +319,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   visualPrefab: {fileID: 284349330848693672, guid: 26433c6cafa539d4ba8b4fc7ad143897, type: 3}
+  CamPosition: {fileID: 0}
 --- !u!1 &5707782873833171645
 GameObject:
   m_ObjectHideFlags: 0
