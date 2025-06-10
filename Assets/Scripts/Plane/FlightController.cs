@@ -46,6 +46,7 @@ public class FlightController : NetworkBehaviour
 
     //Whether or not to recieve input
     private bool _isControlling = false;
+    public bool _isPowered = false;
 
     //Container of all rigidbodies inside plane
     private HashSet<Rigidbody> _passengers = new();
@@ -125,14 +126,17 @@ public class FlightController : NetworkBehaviour
         UpdateFlightControlsServerRpc(pitch, yaw, roll, thrust);
 
     }
-
+    private void UpdateFlightSystems()
+    {
+        thrust *= (GetComponent<FlightSystemsHandler>().GetElectricityThroughput() / 100.0f);
+    }
     private void FixedUpdate()
     {
         if (!IsServer)
         {
             // Clients interpolate to the networked position/rotation
-//transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
-//            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);            
+            //transform.position = Vector3.Lerp(transform.position, netPosition.Value, Time.fixedDeltaTime * 10f);
+            //            transform.rotation = Quaternion.Lerp(transform.rotation, netRotation.Value, Time.fixedDeltaTime * 10f);            
             rigid.linearVelocity = netVelocity.Value;
             return;
         }

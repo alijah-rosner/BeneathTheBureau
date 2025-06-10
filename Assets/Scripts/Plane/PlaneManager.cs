@@ -84,6 +84,7 @@ public class PlaneManager : MonoBehaviour
 
     private void Update()
     {
+
     }
 
     private void OnDestroy()

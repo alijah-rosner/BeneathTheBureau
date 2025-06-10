@@ -5,46 +5,72 @@ using System.Collections.Generic;
 using System.IO.Enumeration;
 using NUnit.Framework;
 
+[System.Serializable]
+public class ResourceSettings
+{
+    public ResourceSettings() { }
+    public ResourceSettings(ResourceType t, ResourceStatus s, bool isProd, float r)
+    {
+        type = t;
+        status = s;
+        isProducer = isProd;
+        rate = r;
+    }
+    public ResourceSettings(ResourceType t, ResourceStatus s, bool isProd, float r,
+        float optRate, float minR, float maxR)
+    {
+        type = t;
+        status = s;
+        isProducer = isProd;
+        rate = r;
+        optimalRate = optRate;
+        minRate = minR;
+        maxRate = maxR;
+    }
+    public ResourceType type;
+    public ResourceStatus status;
+
+    public bool isProducer;
+    //    public bool isConsumer;
+    [Tooltip("System output value")]
+    private float _output;
+    public float Output
+    {
+        get => _output;
+        set => _output = Mathf.Max(0f, value);
+    }
+
+    [Tooltip("Rate at which this system produces or consumes the resource per second")]
+    public float rate = 0f;
+
+    [Tooltip("Optimal rate for this system")]
+    public float optimalRate = 0f;
+
+    [Tooltip("Minimum rate needed for operation")]
+    public float minRate = 0f;
+
+    [Tooltip("Maximum rate before damage occurs")]
+    public float maxRate = 0f;
+}
+public enum ResourceType
+{
+    Fuel,
+    Electricity,
+    Fungus,
+    OrganicMaterial,
+    Oxygen
+}
+
+public enum ResourceStatus
+{
+    Under,
+    Balanced,
+    ReceivingOver
+}
+
+
 public class AircraftSystem : NetworkBehaviour, I_Damageable
 {
-    public enum ResourceType
-    {
-        Fuel,
-        Electricity,
-        Fungus,
-        OrganicMaterial,
-        Oxygen
-    }
-
-    public enum ResourceStatus
-    {
-        Under,
-        Balanced,
-        ReceivingOver
-    }
-
-    [System.Serializable]
-    public class ResourceSettings
-    {
-        public ResourceType type;
-        public ResourceStatus status; 
-
-        public bool isProducer;
-        public bool isConsumer;
-
-        [Tooltip("Rate at which this system produces or consumes the resource per second")]
-        public float rate = 0f;
-
-        [Tooltip("Optimal rate for this system")]
-        public float optimalRate = 0f;
-
-        [Tooltip("Minimum rate needed for operation")]
-        public float minRate = 0f;
-
-        [Tooltip("Maximum rate before damage occurs")]
-        public float maxRate = 0f;
-    }
-
     // Network variables
     [NonSerialized] public NetworkVariable<float> CurrentStructuralIntregity = new NetworkVariable<float>(100.0f);
     [NonSerialized] public NetworkVariable<bool> ReceivingPower = new NetworkVariable<bool>(false);
@@ -54,10 +80,9 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
     [SerializeField] protected string _systemName;
 
     [Header("Resource Settings")]
-    [SerializeField] protected List<ResourceSettings> _resourceSettings = new List<ResourceSettings>();
-
+    public ResourceSettings resourceSetting = new ResourceSettings();
     [Header("Damage Settings")]
-    [SerializeField] protected float _structuralIntregity = 100.0f; 
+    [SerializeField] protected float _structuralIntregity = 100.0f;
     [SerializeField] protected float _structuralFailureThreshold = 60.0f;
 
     //// Events
@@ -69,7 +94,7 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
     protected AircraftSystem powerSource;
     //private List<GameEventListener> _listeners; 
 
-    public string SystemName => _systemName; 
+    public string SystemName => _systemName;
 
     public override void OnNetworkSpawn()
     {
@@ -121,8 +146,12 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
 
     public void SetPowerSource(AircraftSystem source)
     {
-        powerSource = source; 
+        powerSource = source;
     }
 
+    public ResourceSettings GetSystemResourceSettings()
+    {
+        return resourceSetting;
+    }
 }
 

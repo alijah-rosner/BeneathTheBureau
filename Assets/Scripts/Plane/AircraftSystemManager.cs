@@ -10,15 +10,16 @@ public class AircraftSystemManager : NetworkBehaviour
     {
         public NetworkObject systemObj;
         public GameObject spawnPos;
-        public string Name => 
-            systemObj.TryGetComponent<AircraftSystem>(out var system) 
-            ? system.SystemName 
+        public string Name =>
+            systemObj.TryGetComponent<AircraftSystem>(out var system)
+            ? system.SystemName
             : "N/A";
     }
 
     [Header("Network Children")]
     [SerializeField] private List<NetworkSystemInfo> _systems = new List<NetworkSystemInfo>();
-    [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent; 
+    [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent;
+    [SerializeField] private FlightSystemsHandler _systemsHandler;
 
     public override void OnNetworkSpawn()
     {
@@ -28,7 +29,7 @@ public class AircraftSystemManager : NetworkBehaviour
         {
             SpawnNetworkChildren();
             ConnectElectricalSystems();
-        }        
+        }
     }
 
     private void Start()
@@ -43,6 +44,7 @@ public class AircraftSystemManager : NetworkBehaviour
             _systems[i].systemObj = Instantiate(_systems[i].systemObj, _systems[i].spawnPos.transform.position, _systems[i].spawnPos.transform.rotation);
             _systems[i].systemObj.Spawn();
             _systems[i].systemObj.transform.parent = transform;
+            _systemsHandler.AddSystem(_systems[i].Name, _systems[i].systemObj.gameObject.GetComponent<AircraftSystem>());
         }
     }
 

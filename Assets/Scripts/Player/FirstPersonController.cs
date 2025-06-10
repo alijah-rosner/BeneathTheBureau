@@ -156,7 +156,7 @@ public class FirstPersonController : MonoBehaviour
     {
         if (!isGrounded/* && velocity.y < 0*/)
         {
-            Debug.Log("should be moving down");
+           // Debug.Log("should be moving down");
             velocity.y = -9f; 
         }
         velocity.y += gravity * Time.deltaTime;

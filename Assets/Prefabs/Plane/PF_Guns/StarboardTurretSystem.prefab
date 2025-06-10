@@ -617,7 +617,7 @@ GameObject:
   - component: {fileID: 1815547140080219429}
   - component: {fileID: 1827044282164485843}
   m_Layer: 0
-  m_Name: PF_SideTurret
+  m_Name: StarboardTurretSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -701,6 +701,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
+  _systemName: 
+  resourceSetting:
+    type: 0
+    status: 0
+    isProducer: 0
+    rate: 0
+    optimalRate: 0
+    minRate: 0
+    maxRate: 0
+  _structuralIntregity: 100
+  _structuralFailureThreshold: 60
   _projectile: {fileID: 6001854935645031192, guid: 00b9cf83692c21e4ba0df34a9825846c, type: 3}
   _origin: {fileID: 2131090540420202137}
   _head: {fileID: 8668113851941031780}

@@ -1364,6 +1364,7 @@ GameObject:
   - component: {fileID: 232224799872875416}
   - component: {fileID: 805793358177695802}
   - component: {fileID: 3441606231693661584}
+  - component: {fileID: 5068084785785962263}
   m_Layer: 0
   m_Name: PF_SimPlane
   m_TagString: SimulatedAircraft
@@ -1568,6 +1569,7 @@ MonoBehaviour:
   - systemObj: {fileID: -6781944729994175167, guid: 0e02f5aa4dd1a08409b337e15759857f, type: 3}
     spawnPos: {fileID: 8501865768066559986}
   _onAircraftSpawnEvent: {fileID: 11400000, guid: 73be6d4719cc2e449a786c334da558ec, type: 2}
+  _systemsHandler: {fileID: 5068084785785962263}
 --- !u!114 &3441606231693661584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1604,6 +1606,20 @@ MonoBehaviour:
   roll: 0
   CurrentTotalThrust:
     m_InternalValue: 0
+--- !u!114 &5068084785785962263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7770530565923251601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e97f5c43b023bbc438d10fb8ba7cf6e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _electricityThroughput: 0
+  _fungalOutput: 0
 --- !u!1 &8501865768066559986
 GameObject:
   m_ObjectHideFlags: 0

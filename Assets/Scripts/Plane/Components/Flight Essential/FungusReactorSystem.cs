@@ -32,11 +32,14 @@ public class FungusReactorSystem : AircraftSystem
     // Attach functions that correspond to events the reactor is listening to
     private void Start()
     {
+        resourceSetting = new ResourceSettings(ResourceType.Fungus, ResourceStatus.Balanced,
+            true, 0.005f);
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
         prevElectricity = 0f;
         organicModifier.Value = 1f;
         fungalCharge.Value = 100f;
+        resourceSetting.Output = fungalCharge.Value;
     }
 
 
@@ -64,6 +67,8 @@ public class FungusReactorSystem : AircraftSystem
             onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
             prevElectricity = electricityThroughput.Value;
         }
+        resourceSetting.Output -= resourceSetting.rate;
+        fungalCharge.Value = resourceSetting.Output;
     }
 
 }

@@ -23,6 +23,7 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Start()
     {
+        resourceSetting = new ResourceSettings(ResourceType.Electricity, ResourceStatus.Balanced, true, 0.0f);
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         //onInputValueChanged = gameObject.AddComponent<Float_GameEventListener>();
         prevInputVal = 0f;
@@ -37,7 +38,11 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Update()
     {
-       if (electricityInput.Value != electricityOutput.Value)
+        if (electricityInput.Value <= 0)
+        {
+            Online.Value = false;
+        }
+        if (electricityInput.Value != electricityOutput.Value)
         {
             onElectricityValueChanged?.TriggerEvent(electricityInput.Value);
         }
@@ -46,6 +51,7 @@ public class ElectricalPowerSystem : AircraftSystem
     {
         Debug.Log("Old Electricity Val: " + prevInputVal);
         Debug.Log("New Electricity: " + v);
+        prevInputVal = v;
         electricityInput.Value = v;
         electricityOutput.Value = v;
     }
