@@ -8,8 +8,8 @@ using NUnit.Framework;
 
 public class ElectricalPowerSystem : AircraftSystem
 {
-    [SerializeField] private NetworkVariable<float> electricityInput = new NetworkVariable<float>();
-    [SerializeField] private NetworkVariable<float> electricityOutput = new NetworkVariable<float>();
+    [SerializeField] private float electricityInput;
+    [SerializeField] private float electricityOutput;
 
     private float prevInputVal;
 
@@ -28,24 +28,20 @@ public class ElectricalPowerSystem : AircraftSystem
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         //onInputValueChanged = gameObject.AddComponent<Float_GameEventListener>();
         prevInputVal = 0f;
-        electricityInput.Value = 0f;
-    }
-    public override void OnNetworkSpawn()
-    {
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         prevInputVal = 0f;
-        electricityInput.Value = 0f;
+        electricityInput = 0f;
     }
 
     private void Update()
     {
-        if (electricityInput.Value <= 0)
+        if (electricityInput <= 0)
         {
-            Online.Value = false;
+            Online = false;
         }
-        if (electricityInput.Value != electricityOutput.Value)
+       else if (electricityInput != electricityOutput)
         {
-            onElectricityValueChanged?.TriggerEvent(electricityInput.Value);
+            onElectricityValueChanged?.TriggerEvent(electricityInput);
         }
     }
     private void UpdateElectricityInput(float v)
@@ -53,7 +49,7 @@ public class ElectricalPowerSystem : AircraftSystem
         Debug.Log("Old Electricity Val: " + prevInputVal);
         Debug.Log("New Electricity: " + v);
         prevInputVal = v;
-        electricityInput.Value = v;
-        electricityOutput.Value = v;
+        electricityInput = v;
+        electricityOutput = v;
     }
 }
