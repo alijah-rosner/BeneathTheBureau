@@ -58,6 +58,10 @@ public class FungusReactorSystem : AircraftSystem
     // Update output and trigger event if output has changed
     private void Update()
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
 
         electricityThroughput = fungalCharge * organicModifier;
         if (electricityThroughput != prevElectricity)

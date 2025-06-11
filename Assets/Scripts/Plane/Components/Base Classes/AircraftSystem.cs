@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO.Enumeration;
 using NUnit.Framework;
 
+// Resource Settings should be network variable
 [System.Serializable]
 public class ResourceSettings
 {

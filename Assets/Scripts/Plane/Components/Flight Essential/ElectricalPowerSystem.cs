@@ -35,6 +35,11 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Update()
     {
+        if (!NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
         if (electricityInput <= 0)
         {
             Online = false;
