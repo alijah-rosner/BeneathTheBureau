@@ -46,7 +46,8 @@ public class SimulatedPlaneVisual : NetworkBehaviour
         if (IsOwner)
         {
             pos.Value = transform.localPosition;
-            rotation.Value = transform.localRotation;
+            rotation.Value = transform.rotation;
+          
         }
 
         UpdateSimMovementRPC();
@@ -65,7 +66,7 @@ public class SimulatedPlaneVisual : NetworkBehaviour
         if (SimChar)
         {
             SimChar.transform.localPosition = Vector3.Lerp(pos.Value, SimChar.transform.localPosition, 0.6f);
-            SimChar.transform.localRotation = rotation.Value;
+            SimChar.transform.rotation = rotation.Value;
         }
     }
 

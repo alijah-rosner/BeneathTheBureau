@@ -1298,6 +1298,7 @@ GameObject:
   - component: {fileID: 5912636123452822708}
   - component: {fileID: 5310169121874047484}
   - component: {fileID: 6059514869798921170}
+  - component: {fileID: 2126184095935897517}
   m_Layer: 0
   m_Name: PF_BasePlane
   m_TagString: Aircraft
@@ -1432,6 +1433,18 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 1
+--- !u!114 &2126184095935897517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7770530565923251601}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0430eda1dbeb55d488fea20d4dd7a384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &540077085061127498
 PrefabInstance:
   m_ObjectHideFlags: 0

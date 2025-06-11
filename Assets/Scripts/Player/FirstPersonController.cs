@@ -97,7 +97,7 @@ public class FirstPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_playerCamera)
+        if (_playerCamera && _mainCamera)
         {
             CheckGround();
             if (!isPilot)
@@ -110,6 +110,8 @@ public class FirstPersonController : MonoBehaviour
         else
         {
             _playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+
         }
         
 
@@ -140,10 +142,17 @@ public class FirstPersonController : MonoBehaviour
         }
         targetDirection.Normalize();
 
-        // Vector3 moveVec3 = new Vector3(moveVal.x, 0f, moveVal.y);
+        Vector3 camForward = _mainCamera.transform.forward;
+        Vector3 camRight = _mainCamera.transform.right;
 
-        //UpdateAcceleration(acceleration, deceleration);
-        Vector3 moveDirection = (transform.forward * targetDirection.y + transform.right * targetDirection.x) * targetSpeed + Vector3.up * velocity.y;
+        camForward.y = 0f;
+        camRight.y = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        // Use camera-relative movement
+        Vector3 moveDirection = (camForward * targetDirection.y + camRight * targetDirection.x) * targetSpeed + Vector3.up * velocity.y;
+
 
         _controller.Move(moveDirection * Time.deltaTime);
     }
@@ -172,13 +181,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void CameraRotation()
     {
-        float cameraYRotation = _playerCamera.transform.localRotation.eulerAngles.y;
-
-        // Create a new rotation that only rotates around the Y axis
-        Quaternion targetRotation = Quaternion.Euler(0, cameraYRotation, 0);
-
-        // Apply the rotation to your character
-        transform.localRotation = targetRotation;
+        transform.rotation = Quaternion.AngleAxis(_mainCamera.transform.localRotation.y, Vector3.up);
     }
 
 

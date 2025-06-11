@@ -5,36 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="587c7240-7692-4f27-a99b-47b4b3312344" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/ClientPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ClientPlayer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DefaultVolumeProfile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultVolumeProfile.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/NetworkPrefabsList.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/NetworkPrefabsList.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Environment/Cameras.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Environment/Cameras.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/PF_SideTurret.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/PF_SideTurret.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneComponents/ElectricalPowerSystem.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneComponents/ElectricalPowerSystem.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneComponents/FungusReactor.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneComponents/FungusReactor.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_BasePlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_BasePlane.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_v2.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_v2.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_v2.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_v2.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Camera/CameraTargetEventListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Camera/CameraTargetEventListener.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Base Classes/AircraftSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Base Classes/AircraftSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/ElectricalPowerSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/ElectricalPowerSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FungusReactorSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FungusReactorSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/InstantiatePlane.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/InstantiatePlane.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/MouseFlightController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/MouseFlightController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneInterface.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneInterface.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Sim Components/SimulatedPlaneVisual.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Sim Components/SimulatedPlaneVisual.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/PlayerRaycast.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/PlayerRaycast.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/SimCharacter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/SimCharacter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/QualitySettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,6 +116,11 @@
       <workItem from="1749539932652" duration="5055000" />
       <workItem from="1749545167959" duration="6288000" />
       <workItem from="1749551751001" duration="2722000" />
+      <workItem from="1749583500519" duration="2620000" />
+      <workItem from="1749587156558" duration="1329000" />
+      <workItem from="1749589174841" duration="1248000" />
+      <workItem from="1749590813418" duration="8259000" />
+      <workItem from="1749606916342" duration="578000" />
     </task>
     <servers />
   </component>

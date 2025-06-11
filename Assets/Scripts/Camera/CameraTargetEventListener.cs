@@ -83,7 +83,7 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
         
         // Configure the camera settings
         _currentSettings.SetCameraSettingsTarget(_currentTarget);
-        
+        transform.parent.transform.parent = _currentTarget.transform.parent.transform.parent;
      
         _virtualCamera.Follow = _currentTarget.transform;
         
