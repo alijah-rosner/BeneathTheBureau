@@ -20,7 +20,10 @@ public class AircraftSystemManager : NetworkBehaviour
     [SerializeField] private List<NetworkSystemInfo> _systems = new List<NetworkSystemInfo>();
     [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent;
     [SerializeField] private FlightSystemsHandler _systemsHandler;
-
+   
+    [Header("Input Event")]
+    [SerializeField] private Float_GameEvent onValueChangeEvent;
+    private Float_GameEventListener onInputValueChanged;
     //public override void OnNetworkSpawn()
     //{
     //    base.OnNetworkSpawn();
@@ -55,7 +58,6 @@ public class AircraftSystemManager : NetworkBehaviour
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
         ConnectElectricalSystems();
         InitSystems();
-
     }
 
     private void SpawnNetworkChildren()
@@ -80,7 +82,7 @@ public class AircraftSystemManager : NetworkBehaviour
             if (_systems[i].Name == "PlaneInterface")
             {
                 Debug.Log("Grabbing Plane Interface");
-                GetComponent<FlightController2>().planeInterface = _systems[i].systemObj.gameObject;
+                GetComponent<FlightController>().planeInterface = _systems[i].systemObj.gameObject;
                 _systems[i].systemObj.GetComponent<PlaneInterface>().SetAircraftIncludingCamera(gameObject, GameObject.FindGameObjectWithTag("MouseFlightManager"));
             }
         }

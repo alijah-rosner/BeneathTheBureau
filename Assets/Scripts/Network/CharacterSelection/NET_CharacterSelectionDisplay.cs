@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Xml;
 using TMPro;
 using Unity.Netcode;
+using Unity.Services.Authentication;
+using Unity.Services.Lobbies;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
@@ -17,7 +20,8 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
     [SerializeField] private TMP_Text _characterNameText;
     [SerializeField] private TMP_Text _characterBioText;
     [SerializeField] private Transform _introSpawnPoint;
-    [SerializeField] private Button _lockInButton; 
+    [SerializeField] private Button _lockInButton;
+    [SerializeField] private string _returnScene;
 
 
     private List<NET_CharacterSelectButton> _buttons = new();
@@ -27,6 +31,7 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
     {
         _players = new();
     }
+
     public override void OnNetworkSpawn()
     {
         if (IsClient)
@@ -39,12 +44,14 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
                 selectButtonInstance.SetCharacter(this, character);
                 _buttons.Add(selectButtonInstance);
             }
+
             _players.OnListChanged += HandlePlayersStateChanged;
         }
+
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
-            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected; 
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
 
             foreach (NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
             {
@@ -58,8 +65,8 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
         if (IsClient)
         {
             _players.OnListChanged -= HandlePlayersStateChanged;
-
         }
+
         if (IsServer)
         {
             NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
@@ -90,7 +97,7 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
         {
             if (_players[i].ClientID != NetworkManager.Singleton.LocalClientId)
             {
-                continue; 
+                continue;
             }
 
             if (_players[i].IsLockedIn)
@@ -100,12 +107,12 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
 
             if (_players[i].CharacterID == character.Id)
             {
-                return; 
+                return;
             }
 
             if (IsCharacterTaken(character.Id, false))
             {
-                return; 
+                return;
             }
         }
 
@@ -136,7 +143,7 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
 
                 _players[i] = new NET_CharacterSelectState(
                     _players[i].ClientID, characterID, _players[i].IsLockedIn
-                    );
+                );
             }
         }
     }
@@ -155,11 +162,11 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
             }
         }
 
-        foreach(var button in _buttons)
+        foreach (var button in _buttons)
         {
             if (button.IsDisabled)
             {
-                continue; 
+                continue;
             }
 
             if (IsCharacterTaken(button.Character.Id, false))
@@ -173,22 +180,22 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
             if (player.ClientID != NetworkManager.Singleton.LocalClientId)
             {
                 continue;
-
             }
 
             if (player.IsLockedIn)
             {
                 _lockInButton.interactable = false;
-                break; 
+                break;
             }
 
             if (IsCharacterTaken(player.CharacterID, false))
             {
                 _lockInButton.interactable = false;
-                break; 
+                break;
             }
+
             _lockInButton.interactable = true;
-            break; 
+            break;
         }
     }
 
@@ -200,24 +207,24 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
             {
                 if (_players[i].ClientID == NetworkManager.Singleton.LocalClientId)
                 {
-                    continue; 
+                    continue;
                 }
             }
-            
+
             if (_players[i].IsLockedIn && _players[i].CharacterID == characterID)
             {
-                return true; 
+                return true;
             }
         }
 
-        return false; 
+        return false;
     }
 
     public void LockIn()
     {
         //HostManager.Instance.StartGame();
 
-       LockInServerRPC();
+        LockInServerRPC();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -229,17 +236,17 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
             {
                 if (!_characterDatabase.IsValidCharacterID(_players[i].CharacterID))
                 {
-                    return; 
+                    return;
                 }
 
                 if (IsCharacterTaken(_players[i].CharacterID, true))
                 {
-                    return; 
+                    return;
                 }
 
                 _players[i] = new NET_CharacterSelectState(
                     _players[i].ClientID, _players[i].CharacterID, true
-                    );
+                );
             }
         }
 
@@ -258,4 +265,33 @@ public class NET_CharacterSelectionDisplay : NetworkBehaviour
 
         HostManager.Instance.StartGame();
     }
+
+    public async void QuitLobby()
+    {
+        var lobbies = await Lobbies.Instance.QueryLobbiesAsync(new QueryLobbiesOptions());
+        if (IsServer)
+        {
+            HostManager.Instance.Shutdown();
+            ReturnPlayersToTitleRpc();
+        }
+        else
+        {
+            
+            string playerId = AuthenticationService.Instance.PlayerId;
+            await LobbyService.Instance.RemovePlayerAsync(lobbies.Results[0].Id, playerId);
+            
+        } 
+        AuthenticationService.Instance.SignOut(true);
+        NetworkManager.Shutdown();
+        SceneManager.LoadScene(_returnScene);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void ReturnPlayersToTitleRpc()
+    {
+        AuthenticationService.Instance.SignOut(true);
+        NetworkManager.Shutdown();
+        SceneManager.LoadScene(_returnScene);
+    }
+    
 }

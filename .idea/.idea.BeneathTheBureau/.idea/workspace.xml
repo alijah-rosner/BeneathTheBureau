@@ -6,17 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="587c7240-7692-4f27-a99b-47b4b3312344" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Environment/Cameras.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Environment/Cameras.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_BasePlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_BasePlane.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Camera/CameraTargetEventListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Camera/CameraTargetEventListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Network/CharacterSelect.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Network/CharacterSelect.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Network/PF_ConnectMenu.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Network/PF_ConnectMenu.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Scene_CharacterSelection.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Scene_CharacterSelection.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/Scene_ServerScreen.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Scene_ServerScreen.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Network/CharacterSelection/NET_CharacterSelectionDisplay.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Network/CharacterSelection/NET_CharacterSelectionDisplay.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Network/Lobby/HostManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Network/Lobby/HostManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneInterface.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneInterface.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Sim Components/SimulatedPlaneVisual.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Sim Components/SimulatedPlaneVisual.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +116,8 @@
       <workItem from="1749587156558" duration="1329000" />
       <workItem from="1749589174841" duration="1248000" />
       <workItem from="1749590813418" duration="8259000" />
-      <workItem from="1749606916342" duration="578000" />
+      <workItem from="1749606916342" duration="4198000" />
+      <workItem from="1749676637698" duration="4862000" />
     </task>
     <servers />
   </component>

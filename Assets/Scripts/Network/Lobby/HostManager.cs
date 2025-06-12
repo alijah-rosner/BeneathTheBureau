@@ -200,7 +200,8 @@ public class HostManager : MonoBehaviour
         }
 
         _lobbyId = string.Empty;
-
+        NetworkManager.Singleton.ConnectionApprovalCallback -= ApprovalCheck;
+        NetworkManager.Singleton.OnServerStarted -= OnNetworkReady;
         //NetworkServer.OnClientLeft -= OnClientDisconnect;
 
         //NetworkServer?.Dispose();
