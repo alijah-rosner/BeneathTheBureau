@@ -9,9 +9,9 @@ using NUnit.Framework;
 public class FungusReactorSystem : AircraftSystem
 {
     [Tooltip("Debug Values - Don't assign")]
-    [SerializeField] private float fungalCharge;
-    [SerializeField] private float organicModifier;
-    [SerializeField] private float electricityThroughput;
+    [SerializeField] private NetworkVariable<float> fungalCharge = new NetworkVariable<float>();
+    [SerializeField] private NetworkVariable<float> organicModifier = new NetworkVariable<float>();
+    [SerializeField] private NetworkVariable<float> electricityThroughput = new NetworkVariable<float>();
 
     private float prevElectricity;
     
@@ -38,38 +38,42 @@ public class FungusReactorSystem : AircraftSystem
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
         prevElectricity = 0f;
-        organicModifier = 1f;
-        fungalCharge = resourceSettings[0].Output;
-        //resourceSetting.Output = fungalCharge;
+        organicModifier.Value = 1f;
+        fungalCharge.Value = 100f;
+        resourceSetting.Output = fungalCharge.Value;
     }
 
 
     // Update values based off event triggered
     private void UpdateFungus(float v)
     {
-        fungalCharge = v;
+        fungalCharge.Value = v;
     }
 
     private void UpdateOrganicMaterial(float v)
     {
-        organicModifier = v;
+        organicModifier.Value = v;
     }
 
 
     // Update output and trigger event if output has changed
     private void Update()
     {
-
-        electricityThroughput = resourceSettings[0].Output * organicModifier;
-        if (electricityThroughput != prevElectricity)
+        if (!IsServer)
+        {
+            return;
+        }
+        
+        electricityThroughput.Value = fungalCharge.Value * organicModifier.Value;
+        if (electricityThroughput.Value != prevElectricity)
         {
             Debug.Log("Changing Electricity.");
-            Debug.Log("Previous: " + prevElectricity + "\nNew: " + electricityThroughput);
-            onOutputElectricityChanged?.TriggerEvent(electricityThroughput);
-            prevElectricity = electricityThroughput;
+            Debug.Log("Previous: " + prevElectricity + "\nNew: " + electricityThroughput.Value);
+            onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
+            prevElectricity = electricityThroughput.Value;
         }
-        resourceSettings[0].Output -= resourceSettings[0].rate;
-        //fungalCharge = resourceSetting.Output;
+        resourceSetting.Output -= resourceSetting.rate;
+        fungalCharge.Value = resourceSetting.Output;
     }
 
 }

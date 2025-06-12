@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3471224669022720135}
   - component: {fileID: 7305386581152666178}
   - component: {fileID: 3934198824553942204}
-  - component: {fileID: 2770256721385750183}
+  - component: {fileID: 6500679494735933254}
   - component: {fileID: 8216816570399057785}
   - component: {fileID: 4044152479253477622}
   m_Layer: 9
@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   componentType: 1
---- !u!114 &2770256721385750183
+--- !u!114 &6500679494735933254
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 332992379
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -147,7 +147,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
+  AutoObjectParentSync: 0
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
 --- !u!114 &8216816570399057785
@@ -164,14 +164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   _systemName: PlaneInterface
-  resourceSetting:
-    type: 0
-    status: 0
-    isProducer: 0
-    rate: 0
-    optimalRate: 0
-    minRate: 0
-    maxRate: 0
+  _resourceSettings: []
   _structuralIntregity: 100
   _structuralFailureThreshold: 60
   aircraft: {fileID: 0}

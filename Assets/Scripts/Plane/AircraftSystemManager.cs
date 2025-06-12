@@ -8,7 +8,7 @@ public class AircraftSystemManager : NetworkBehaviour
     [System.Serializable]
     public class NetworkSystemInfo
     {
-        public GameObject systemObj;
+        public NetworkObject systemObj;
         public GameObject spawnPos;
         public string Name =>
             systemObj.TryGetComponent<AircraftSystem>(out var system)
@@ -20,22 +20,7 @@ public class AircraftSystemManager : NetworkBehaviour
     [SerializeField] private List<NetworkSystemInfo> _systems = new List<NetworkSystemInfo>();
     [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent;
 
-    // Go through all simulated systems, validate that the  
-    //[SerializeField] private FlightSystemsHandler _systemsHandler;
-
     public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-
-        if (IsServer)
-        {
-            //SpawnNetworkChildren();
-            ConnectElectricalSystems();
-        }
-        _onAircraftSpawnEvent?.TriggerEvent(gameObject);
-
-    }
-    private void InitSystems()
     {
         base.OnNetworkSpawn();
 
@@ -44,24 +29,26 @@ public class AircraftSystemManager : NetworkBehaviour
             SpawnNetworkChildren();
             ConnectElectricalSystems();
         }
-        
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
-        foreach (NetworkSystemInfo sys in _systems)
-        {
-           // _systemsHandler.AddSystem(sys.Name, sys.systemObj.GetComponent<AircraftSystem>());
-        }
+                
     }
 
     private void Start()
     {
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
         ConnectElectricalSystems();
-        //InitSystems();
 
     }
 
     private void SpawnNetworkChildren()
     {
+        for (int i = 0; i < _systems.Count; i++)
+        {
+            _systems[i].systemObj = Instantiate(_systems[i].systemObj, _systems[i].spawnPos.transform.position, _systems[i].spawnPos.transform.rotation);
+            _systems[i].systemObj.Spawn();
+            _systemsHandler.AddSystem(_systems[i].Name, _systems[i].systemObj.gameObject.GetComponent<AircraftSystem>());
+            //_systems[i].systemObj.TrySetParent(transform, false);
+        } 
         SetSystemParentRpc(NetworkManager.ServerClientId);
         ConnectElectricalSystems();
     }
@@ -71,7 +58,7 @@ public class AircraftSystemManager : NetworkBehaviour
     {
         for (int i = 0; i < _systems.Count; i++)
         {
-           // _systems[i].systemObj.TrySetParent(transform, false);
+            _systems[i].systemObj.TrySetParent(transform, false);
         }
     }
 

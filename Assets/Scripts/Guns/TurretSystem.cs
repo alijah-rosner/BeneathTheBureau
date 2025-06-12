@@ -18,7 +18,6 @@ public class TurretSystem : AircraftSystem
     [SerializeField] private GameObject _head;
 
     private GameObject _host;
-    private ulong hostNetId = ulong.MaxValue;
 
     private float xLook;
     private float yLook;
@@ -48,16 +47,15 @@ public class TurretSystem : AircraftSystem
     // Update is called once per frame
     void Update()
     {
-        //if (!IsOwner)
-        //{
-        //    return; 
-        //}
+        if (!IsOwner)
+        {
+            return; 
+        }
 
         if (_canInteract && !_hasShooter)
         {
-            if (Input.GetKeyDown(KeyCode.E) && hostNetId == ulong.MaxValue)
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                hostNetId = NetworkManager.Singleton.LocalClientId;
                 _hasShooter = true;
                 Debug.Log("Piloting turret");
                 PlayerController playerControl = _host.gameObject.GetComponent<PlayerController>();
@@ -73,8 +71,8 @@ public class TurretSystem : AircraftSystem
 
             if (Input.GetKey(KeyCode.Mouse0) && _timeToShoot)
             {
-                hostNetId = NetworkManager.Singleton.LocalClientId;
-
+                ShootProjectileRpc();
+                
 
                 Debug.Log("Attempting to shoot");
                 _timeToShoot = false;
@@ -93,16 +91,16 @@ public class TurretSystem : AircraftSystem
         }
     }
 
-    //[Rpc(SendTo.Everyone)]
-    //private void ShootProjectileRpc()
-    //{
-    //    GameObject proj = Instantiate(_projectile, _origin.position, _head.transform.rotation);
-    //    var netProj = proj.GetComponent<NetworkObject>();
-    //    netProj.Spawn();
+    [Rpc(SendTo.Everyone)]
+    private void ShootProjectileRpc()
+    {
+        GameObject proj = Instantiate(_projectile, _origin.position, _head.transform.rotation);
+        var netProj = proj.GetComponent<NetworkObject>();
+        netProj.Spawn();
 
 
-    //    proj.GetComponent<BH_Projectile>()._turretHost = _head;
-    //}
+        proj.GetComponent<BH_Projectile>()._turretHost = _head;
+    }
 
     private void UpdateCamera()
     {

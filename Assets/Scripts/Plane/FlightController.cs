@@ -75,23 +75,30 @@ public class FlightController : NetworkBehaviour
     // Store previous velocity as NetworkVariable
     private NetworkVariable<Vector3> netPreviousLocalVelocity = new NetworkVariable<Vector3>();
 
-    // Pilot Handling
-    private ulong curPilotId = ulong.MaxValue;
-    [SerializeField] private GameObject _cameraTarget;
-    [SerializeField] private CameraTargetEventData _cameraRequestData;
 
-    [Header("Event Triggers & Data")]
-    [SerializeField] private CameraTargetEvent _cameraTargetEvent;
-    [SerializeField] private SO_CameraSettings _onExitCameraSettings;
+    public void TriggerController(bool r)
+    {
+        _isControlling = r;
+    }
 
-    //private List<ResourceSync> _resourceSyncs;
-   
+    public bool GetIsMoving()
+    {
+        return _isMoving;
+    }
+    public bool GetController()
+    {
+        return _isControlling;
+    }
+
+    public HashSet<Rigidbody> GetPassengers()
+    {
+        return _passengers;
+    }
+
     private void Awake()
     {
         curThrust = 0f;
         rigid = GetComponent<Rigidbody>();
-        _cameraRequestData.NewTarget = GameObject.FindWithTag("AircraftCameraPosition");
-        controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
 
         if (controller == null)
             Debug.LogError(name + ": Plane - Missing reference to MouseFlightController!");
@@ -109,10 +116,8 @@ public class FlightController : NetworkBehaviour
         float autoYaw = 0f;
         float autoPitch = 0f;
         float autoRoll = 0f;
-        if (NetworkManager.Singleton.LocalClientId == curPilotId)
-        {
+        if (controller != null)
             RunAutopilotRpc(controller.MouseAimPos, out autoYaw, out autoPitch, out autoRoll);
-        }
 
         yaw = autoYaw;
         pitch = autoPitch;
@@ -136,25 +141,25 @@ public class FlightController : NetworkBehaviour
             return;
         }
 
-        //if (!IsOwner)
-        //{
-        //    return;
-        //}
-        curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
-        //currentPitch = Mathf.Lerp(currentPitch, netPitch.Value, Time.deltaTime * 2f);
-        //currentRoll = Mathf.Lerp(currentRoll, netRoll.Value, Time.deltaTime * 2f);
-        currentPitch = netPitch.Value;
-        currentRoll = netRoll.Value;
+        // Server-side physics calculations
+        if (IsOwner)
+        {
+            curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
+            //currentPitch = Mathf.Lerp(currentPitch, netPitch.Value, Time.deltaTime * 2f);
+            //currentRoll = Mathf.Lerp(currentRoll, netRoll.Value, Time.deltaTime * 2f);
+            currentPitch = netPitch.Value;
+            currentRoll = netRoll.Value;
 
-        // Apply forces
-        rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
-        rigid.AddRelativeTorque(new Vector3(
-            turnTorque.x * currentPitch,
-            turnTorque.y * netYaw.Value,
-            -turnTorque.z * currentRoll) * forceMult,
-            ForceMode.Force);
+            // Apply forces
+            rigid.AddRelativeForce(Vector3.forward * curThrust * forceMult, ForceMode.Force);
+            rigid.AddRelativeTorque(new Vector3(
+                turnTorque.x * currentPitch,
+                turnTorque.y * netYaw.Value,
+                -turnTorque.z * currentRoll) * forceMult,
+                ForceMode.Force);
 
-        ClampRotation();
+            ClampRotation();
+        }
 
         // Update network variables on the server
         netPosition.Value = transform.position;
@@ -208,25 +213,6 @@ public class FlightController : NetworkBehaviour
         }
     }
 
-    public void AssignPilot(ulong pilotId)
-    {
-        if (curPilotId != ulong.MaxValue)
-            return;
-
-        // Set the new pilot
-        curPilotId = pilotId;
-
-
-        // Transfer aircraft ownership to the new pilot
-        if (TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
-        {
-            aircraftNetObj.ChangeOwnership(pilotId);
-            GetComponent<NetworkObject>().ChangeOwnership(pilotId);
-        }
-
-        // Notify all clients about the pilot change
-        UpdatePilotState(pilotId, true);
-    }
     private void AddTurbulenceEffect()
     {
         // Add consistent rumble
@@ -321,7 +307,6 @@ public class FlightController : NetworkBehaviour
         }
     }
 
-
     [ClientRpc]
     private void AddPassengerClientRpc(ulong networkObjectId)
     {
@@ -402,120 +387,71 @@ public class FlightController : NetworkBehaviour
             RemovePassengerServerRpc(netObj.NetworkObjectId);
         }
     }
-
-    private void OnPilotChanged(ulong previousPilotId, ulong newPilotId)
-    {
-        // Handle any necessary state cleanup when pilot changes
-        if (newPilotId == NetworkManager.Singleton.LocalClientId)
-        {
-            UpdatePilotState(newPilotId, true);
-        }
-        // If we were the previous pilot
-        else if (previousPilotId == NetworkManager.Singleton.LocalClientId)
-        {
-            UpdatePilotState(previousPilotId, false);
-        }
-    }
-
-    [Rpc(SendTo.Everyone)]
-    public void ReleasePilotControlServerRpc(ulong pilotId)
-    {
-        if (curPilotId != pilotId)
-            return;
-
-        // Clear the pilot
-        curPilotId = ulong.MaxValue;
-
-        // Return aircraft ownership to server
-        if (TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
-        {
-            aircraftNetObj.ChangeOwnership(NetworkManager.ServerClientId);
-        }
-
-        // Notify all clients about the pilot change
-        UpdatePilotState(pilotId, false);
-    }
-    [Rpc(SendTo.Server)]
-    private void RequestPilotControlServerRpc(ulong requestingPlayerId)
-    {
-        if (curPilotId != ulong.MaxValue)
-            return;
-
-        // Set the new pilot
-        curPilotId = requestingPlayerId;
-
-
-        // Transfer aircraft ownership to the new pilot
-        if (TryGetComponent<NetworkObject>(out NetworkObject aircraftNetObj))
-        {
-            aircraftNetObj.ChangeOwnership(requestingPlayerId);
-            GetComponent<NetworkObject>().ChangeOwnership(requestingPlayerId);
-        }
-
-        // Notify all clients about the pilot change
-        UpdatePilotState(requestingPlayerId, true);
-    }
-
-    private void UpdatePilotState(ulong pilotId, bool isPilot)
-    {
-
-        if (NetworkManager.Singleton.LocalClientId != pilotId)
-        {
-            return;
-        }
-
-        GameObject pilotObj = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
-        if (pilotObj == null) return;
-
-        FirstPersonController _playerController = pilotObj.GetComponent<FirstPersonController>();
-        GameObject simObj = _playerController.GetComponent<SimulatedPlaneVisual>().GetVisual();
-        if (_playerController == null) return;
-
-        //Camera pilotCamera = playerController.GetCamera();
-
-        if (isPilot)
-        {
-            // Activate pilot mode
-            _playerController.SetIsPilot(true);
-            _cameraTargetEvent?.TriggerEvent(_cameraRequestData);
-            if (TryGetComponent<FlightController>(out var flightController))
-            {
-                flightController.enabled = true;
-                flightController.TriggerController(true);
-            }
-        }
-        else
-        {
-            // Deactivate pilot mode
-            _playerController.SetIsPilot(false);
-            //playerController.SetInAircraft(true);
-            CameraTargetEventData playerCameraData = new(simObj, _onExitCameraSettings);
-
-            _cameraTargetEvent?.TriggerEvent(playerCameraData);
-
-            if (TryGetComponent<FlightController>(out var flightController))
-            {
-                flightController.TriggerController(false);
-            }
-        }
-    }
-    public void TriggerController(bool r)
-    {
-        _isControlling = r;
-    }
-
-    public bool GetIsMoving()
-    {
-        return _isMoving;
-    }
-    public bool GetController()
-    {
-        return _isControlling;
-    }
-
-    public HashSet<Rigidbody> GetPassengers()
-    {
-        return _passengers;
-    }
-
 }
+
+
+
+//private void UpdatePassengers()
+//{
+//    if (!IsServer) return;
+
+//    Vector3 currentLocalVelocity = transform.InverseTransformDirection(rigid.linearVelocity);
+//    Vector3 localAcceleration = (currentLocalVelocity - netPreviousLocalVelocity.Value) / Time.fixedDeltaTime;
+
+//    // Update network variables
+//    netLocalAcceleration.Value = localAcceleration;
+//    netPreviousLocalVelocity.Value = currentLocalVelocity;
+//    netAircraftVelocity.Value = rigid.linearVelocity;
+//    netAngularVelocity.Value = rigid.angularVelocity;
+
+//    foreach (Rigidbody passenger in _passengers)
+//    {
+//        if (passenger == null) continue;
+
+//        NetworkObject passengerNetObj = passenger.GetComponent<NetworkObject>();
+//        if (passengerNetObj == null || !passengerNetObj.IsSpawned) continue;
+
+//        // pass the NetworkObjectId and add turbulence in direction
+//        //SyncPassengerPhysicsClientRpc(
+//        //    passengerNetObj.NetworkObjectId,
+//        //    transform.TransformDirection(localAcceleration),
+//        //    netTurbulenceFlag.Value
+//        //);
+//    }
+//    if (Input.GetKeyDown(KeyCode.J))
+//    {
+//        foreach (Rigidbody pass in _passengers)
+//        {
+//            Debug.Log("Passenger:" + pass.gameObject.GetComponent<NetworkObject>().name);
+//        }
+
+//    }
+//}
+
+//[ClientRpc]
+//private void SyncPassengerPhysicsClientRpc(
+// ulong networkObjectId,
+// Vector3 localAcceleration,
+// bool hasTurbulence)
+//{
+//    if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject passengerObj))
+//        return;
+
+//    if (!passengerObj.TryGetComponent<Rigidbody>(out Rigidbody passengerRb))
+//        return;
+
+//    // Calculate the desired position relative to aircraft
+//    Vector3 relativePos = passengerRb.position - transform.position;
+//    Vector3 desiredRelativePos = Quaternion.Inverse(transform.rotation) * relativePos;
+
+//    // Update position directly instead of only using forces
+//    Vector3 targetPos = transform.position + transform.rotation * desiredRelativePos;
+//    passengerRb.MovePosition(Vector3.Lerp(passengerRb.position, targetPos, Time.fixedDeltaTime * 20f));
+
+//    // Apply velocity matching
+//    Vector3 desiredVelocity = netAircraftVelocity.Value;
+//    passengerRb.linearVelocity = Vector3.Lerp(passengerRb.linearVelocity, desiredVelocity, Time.fixedDeltaTime * 10f);
+
+//    // Apply rotation
+//    passengerRb.MoveRotation(Quaternion.Lerp(passengerRb.rotation, transform.rotation, Time.fixedDeltaTime * 15f));
+//}

@@ -10,12 +10,18 @@ public class EngineSystem : AircraftSystem
     [SerializeField] float _accelerationRate;
     
 
-    private FlightController2 _controller;
-    private GameObject _throttle;
+    public NetworkVariable<float> CurrentThrust = new NetworkVariable<float>(0.0f);
 
-    private void Start()
+    private FlightController2 _controller;
+    private GameObject _throttle; 
+
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         _controller = FindFirstObjectByType<FlightController2>();
+        Online.OnValueChanged += OnlineStateChanged;
+        
     }
 
     private void OnlineStateChanged(bool oldValue, bool newValue)
@@ -25,12 +31,22 @@ public class EngineSystem : AircraftSystem
 
     private void UpdateStatus()
     {
-
+        if (Online.Value)
+        {
+            // start turning the engines off, accelerating at the right rate yada yada yada
+        }
+        else
+        {
+            
+        }
     }
 
     public void ChangeThrottleValue(float value)
     {
-
+        if (IsServer)
+        {
+            CurrentThrust.Value = value; 
+        }
     }
 }
 

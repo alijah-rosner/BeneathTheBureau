@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public class FlightController2 : NetworkBehaviour
+public class FlightController2 : AircraftSystem
 {
 
     [Header("Components")]
@@ -61,7 +61,7 @@ public class FlightController2 : NetworkBehaviour
         base.OnNetworkSpawn();
         rigid = GetComponent<Rigidbody>();
         _isControlling = false;
-       // engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
+        engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
     }
 
     private void Start()

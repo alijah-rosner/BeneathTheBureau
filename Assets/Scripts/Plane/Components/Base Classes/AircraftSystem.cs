@@ -7,12 +7,12 @@ using NUnit.Framework;
 
 // Resource Settings should be network variable
 
-public class AircraftSystem : MonoBehaviour, I_Damageable
+public class AircraftSystem : NetworkBehaviour, I_Damageable
 {
     // Network variables
-    [NonSerialized] public float CurrentStructuralIntregity = 100.0f;
-    [NonSerialized] public bool ReceivingPower = false;
-    [NonSerialized] public bool Online = false;
+    [NonSerialized] public NetworkVariable<float> CurrentStructuralIntregity = new NetworkVariable<float>(100.0f);
+    [NonSerialized] public NetworkVariable<bool> ReceivingPower = new NetworkVariable<bool>(false);
+    [NonSerialized] public NetworkVariable<bool> Online = new NetworkVariable<bool>(false);
 
     [Header("Basic System Settings")]
     [SerializeField] protected string _systemName;
@@ -34,18 +34,34 @@ public class AircraftSystem : MonoBehaviour, I_Damageable
 
     public string SystemName => _systemName;
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            DamageEventSystem.Instance?.Register(gameObject, this);
+            // subsribe inputvalue change to the appropriate
+            // same w the output value 
+        }
+    }
 
     private void Start()
     {
         transform.parent = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
-        DamageEventSystem.Instance?.Register(gameObject, this);
     }
 
-
-    private void OnDestroy()
+    public override void OnNetworkDespawn()
     {
-        DamageEventSystem.Instance?.Unregister(gameObject);
+        base.OnNetworkDespawn();
+
+        // Unregister from damage system
+        if (IsServer)
+        {
+            DamageEventSystem.Instance?.Unregister(gameObject);
+        }
     }
+
 
     public void TakeDamage(SO_DamageData data)
     {
