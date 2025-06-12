@@ -84,26 +84,8 @@ public class FlightController : NetworkBehaviour
     [SerializeField] private CameraTargetEvent _cameraTargetEvent;
     [SerializeField] private SO_CameraSettings _onExitCameraSettings;
 
-    
-    public void TriggerController(bool r)
-    {
-        _isControlling = r;
-    }
-
-    public bool GetIsMoving()
-    {
-        return _isMoving;
-    }
-    public bool GetController()
-    {
-        return _isControlling;
-    }
-
-    public HashSet<Rigidbody> GetPassengers()
-    {
-        return _passengers;
-    }
-
+    //private List<ResourceSync> _resourceSyncs;
+   
     private void Awake()
     {
         curThrust = 0f;
@@ -141,7 +123,7 @@ public class FlightController : NetworkBehaviour
     }
     private void UpdateFlightSystems()
     {
-        thrust *= (GetComponent<FlightSystemsHandler>().GetElectricityThroughput() / 100.0f);
+
     }
     private void FixedUpdate()
     {
@@ -517,4 +499,23 @@ public class FlightController : NetworkBehaviour
             }
         }
     }
+    public void TriggerController(bool r)
+    {
+        _isControlling = r;
+    }
+
+    public bool GetIsMoving()
+    {
+        return _isMoving;
+    }
+    public bool GetController()
+    {
+        return _isControlling;
+    }
+
+    public HashSet<Rigidbody> GetPassengers()
+    {
+        return _passengers;
+    }
+
 }

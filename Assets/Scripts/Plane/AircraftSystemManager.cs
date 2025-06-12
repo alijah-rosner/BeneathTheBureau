@@ -19,23 +19,22 @@ public class AircraftSystemManager : NetworkBehaviour
     [Header("Network Children")]
     [SerializeField] private List<NetworkSystemInfo> _systems = new List<NetworkSystemInfo>();
     [SerializeField] private GameObject_GameEvent _onAircraftSpawnEvent;
-    [SerializeField] private FlightSystemsHandler _systemsHandler;
-   
-    [Header("Input Event")]
-    [SerializeField] private Float_GameEvent onValueChangeEvent;
-    private Float_GameEventListener onInputValueChanged;
-    //public override void OnNetworkSpawn()
-    //{
-    //    base.OnNetworkSpawn();
 
-    //    if (IsServer)
-    //    {
-    //        SpawnNetworkChildren();
-    //        ConnectElectricalSystems();
-    //    }
-    //    _onAircraftSpawnEvent?.TriggerEvent(gameObject);
-                
-    //}
+    // Go through all simulated systems, validate that the  
+    //[SerializeField] private FlightSystemsHandler _systemsHandler;
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            //SpawnNetworkChildren();
+            ConnectElectricalSystems();
+        }
+        _onAircraftSpawnEvent?.TriggerEvent(gameObject);
+
+    }
     private void InitSystems()
     {
         base.OnNetworkSpawn();
@@ -49,7 +48,7 @@ public class AircraftSystemManager : NetworkBehaviour
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
         foreach (NetworkSystemInfo sys in _systems)
         {
-            _systemsHandler.AddSystem(sys.Name, sys.systemObj.GetComponent<AircraftSystem>());
+           // _systemsHandler.AddSystem(sys.Name, sys.systemObj.GetComponent<AircraftSystem>());
         }
     }
 
@@ -57,7 +56,8 @@ public class AircraftSystemManager : NetworkBehaviour
     {
         _onAircraftSpawnEvent?.TriggerEvent(gameObject);
         ConnectElectricalSystems();
-        InitSystems();
+        //InitSystems();
+
     }
 
     private void SpawnNetworkChildren()

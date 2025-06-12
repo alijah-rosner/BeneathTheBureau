@@ -23,7 +23,7 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Start()
     {
-        resourceSetting = new ResourceSettings(ResourceType.Electricity, ResourceStatus.Balanced, true, 0.0f);
+        //resourceSetting = new ResourceSettings(ResourceType.Electricity, ResourceStatus.Balanced, true, 0.0f);
 
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         //onInputValueChanged = gameObject.AddComponent<Float_GameEventListener>();
@@ -35,10 +35,6 @@ public class ElectricalPowerSystem : AircraftSystem
 
     private void Update()
     {
-        if (!NetworkManager.Singleton.IsHost)
-        {
-            return;
-        }
 
         if (electricityInput <= 0)
         {

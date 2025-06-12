@@ -277,16 +277,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf5b46e6c2baf84eb3324afa509b257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   _systemName: FungusReactor
+  resourceSettings:
+  - onValueChangeEvent: {fileID: 11400000, guid: fd8a0bc22db74f14e86eaa4e296bd357, type: 2}
+    type: 2
+    status: 0
+    isProducer: 0
+    _prevOutput: 100
+    rate: 0.05
+    optimalRate: 0
+    minRate: 0
+    maxRate: 0
   _structuralIntregity: 100
   _structuralFailureThreshold: 60
-  fungalCharge:
-    m_InternalValue: 0
-  organicModifier:
-    m_InternalValue: 0
-  electricityThroughput:
-    m_InternalValue: 0
+  fungalCharge: 0
+  organicModifier: 0
+  electricityThroughput: 0
   onFungusValueChanged: {fileID: 11400000, guid: fd8a0bc22db74f14e86eaa4e296bd357, type: 2}
   onOutputElectricityChanged: {fileID: 11400000, guid: 274a928df9887ca42ab5b593f8be9323, type: 2}
 --- !u!114 &6157401308946868045

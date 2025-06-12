@@ -183,7 +183,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -252,10 +252,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _systemName: ElectricalSystem
-  resourceSetting:
-    type: 0
-    status: 0
+  resourceSettings:
+  - onValueChangeEvent: {fileID: 11400000, guid: 274a928df9887ca42ab5b593f8be9323, type: 2}
+    type: 1
+    status: 1
     isProducer: 0
+    _prevOutput: 100
     rate: 0
     optimalRate: 0
     minRate: 0

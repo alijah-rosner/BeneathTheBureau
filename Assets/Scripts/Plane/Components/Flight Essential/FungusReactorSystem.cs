@@ -21,6 +21,7 @@ public class FungusReactorSystem : AircraftSystem
         Balanced,
         Overfed
     }
+
     [Header("Event that triggers listeners")]
     [SerializeField] Float_GameEvent onFungusValueChanged;
     [SerializeField] Float_GameEvent onOutputElectricityChanged;
@@ -32,14 +33,14 @@ public class FungusReactorSystem : AircraftSystem
     // Attach functions that correspond to events the reactor is listening to
     private void Start()
     {
-        resourceSetting = new ResourceSettings(ResourceType.Fungus, ResourceStatus.Balanced,
-            true, 0.005f);
+        //resourceSetting = new ResourceSettings(ResourceType.Fungus, ResourceStatus.Balanced,
+        //    true, 0.005f);
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
         prevElectricity = 0f;
         organicModifier = 1f;
-        fungalCharge = 100f;
-        resourceSetting.Output = fungalCharge;
+        fungalCharge = resourceSettings[0].Output;
+        //resourceSetting.Output = fungalCharge;
     }
 
 
@@ -58,12 +59,8 @@ public class FungusReactorSystem : AircraftSystem
     // Update output and trigger event if output has changed
     private void Update()
     {
-        if (!NetworkManager.Singleton.IsHost)
-        {
-            return;
-        }
 
-        electricityThroughput = fungalCharge * organicModifier;
+        electricityThroughput = resourceSettings[0].Output * organicModifier;
         if (electricityThroughput != prevElectricity)
         {
             Debug.Log("Changing Electricity.");
@@ -71,8 +68,8 @@ public class FungusReactorSystem : AircraftSystem
             onOutputElectricityChanged?.TriggerEvent(electricityThroughput);
             prevElectricity = electricityThroughput;
         }
-        resourceSetting.Output -= resourceSetting.rate;
-        fungalCharge = resourceSetting.Output;
+        resourceSettings[0].Output -= resourceSettings[0].rate;
+        //fungalCharge = resourceSetting.Output;
     }
 
 }

@@ -259,6 +259,10 @@ PrefabInstance:
       value: 512
       objectReference: {fileID: 0}
     - target: {fileID: 162201991035112829, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
+      propertyPath: m_DisconnectTimeoutMS
+      value: 300000
+      objectReference: {fileID: 0}
+    - target: {fileID: 162201991035112829, guid: d14f16c89fe0e7b43bb238f004faee98, type: 3}
       propertyPath: ConnectionData.ServerListenAddress
       value: 0.0.0.0
       objectReference: {fileID: 0}
