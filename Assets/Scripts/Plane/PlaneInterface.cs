@@ -42,6 +42,7 @@ public class PlaneInterface : AircraftSystem, I_Interactable
         {
             // Deactivate pilot mode
             _playerController = pilotObj.GetComponent<FirstPersonController>();
+            ReleasePilotControlServerRpc(currentPilotId.Value);
             _playerController.SetIsPilot(false);
             //playerController.SetInAircraft(true);
             CameraTargetEventData playerCameraData = new(simObj, _onExitCameraSettings);

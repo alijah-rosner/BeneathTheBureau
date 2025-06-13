@@ -132,6 +132,96 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Pilot",
+            "id": "96b48a44-f5ae-4167-b719-c05145a71ab7",
+            "actions": [
+                {
+                    "name": "PilotLook",
+                    "type": "PassThrough",
+                    "id": "9c8a2e0f-85dd-4032-95d1-a3dfb7d4e0dc",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PilotMovement",
+                    "type": "PassThrough",
+                    "id": "f770e22e-3e16-46fc-bd0e-8ab775beb2f8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PilotChart",
+                    "type": "Button",
+                    "id": "360efc2a-caf2-4391-b781-b37607752255",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "08708f78-c9ab-4623-813d-70656c9fb7c3",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PilotLook",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "WASD",
+                    "id": "5ba49ad0-7771-4cfe-bfa5-5b35ffb957c5",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PilotMovement",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "442e16f5-ee75-4184-aca8-d014e524853e",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PilotMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "1bae1a05-e20b-4fda-ae01-d029e67bf574",
+                    "path": "<Keyboard>/s",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PilotMovement",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "4c0e3b99-3584-4a14-b224-7311fc3ca3c0",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PilotChart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []

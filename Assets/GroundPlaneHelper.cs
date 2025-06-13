@@ -16,7 +16,7 @@ public class GroundPlaneHelper : MonoBehaviour
     {
         if (_simAircraft)
         {
-            transform.rotation = Quaternion.Euler(0, _simAircraft.transform.eulerAngles.y, 0);
+            transform.rotation = _simAircraft.transform.rotation;
         }
     }
 }

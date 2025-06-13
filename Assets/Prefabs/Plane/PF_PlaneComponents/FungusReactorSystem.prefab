@@ -277,6 +277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdf5b46e6c2baf84eb3324afa509b257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   _systemName: FungusReactor
   resourceSettings:
   - onValueChangeEvent: {fileID: 11400000, guid: fd8a0bc22db74f14e86eaa4e296bd357, type: 2}
@@ -290,9 +291,15 @@ MonoBehaviour:
     maxRate: 0
   _structuralIntregity: 100
   _structuralFailureThreshold: 60
-  fungalCharge: 0
-  organicModifier: 0
-  electricityThroughput: 0
+  organicMaterial:
+    m_InternalValue: 100
+  fungalCharge:
+    m_InternalValue: 1
+  organicModifier:
+    m_InternalValue: 100
+  electricityThroughput:
+    m_InternalValue: 0
+  _fungusGrowthTickRate: 3
   onFungusValueChanged: {fileID: 11400000, guid: fd8a0bc22db74f14e86eaa4e296bd357, type: 2}
   onOutputElectricityChanged: {fileID: 11400000, guid: 274a928df9887ca42ab5b593f8be9323, type: 2}
 --- !u!114 &6157401308946868045
@@ -309,18 +316,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkTransformExpanded: 0
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncPositionX: 0
+  SyncPositionY: 0
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -329,5 +336,5 @@ MonoBehaviour:
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
-  Interpolate: 1
+  Interpolate: 0
   SlerpPosition: 0

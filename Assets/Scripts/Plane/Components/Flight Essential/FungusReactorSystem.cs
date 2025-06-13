@@ -9,11 +9,15 @@ using NUnit.Framework;
 public class FungusReactorSystem : AircraftSystem
 {
     [Tooltip("Debug Values - Don't assign")]
+    [SerializeField] private NetworkVariable<float> organicMaterial = new NetworkVariable<float>();
     [SerializeField] private NetworkVariable<float> fungalCharge = new NetworkVariable<float>();
     [SerializeField] private NetworkVariable<float> organicModifier = new NetworkVariable<float>();
     [SerializeField] private NetworkVariable<float> electricityThroughput = new NetworkVariable<float>();
+    [SerializeField] private float _fungusGrowthTickRate;
+ 
 
     private float prevElectricity;
+    private float _fungusGrowthTimer = 0.0f;
     
     public enum ReactorState
     {
@@ -38,9 +42,12 @@ public class FungusReactorSystem : AircraftSystem
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
         prevElectricity = 0f;
-        organicModifier.Value = 1f;
-        fungalCharge.Value = 100f;
-        resourceSetting.Output = fungalCharge.Value;
+        
+        if (IsServer)
+        {
+        }
+
+        //resourceSetting.Output = fungalCharge.Value;
     }
 
 
@@ -63,8 +70,22 @@ public class FungusReactorSystem : AircraftSystem
         {
             return;
         }
+
+        _fungusGrowthTimer += Time.deltaTime;
+        if (_fungusGrowthTimer > _fungusGrowthTickRate)
+        {
+            _fungusGrowthTimer = 0.0f;
+            
+            float consumption = fungalCharge.Value / 25f;
+            organicMaterial.Value = Mathf.Max(0, organicMaterial.Value - consumption);
+            
+
+            float growthRate = Mathf.Log(organicMaterial.Value + 1f, 10f) * (1f - fungalCharge.Value / 100f);
+            fungalCharge.Value = Mathf.Min(100f, fungalCharge.Value + growthRate);
+        }
         
-        electricityThroughput.Value = fungalCharge.Value * organicModifier.Value;
+        
+        electricityThroughput.Value = Mathf.Pow(fungalCharge.Value / 100f, 0.75f) * 100f;
         if (electricityThroughput.Value != prevElectricity)
         {
             Debug.Log("Changing Electricity.");
@@ -72,8 +93,8 @@ public class FungusReactorSystem : AircraftSystem
             onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
             prevElectricity = electricityThroughput.Value;
         }
-        resourceSetting.Output -= resourceSetting.rate;
-        fungalCharge.Value = resourceSetting.Output;
+        //resourceSetting.Output -= resourceSetting.rate;
+        //fungalCharge.Value = resourceSetting.Output;
     }
 
 }

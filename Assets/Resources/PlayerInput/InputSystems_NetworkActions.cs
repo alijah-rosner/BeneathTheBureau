@@ -154,6 +154,96 @@ public partial class @InputSystems_NetworkActions: IInputActionCollection2, IDis
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Pilot"",
+            ""id"": ""96b48a44-f5ae-4167-b719-c05145a71ab7"",
+            ""actions"": [
+                {
+                    ""name"": ""PilotLook"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""9c8a2e0f-85dd-4032-95d1-a3dfb7d4e0dc"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PilotMovement"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""f770e22e-3e16-46fc-bd0e-8ab775beb2f8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PilotChart"",
+                    ""type"": ""Button"",
+                    ""id"": ""360efc2a-caf2-4391-b781-b37607752255"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""08708f78-c9ab-4623-813d-70656c9fb7c3"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PilotLook"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""5ba49ad0-7771-4cfe-bfa5-5b35ffb957c5"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PilotMovement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""442e16f5-ee75-4184-aca8-d014e524853e"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PilotMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""1bae1a05-e20b-4fda-ae01-d029e67bf574"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PilotMovement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4c0e3b99-3584-4a14-b224-7311fc3ca3c0"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PilotChart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -164,11 +254,17 @@ public partial class @InputSystems_NetworkActions: IInputActionCollection2, IDis
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
+        // Pilot
+        m_Pilot = asset.FindActionMap("Pilot", throwIfNotFound: true);
+        m_Pilot_PilotLook = m_Pilot.FindAction("PilotLook", throwIfNotFound: true);
+        m_Pilot_PilotMovement = m_Pilot.FindAction("PilotMovement", throwIfNotFound: true);
+        m_Pilot_PilotChart = m_Pilot.FindAction("PilotChart", throwIfNotFound: true);
     }
 
     ~@InputSystems_NetworkActions()
     {
         UnityEngine.Debug.Assert(!m_Player.enabled, "This will cause a leak and performance issues, InputSystems_NetworkActions.Player.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Pilot.enabled, "This will cause a leak and performance issues, InputSystems_NetworkActions.Pilot.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -296,11 +392,79 @@ public partial class @InputSystems_NetworkActions: IInputActionCollection2, IDis
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Pilot
+    private readonly InputActionMap m_Pilot;
+    private List<IPilotActions> m_PilotActionsCallbackInterfaces = new List<IPilotActions>();
+    private readonly InputAction m_Pilot_PilotLook;
+    private readonly InputAction m_Pilot_PilotMovement;
+    private readonly InputAction m_Pilot_PilotChart;
+    public struct PilotActions
+    {
+        private @InputSystems_NetworkActions m_Wrapper;
+        public PilotActions(@InputSystems_NetworkActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @PilotLook => m_Wrapper.m_Pilot_PilotLook;
+        public InputAction @PilotMovement => m_Wrapper.m_Pilot_PilotMovement;
+        public InputAction @PilotChart => m_Wrapper.m_Pilot_PilotChart;
+        public InputActionMap Get() { return m_Wrapper.m_Pilot; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PilotActions set) { return set.Get(); }
+        public void AddCallbacks(IPilotActions instance)
+        {
+            if (instance == null || m_Wrapper.m_PilotActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_PilotActionsCallbackInterfaces.Add(instance);
+            @PilotLook.started += instance.OnPilotLook;
+            @PilotLook.performed += instance.OnPilotLook;
+            @PilotLook.canceled += instance.OnPilotLook;
+            @PilotMovement.started += instance.OnPilotMovement;
+            @PilotMovement.performed += instance.OnPilotMovement;
+            @PilotMovement.canceled += instance.OnPilotMovement;
+            @PilotChart.started += instance.OnPilotChart;
+            @PilotChart.performed += instance.OnPilotChart;
+            @PilotChart.canceled += instance.OnPilotChart;
+        }
+
+        private void UnregisterCallbacks(IPilotActions instance)
+        {
+            @PilotLook.started -= instance.OnPilotLook;
+            @PilotLook.performed -= instance.OnPilotLook;
+            @PilotLook.canceled -= instance.OnPilotLook;
+            @PilotMovement.started -= instance.OnPilotMovement;
+            @PilotMovement.performed -= instance.OnPilotMovement;
+            @PilotMovement.canceled -= instance.OnPilotMovement;
+            @PilotChart.started -= instance.OnPilotChart;
+            @PilotChart.performed -= instance.OnPilotChart;
+            @PilotChart.canceled -= instance.OnPilotChart;
+        }
+
+        public void RemoveCallbacks(IPilotActions instance)
+        {
+            if (m_Wrapper.m_PilotActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IPilotActions instance)
+        {
+            foreach (var item in m_Wrapper.m_PilotActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_PilotActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public PilotActions @Pilot => new PilotActions(this);
     public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+    }
+    public interface IPilotActions
+    {
+        void OnPilotLook(InputAction.CallbackContext context);
+        void OnPilotMovement(InputAction.CallbackContext context);
+        void OnPilotChart(InputAction.CallbackContext context);
     }
 }

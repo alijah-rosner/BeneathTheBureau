@@ -192,6 +192,7 @@ MonoBehaviour:
   _defaultCameraTarget: {fileID: 0}
   _defaultCameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
   _virtualCamera: {fileID: 119995603913187547}
+  _brain: {fileID: 6919155084581860663}
 --- !u!1 &2558211257271410948
 GameObject:
   m_ObjectHideFlags: 0
@@ -248,6 +249,7 @@ GameObject:
   - component: {fileID: 2042754918546161210}
   - component: {fileID: 5694191973219200404}
   - component: {fileID: 6919155084581860663}
+  - component: {fileID: 8238392604794157348}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -397,6 +399,20 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &8238392604794157348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3279492031078820206}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9bda5c5fb56aa943a77ead686b54dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _aircraftSpawnEvent: {fileID: 11400000, guid: 73be6d4719cc2e449a786c334da558ec, type: 2}
+  _brain: {fileID: 6919155084581860663}
 --- !u!1 &6778466145871362925
 GameObject:
   m_ObjectHideFlags: 0

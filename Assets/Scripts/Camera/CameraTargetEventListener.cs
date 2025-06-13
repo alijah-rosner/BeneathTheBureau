@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTargetEventData>
 {
-    //[Header("Events")]
+    [Header("Events")]
     [SerializeField] private CameraTargetEvent _cameraTargetEvent;
+
     
     
     [Header("Default Settings")]
@@ -15,6 +16,8 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
     
     [Header("References")]
     [SerializeField] private CinemachineCamera _virtualCamera;
+    [SerializeField] private CinemachineBrain _brain;
+
     
     // Current camera state
     private GameObject _currentTarget;
@@ -30,6 +33,8 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
         }
     }
     
+    
+    
     private void OnEnable()
     {
         // _cameraTargetEvent = GlobalGameEvents.CameraTargetEvent;
@@ -40,6 +45,7 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
             _cameraTargetEvent.RegisterListener(this);
             Debug.Log("Registered event listener");
         }
+        
         
         // Set up default camera settings
         // if (_defaultCameraTarget != null && _defaultCameraSettings != null)
@@ -83,9 +89,10 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
         
         // Configure the camera settings
         _currentSettings.SetCameraSettingsTarget(_currentTarget);
-        transform.parent.transform.parent = _currentTarget.transform.parent.transform.parent;
+        //transform.parent.transform.parent = _currentTarget.transform.parent.transform.parent;
      
         _virtualCamera.Follow = _currentTarget.transform;
+        _brain.WorldUpOverride = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
         
         Debug.Log($"Camera switched to target: {_currentTarget.name}");
     }

@@ -139,7 +139,10 @@ public class MouseFlightController : MonoBehaviour
         {
             _isEnabled = aircraft.GetComponent<FlightController2>().GetController();
             if (useFixed == false)
+            {
                 UpdateCameraPos();
+            }
+
 
             RotateRig();
         }

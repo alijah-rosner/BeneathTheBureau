@@ -9,7 +9,8 @@ public class InstantiatePlane : NetworkBehaviour
     [SerializeField] private GameObject SimPlane;
     [SerializeField] private GameObject[] childPositions;
     [SerializeField] private NetworkObject[] children;
-
+    [SerializeField] private Transform baseSpawnPoint;
+    [SerializeField] private Transform simSpawnPoint;
     public override void OnNetworkSpawn()
     {
         if (!IsServer)
@@ -17,10 +18,10 @@ public class InstantiatePlane : NetworkBehaviour
             return;
         }
 
-        GameObject basePlane = Instantiate(GroundPlane, new Vector3(0f, 0f, 0f), Quaternion.identity);
+        GameObject basePlane = Instantiate(GroundPlane, baseSpawnPoint.position, Quaternion.identity);
         basePlane.GetComponent<NetworkObject>().Spawn();
 
-        GameObject simPlane = Instantiate(SimPlane, new Vector3(0f, 10f, 10f), Quaternion.identity);
+        GameObject simPlane = Instantiate(SimPlane, simSpawnPoint.position, Quaternion.identity);
         simPlane.GetComponent<NetworkObject>().Spawn();
         //simPlane.tag = "SimulatedAircraft";
         foreach (var client in HostManager.Instance.ClientData)

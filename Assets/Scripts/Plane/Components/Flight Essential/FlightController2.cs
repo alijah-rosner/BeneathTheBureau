@@ -47,7 +47,7 @@ public class FlightController2 : AircraftSystem
     private bool _isControlling = false;
 
 
-    public NetworkVariable<float> CurrentTotalThrust = new NetworkVariable<float> { Value = 0f };
+    //public NetworkVariable<float> CurrentTotalThrust = new NetworkVariable<float> { Value = 0f };
     private NetworkVariable<float> CurrentPitch = new NetworkVariable<float>();
     private NetworkVariable<float> CurrentYaw = new NetworkVariable<float>();
     private NetworkVariable<float> CurrentRoll = new NetworkVariable<float>();
@@ -61,7 +61,7 @@ public class FlightController2 : AircraftSystem
         base.OnNetworkSpawn();
         rigid = GetComponent<Rigidbody>();
         _isControlling = false;
-        engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
+        //engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
     }
 
     private void Start()
@@ -71,8 +71,8 @@ public class FlightController2 : AircraftSystem
 
     private void CalculateTotalCurrentThrust(float oldValue, float newValue)
     {
-        CurrentTotalThrust.Value -= oldValue;
-        CurrentTotalThrust.Value += newValue; 
+        //CurrentTotalThrust.Value -= oldValue;
+        //CurrentTotalThrust.Value += newValue; 
     }
 
     private void Update()
@@ -154,6 +154,7 @@ public class FlightController2 : AircraftSystem
         {
             float keyboardPitch = Input.GetAxis("Vertical");
             {
+                Debug.Log(keyboardPitch);
                 if (Mathf.Abs(keyboardPitch) > .25f)
                 {
                     float roundedPitch = -Mathf.Sign(keyboardPitch);

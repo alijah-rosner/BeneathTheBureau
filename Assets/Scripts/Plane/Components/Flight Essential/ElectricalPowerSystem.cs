@@ -28,17 +28,29 @@ public class ElectricalPowerSystem : AircraftSystem
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
         //onInputValueChanged = gameObject.AddComponent<Float_GameEventListener>();
         prevInputVal = 0f;
-        electricityInput.Value = 0f;
+        if (IsServer)
+        {
+            electricityInput.Value = 0.0f;
+        }
     }
     public override void OnNetworkSpawn()
     {
         onInputValueChanged = new Float_GameEventListener(UpdateElectricityInput, onValueChangeEvent);
-        prevInputVal = 0f;
-        electricityInput.Value = 0f;
+        if (IsServer)
+        {
+            prevInputVal = 0f;
+            electricityInput.Value = 0f;
+        }
+
     }
 
     private void Update()
     {
+        if (!IsServer)
+        {
+            return;
+        }
+        
         if (electricityInput.Value <= 0)
         {
             Online.Value = false;

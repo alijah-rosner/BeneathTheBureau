@@ -94,6 +94,7 @@ public class FirstPersonController : MonoBehaviour
         Debug.Log("OnEnable on First Person Controller called!");
     }
 
+
     // Update is called once per frame
     void Update()
     {
@@ -103,9 +104,9 @@ public class FirstPersonController : MonoBehaviour
             if (!isPilot)
             {
                 ApplyMovement();
+                ApplyGravity();
+                CameraRotation();
             }
-            ApplyGravity();
-            CameraRotation();
         }
         else
         {
@@ -181,7 +182,7 @@ public class FirstPersonController : MonoBehaviour
 
     private void CameraRotation()
     {
-        transform.rotation = Quaternion.AngleAxis(_mainCamera.transform.localRotation.y, Vector3.up);
+        transform.localRotation = Quaternion.AngleAxis(_mainCamera.transform.rotation.y, Vector3.up);
     }
 
 
@@ -212,5 +213,16 @@ public class FirstPersonController : MonoBehaviour
     public void SetIsPilot(bool truthval)
     {
         isPilot = truthval;
+        Debug.Log(truthval);
+        if (truthval)
+        {
+            inputActions.Disable();
+            inputActions.Pilot.Enable();
+        }
+        else
+        {
+            inputActions.Pilot.Disable();
+            inputActions.Enable();
+        }
     }
 }

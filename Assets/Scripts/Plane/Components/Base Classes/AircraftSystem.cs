@@ -37,7 +37,7 @@ public class AircraftSystem : NetworkBehaviour, I_Damageable
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
+        
         if (IsServer)
         {
             DamageEventSystem.Instance?.Register(gameObject, this);
