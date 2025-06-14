@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class BaseEnemy : MonoBehaviour
+public class badBaseEnemy : MonoBehaviour
 {
   //Navigation params
   public NavMeshAgent agent;

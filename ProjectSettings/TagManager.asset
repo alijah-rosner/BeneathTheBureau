@@ -11,6 +11,7 @@ TagManager:
   - PlaneInterface
   - SimulatedAircraft
   - AircraftCameraPosition
+  - NPC
   layers:
   - Default
   - TransparentFX
