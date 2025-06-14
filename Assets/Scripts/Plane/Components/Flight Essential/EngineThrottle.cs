@@ -2,11 +2,13 @@ using UnityEngine;
 using Unity.Netcode;
 using System;
 using Unity.VisualScripting;
+using UnityEngine.Rendering;
 
 public class Throttle : MonoBehaviour, I_Interactable
 {
     private EngineSystem _engineSystem;
-    private float _value; 
+    private float _value;
+    protected float Value;  
 
     private void Start()
     {

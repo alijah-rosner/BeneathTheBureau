@@ -5,7 +5,17 @@ using Unity.Netcode;
 
 public class FlightController2 : AircraftSystem
 {
+    [Header("Events To Listen For")] [SerializeField]
+    private AircraftSystemEvent _onEngineThrottled_0;
+    private AircraftSystemEvent _onEngineThrottled_1;
+    private AircraftSystemEvent _onEngineThrottled_2;
+    private AircraftSystemEvent _onEngineThrottled_3;
 
+    private AircraftSystemGameEventListener _onThrottled_Listener_0;
+    private AircraftSystemGameEventListener _onThrottled_Listener_1;
+    private AircraftSystemGameEventListener _onThrottled_Listener_2;
+    private AircraftSystemGameEventListener _onThrottled_Listener_3;
+    
     [Header("Components")]
     [SerializeField] public MouseFlightController controller = null;
     [SerializeField] public GameObject planeInterface = null;
@@ -59,8 +69,8 @@ public class FlightController2 : AircraftSystem
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        rigid = GetComponent<Rigidbody>();
-        _isControlling = false;
+        if (!TryGetComponent(out rigid))
+            Debug.LogError("Missing Rigidbody on FlightController2");        _isControlling = false;
         //engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
     }
 
@@ -103,8 +113,6 @@ public class FlightController2 : AircraftSystem
         if (IsOwner)
         {
             curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
-            //currentPitch = Mathf.Lerp(currentPitch, netPitch.Value, Time.deltaTime * 2f);
-            //currentRoll = Mathf.Lerp(currentRoll, netRoll.Value, Time.deltaTime * 2f);
             currentPitch = pitch;
             currentRoll = roll;
 
@@ -154,7 +162,6 @@ public class FlightController2 : AircraftSystem
         {
             float keyboardPitch = Input.GetAxis("Vertical");
             {
-                Debug.Log(keyboardPitch);
                 if (Mathf.Abs(keyboardPitch) > .25f)
                 {
                     float roundedPitch = -Mathf.Sign(keyboardPitch);
@@ -213,7 +220,9 @@ public class FlightController2 : AircraftSystem
         roll = Mathf.Clamp(roll, -25f, 25f);
 
         // Update the rotation
-        transform.localEulerAngles = new Vector3(pitch, currentRotation.y, roll);
+        Quaternion newQuat = Quaternion.Euler(pitch, currentRotation.y, roll);
+        rigid.MoveRotation(newQuat);
+        //transform.localEulerAngles = new Vector3(pitch, currentRotation.y, roll);
     }
 
 

@@ -9,17 +9,13 @@ public class BH_Projectile : NetworkBehaviour
     // Start is called before the first frame update
     private float _speed = 2000f;
     private Rigidbody rh;
-    public GameObject _turretHost;
 
     void Start()
     {
         rh = GetComponent<Rigidbody>();
 
-        Vector3 vec = _turretHost.transform.forward;
+        Vector3 vec = transform.forward;
 
-        //Vector3 quat = _turretHost.transform.position * _turretHost.transform.rotation;
-
-        //Vector3 force = _turretHost.transform.forward * _speed;
         rh.AddForce(vec * _speed);
     }
     public override void OnNetworkSpawn()
@@ -28,22 +24,9 @@ public class BH_Projectile : NetworkBehaviour
 
         rh = GetComponent<Rigidbody>();
 
-        Vector3 vec = _turretHost.transform.forward;
-
-        //Vector3 quat = _turretHost.transform.position * _turretHost.transform.rotation;
-
-        //Vector3 force = _turretHost.transform.forward * _speed;
+        Vector3 vec = transform.forward;
+        
         rh.AddForce(vec * _speed);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
-    private void FixedUpdate()
-    {
-        //rh.AddForce(Vector3.forward * _speed);
     }
 
     private void OnCollisionEnter(Collision collision)

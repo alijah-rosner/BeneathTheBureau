@@ -23,41 +23,6 @@ public class PlaneButton : MonoBehaviour, I_Interactable
         _state = ButtonState.ToggledOff;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //if (_objectToEnable.Length == 0)
-        //{
-        //    return;
-        //}
-
-        //if (_state == ButtonState.ToggledOn)
-        //{
-        //    if (IsOwner)
-        //    {
-        //        if (_performingAction)
-        //        {
-        //            UpdateAnimationsRpc("Off");
-        //            _state = ButtonState.ToggledOff;
-        //            _performingAction = false;
-        //        }
-        //    }
-        //}
-        //if (_state == ButtonState.ToggledOff)
-        //{
-        //    if (IsOwner)
-        //    {
-        //        if (_performingAction)
-        //        {
-        //            UpdateAnimationsRpc("On");
-        //            _state = ButtonState.ToggledOn;
-        //            _performingAction = false;
-        //        }
-        //    }
-        //}
-
-    }
-
     [Rpc(SendTo.Everyone)]
     void UpdateAnimationsRpc(string triggerWord)
     {

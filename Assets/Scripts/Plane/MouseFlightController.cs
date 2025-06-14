@@ -130,7 +130,7 @@ public class MouseFlightController : MonoBehaviour
 
     private void Start()
     {
-        mouseAim = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
+        mouseAim = GameObject.FindGameObjectWithTag("AircraftCameraPosition").transform.GetChild(0).transform;
     }
 
     private void Update()
@@ -140,7 +140,7 @@ public class MouseFlightController : MonoBehaviour
             _isEnabled = aircraft.GetComponent<FlightController2>().GetController();
             if (useFixed == false)
             {
-                UpdateCameraPos();
+                //UpdateCameraPos();
             }
 
 

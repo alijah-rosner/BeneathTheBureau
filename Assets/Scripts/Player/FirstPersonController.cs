@@ -31,7 +31,8 @@ public class FirstPersonController : MonoBehaviour
     [SerializeField] private InputSystems_NetworkActions inputActions;
     private PlayerInput _playerInput;
     private bool isGrounded;
-    private bool isPilot = false;
+    
+    [SerializeField] private bool isPilot = false;
 
     [Header("References")]
     [SerializeField] private LayerMask groundLayer; // Assign this in the Inspector
