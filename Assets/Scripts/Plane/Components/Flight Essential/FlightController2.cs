@@ -6,16 +6,17 @@ using Unity.Netcode;
 public class FlightController2 : AircraftSystem
 {
     [Header("Events To Listen For")]
-    [SerializeField] private AircraftSystemEvent _onEngineThrottled_0;
-    [SerializeField] private AircraftSystemEvent _onEngineThrottled_1;
-    [SerializeField] private AircraftSystemEvent _onEngineThrottled_2;
-    [SerializeField] private AircraftSystemEvent _onEngineThrottled_3;
+    [SerializeField]
+    private AircraftSystemEvent _onEngineThrottled_0;
+    private AircraftSystemEvent _onEngineThrottled_1;
+    private AircraftSystemEvent _onEngineThrottled_2;
+    private AircraftSystemEvent _onEngineThrottled_3;
 
     private AircraftSystemGameEventListener _onThrottled_Listener_0;
     private AircraftSystemGameEventListener _onThrottled_Listener_1;
     private AircraftSystemGameEventListener _onThrottled_Listener_2;
     private AircraftSystemGameEventListener _onThrottled_Listener_3;
-    
+
     [Header("Components")]
     [SerializeField] public MouseFlightController controller = null;
     [SerializeField] public GameObject planeInterface = null;
@@ -48,7 +49,7 @@ public class FlightController2 : AircraftSystem
     public float Yaw { set { yaw = Mathf.Clamp(value, -1f, 1f); } get { return yaw; } }
     public float Roll { set { roll = Mathf.Clamp(value, -1f, 1f); } get { return roll; } }
 
-    private Rigidbody rigid; 
+    private Rigidbody rigid;
 
     private float currentPitch = 0f;
     private float currentRoll = 0f;
@@ -70,7 +71,7 @@ public class FlightController2 : AircraftSystem
     {
         base.OnNetworkSpawn();
         if (!TryGetComponent(out rigid))
-            Debug.LogError("Missing Rigidbody on FlightController2");        _isControlling = false;
+            Debug.LogError("Missing Rigidbody on FlightController2"); _isControlling = false;
         //engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
     }
 
@@ -89,8 +90,12 @@ public class FlightController2 : AircraftSystem
     {
         if (!IsOwner)
         {
-            controller = null; 
+            controller = null;
             return;
+        }
+        if (!controller)
+        {
+            controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
         }
 
         if (!controller)
@@ -133,9 +138,9 @@ public class FlightController2 : AircraftSystem
         }
 
         AddTurbulenceEffect();
-        
+
         if (!IsServer)
-        {    
+        {
             return;
         }
 
