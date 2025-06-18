@@ -12,6 +12,7 @@ TagManager:
   - SimulatedAircraft
   - AircraftCameraPosition
   - NPC
+  - Engine
   layers:
   - Default
   - TransparentFX
