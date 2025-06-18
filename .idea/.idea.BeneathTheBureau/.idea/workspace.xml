@@ -6,18 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="587c7240-7692-4f27-a99b-47b4b3312344" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/StarboardTurretSystem.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/StarboardTurretSystem.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_PlaneInterface.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/AircraftSystemButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AircraftSystemButton.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_Mesh.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_v2.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Brain_v2.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Guns/BH_Projectile.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Guns/BH_Projectile.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Guns/TurretSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Guns/TurretSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineSystem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineThrottle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineThrottle.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Player/Veteran_Mesh.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/SO_Events/BaseEventClasses/GameEventListener.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/SO_Events/BaseEventClasses/GameEventListener.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/ElectricalPowerSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/ElectricalPowerSystem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/MouseFlightController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/MouseFlightController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/PlaneButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Player/FirstPersonController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FungusReactorSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FungusReactorSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/EditorBuildSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,9 +30,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/SO_Events/BaseEventClasses/SystemButton_Event.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/SO_Events/BaseEventClasses/SystemButton_EventListener.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Camera/GlobalGameEvents.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineSystem.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -49,7 +48,7 @@
     &quot;Attach to Unity Editor.Attach to Unity Editor.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;network__branch&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -133,6 +132,13 @@
       <workItem from="1749769557691" duration="12252000" />
       <workItem from="1749782362769" duration="1222000" />
       <workItem from="1749784359815" duration="14979000" />
+      <workItem from="1749862828807" duration="1454000" />
+      <workItem from="1750195106683" duration="303000" />
+      <workItem from="1750195553399" duration="2124000" />
+      <workItem from="1750198191130" duration="191000" />
+      <workItem from="1750199986885" duration="1368000" />
+      <workItem from="1750275358436" duration="252000" />
+      <workItem from="1750275936731" duration="9411000" />
     </task>
     <servers />
   </component>

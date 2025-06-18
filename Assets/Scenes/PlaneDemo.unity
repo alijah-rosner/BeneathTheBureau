@@ -1755,11 +1755,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7729687723968021049, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: m_ControllerManager.Controllers.Array.data[0].Input.Gain
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7729687723968021049, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: m_ControllerManager.Controllers.Array.data[1].Input.Gain
-      value: -2
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 7729687723968021049, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: m_ControllerManager.Controllers.Array.data[1].InputValue

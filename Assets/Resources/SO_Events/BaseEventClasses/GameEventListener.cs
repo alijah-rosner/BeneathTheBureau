@@ -21,6 +21,7 @@ public class GameEventListener<T> : I_EventListener<T>
         _response = response;
         _gameEvent.RegisterListener(this);
     }
+    
     ~GameEventListener()
     {
         _gameEvent.UnregisterListener(this);

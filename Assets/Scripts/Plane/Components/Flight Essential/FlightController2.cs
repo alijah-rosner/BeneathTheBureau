@@ -5,11 +5,11 @@ using Unity.Netcode;
 
 public class FlightController2 : AircraftSystem
 {
-    [Header("Events To Listen For")] [SerializeField]
-    private AircraftSystemEvent _onEngineThrottled_0;
-    private AircraftSystemEvent _onEngineThrottled_1;
-    private AircraftSystemEvent _onEngineThrottled_2;
-    private AircraftSystemEvent _onEngineThrottled_3;
+    [Header("Events To Listen For")]
+    [SerializeField] private AircraftSystemEvent _onEngineThrottled_0;
+    [SerializeField] private AircraftSystemEvent _onEngineThrottled_1;
+    [SerializeField] private AircraftSystemEvent _onEngineThrottled_2;
+    [SerializeField] private AircraftSystemEvent _onEngineThrottled_3;
 
     private AircraftSystemGameEventListener _onThrottled_Listener_0;
     private AircraftSystemGameEventListener _onThrottled_Listener_1;
@@ -76,7 +76,7 @@ public class FlightController2 : AircraftSystem
 
     private void Start()
     {
-        controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
+        //controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
     }
 
     private void CalculateTotalCurrentThrust(float oldValue, float newValue)
@@ -87,11 +87,16 @@ public class FlightController2 : AircraftSystem
 
     private void Update()
     {
-        if (!IsServer)
+        if (!IsOwner)
         {
+            controller = null; 
             return;
         }
 
+        if (!controller)
+        {
+            controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
+        }
         UpdateAltimeter();
 
         // Calculate the autopilot inputs.

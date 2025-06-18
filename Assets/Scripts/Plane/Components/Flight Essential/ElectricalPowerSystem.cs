@@ -62,6 +62,10 @@ public class ElectricalPowerSystem : AircraftSystem
     }
     private void UpdateElectricityInput(float v)
     {
+        if (!IsServer)
+        {
+            return;
+        }
         Debug.Log("Old Electricity Val: " + prevInputVal);
         Debug.Log("New Electricity: " + v);
         prevInputVal = v;

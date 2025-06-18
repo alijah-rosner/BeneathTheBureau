@@ -82,6 +82,8 @@ public class FungusReactorSystem : AircraftSystem
 
             float growthRate = Mathf.Log(organicMaterial.Value + 1f, 10f) * (1f - fungalCharge.Value / 100f);
             fungalCharge.Value = Mathf.Min(100f, fungalCharge.Value + growthRate);
+            TriggerFungusValueEventRpc();
+            //onFungusValueChanged?.TriggerEvent(fungalCharge.Value);
         }
         
         
@@ -90,11 +92,22 @@ public class FungusReactorSystem : AircraftSystem
         {
             Debug.Log("Changing Electricity.");
             Debug.Log("Previous: " + prevElectricity + "\nNew: " + electricityThroughput.Value);
-            onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
+            TriggerElectricalValueEventRpc();       
             prevElectricity = electricityThroughput.Value;
         }
         //resourceSetting.Output -= resourceSetting.rate;
         //fungalCharge.Value = resourceSetting.Output;
     }
-
+    
+    [Rpc(SendTo.Everyone)]
+    private void TriggerFungusValueEventRpc()
+    {
+        onFungusValueChanged?.TriggerEvent(fungalCharge.Value);
+    }
+    
+    [Rpc(SendTo.Everyone)]
+    private void TriggerElectricalValueEventRpc()
+    {
+        onOutputElectricityChanged?.TriggerEvent(electricityThroughput.Value);
+    }
 }
