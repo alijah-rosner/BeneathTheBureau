@@ -18,8 +18,7 @@ public class AircraftSystemButton : MonoBehaviour, I_Interactable
     [SerializeField] private float _minRotationOnAxis;
     [SerializeField] private float _sensitivity;
     [SerializeField] private GameObject _draggable;
-
-
+    private NetworkVariable<Vector3> _eulers = new();
 
     private ulong _playerId;
     private float _val;
@@ -68,7 +67,8 @@ public class AircraftSystemButton : MonoBehaviour, I_Interactable
             euler.z = _currentAngle;
         }
         _val = Mathf.InverseLerp(_minRotationOnAxis, _maxRotationOnAxis, _currentAngle) * 100f;
-        transform.localEulerAngles = euler;
+        _eulers.Value = euler; 
+        transform.localEulerAngles = _eulers.Value;
     }
 
     private float GetCurrentAngle()

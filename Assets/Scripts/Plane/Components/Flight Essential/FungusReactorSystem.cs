@@ -42,7 +42,7 @@ public class FungusReactorSystem : AircraftSystem
         onFungusAdded = new Float_GameEventListener(UpdateFungus);
         onOrganicMaterialAdded = new Float_GameEventListener(UpdateOrganicMaterial);
         prevElectricity = 0f;
-        
+        //fungalCharge.OnValueChanged += On
         if (IsServer)
         {
         }
