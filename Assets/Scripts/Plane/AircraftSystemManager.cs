@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Netcode;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Unity.Netcode.Components;
 
 public class AircraftSystemManager : NetworkBehaviour
 {
@@ -92,5 +93,16 @@ public class AircraftSystemManager : NetworkBehaviour
 
     private void ConnectMechanicalSystems()
     {
+    }
+    
+    public void RequestAircraftSystemOwnership(ulong clId, NetworkObject obj)
+    {
+        RequestAircraftSystemOwnershipRpc(clId);
+    }
+
+    [Rpc(SendTo.Server)]
+    public void RequestAircraftSystemOwnershipRpc(ulong clId)
+    {
+        NetworkObject.ChangeOwnership(clId);
     }
 }

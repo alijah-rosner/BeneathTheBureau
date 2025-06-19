@@ -31,41 +31,16 @@ public class EngineSystem : AircraftSystem
 
     private void OnEngineEngage(AircraftSystemButton button)
     {
-        _thrustThrottle = button; 
-        
+        _thrustThrottle = button;
         OnEngineEngageRpc(button.PlayerId);
     }
     
-    [Rpc(SendTo.Server)]
+    [Rpc(SendTo.Everyone)]
     private void OnEngineEngageRpc(ulong clientId)
     {
         _thrustThrottle.RotateAircraftSystemButton(30.0f);
         CurrentThrust.Value = _thrustThrottle.Value; 
     }
 
-    private void OnlineStateChanged(bool oldValue, bool newValue)
-    {
-        UpdateStatus();
-    }
-
-    private void UpdateStatus()
-    {
-        if (Online.Value)
-        {
-            // start turning the engines off, accelerating at the right rate yada yada yada
-        }
-        else
-        {
-            
-        }
-    }
-
-    public void ChangeThrottleValue(float value)
-    {
-        if (IsServer)
-        {
-            CurrentThrust.Value = value; 
-        }
-    }
 }
 

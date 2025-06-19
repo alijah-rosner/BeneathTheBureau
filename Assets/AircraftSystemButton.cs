@@ -1,5 +1,6 @@
 using System;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -11,27 +12,34 @@ public class AircraftSystemButton : MonoBehaviour, I_Interactable
 
     [Header("Settings")]
     [SerializeField] private bool _isButton;
-
+    
+    [Header("References")]
+    [SerializeField] private AircraftSystemManager _aircraftSystemManager;
+    
     [Header("Non-Button Settings")] 
     [SerializeField] private Vector3 _axisToRotate;
     [SerializeField] private float _maxRotationOnAxis;
     [SerializeField] private float _minRotationOnAxis;
     [SerializeField] private float _sensitivity;
     [SerializeField] private GameObject _draggable;
-    private NetworkVariable<Vector3> _eulers = new();
+
+    private NetworkVariable<Vector3> _networkedRotation; 
 
     private ulong _playerId;
     private float _val;
     private bool _isBeingUsed = false;
-
     public ulong PlayerId => _playerId;
     public float Value => _val;
     private float _currentAngle;
-
+    
     public void Interact(ulong netObjId)
     {
         _playerId = netObjId;
-
+        _aircraftSystemManager.TryGetComponent<NetworkObject>(out var obj);
+        if (obj)
+        {
+            _aircraftSystemManager.RequestAircraftSystemOwnership(netObjId, obj);
+        }
         _isBeingUsed = !_isBeingUsed;
         _currentAngle = GetCurrentAngle();
     }
@@ -67,8 +75,8 @@ public class AircraftSystemButton : MonoBehaviour, I_Interactable
             euler.z = _currentAngle;
         }
         _val = Mathf.InverseLerp(_minRotationOnAxis, _maxRotationOnAxis, _currentAngle) * 100f;
-        _eulers.Value = euler; 
-        transform.localEulerAngles = _eulers.Value;
+        transform.localEulerAngles = euler;
+        _interactionEvent?.TriggerEvent(this);
     }
 
     private float GetCurrentAngle()
