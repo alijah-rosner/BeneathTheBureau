@@ -12,7 +12,7 @@ public class PlayerRaycast : MonoBehaviour
     List<I_Interactable> _interactables;
     private GameObject _camera;
     private Ray _raycast;
-    [SerializeField] NetworkBehaviour _localPlayer; 
+    [SerializeField] NetworkBehaviour _localPlayer;
 
     void Start()
     {
@@ -30,12 +30,20 @@ public class PlayerRaycast : MonoBehaviour
 
         if (_camera)
         {
-            RaycastHit hit; 
+            RaycastHit hit;
             if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
             {
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
+
+                    if (hit.collider.TryGetComponent<NetworkObject>(out var netObj))
+                    {
+                        InteractServerRpc(netObj.NetworkObjectId);
+                    }
+                    else
+                    {
+                        hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
+                    }
                 }
             }
             Debug.DrawRay(_camera.transform.position, _camera.transform.forward * 1);
@@ -47,6 +55,17 @@ public class PlayerRaycast : MonoBehaviour
 
     }
 
+    [ServerRpc]
+    private void InteractServerRpc(ulong targetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var obj))
+        {
+            if (obj.TryGetComponent<I_Interactable>(out var interactable))
+            {
+                interactable.Interact(_localPlayer.NetworkObjectId);
+            }
+        }
+    }
     void InformListeners()
     {
 

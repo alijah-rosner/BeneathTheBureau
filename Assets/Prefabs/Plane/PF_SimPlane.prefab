@@ -949,18 +949,9 @@ MonoBehaviour:
   _isButton: 0
   _axisToRotate: {x: 1, y: 0, z: 0}
   _maxRotationOnAxis: 30
+  _minRotationOnAxis: 0
   _sensitivity: 0
-  _look:
-    m_Name: Look
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 4137f224-0810-43a0-802d-59cbee718600
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
   _draggable: {fileID: 5254100814671752663}
-  _base: {fileID: 0}
 --- !u!1 &3219813253362496759
 GameObject:
   m_ObjectHideFlags: 0
@@ -2165,6 +2156,7 @@ GameObject:
   - component: {fileID: 5543641618356055332}
   - component: {fileID: 7006783171088435184}
   - component: {fileID: 436764799581976337}
+  - component: {fileID: 6084441279116770549}
   m_Layer: 9
   m_Name: ENGINE_ON_HERE_0
   m_TagString: Untagged
@@ -2277,18 +2269,45 @@ MonoBehaviour:
   _isButton: 0
   _axisToRotate: {x: 1, y: 0, z: 0}
   _maxRotationOnAxis: 35
+  _minRotationOnAxis: 0
   _sensitivity: 200
-  _look:
-    m_Name: Look
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: b4f17b8b-9515-47dc-b6e4-c3f911536b3b
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
   _draggable: {fileID: 5254100814671752663}
-  _base: {fileID: 3163883637214935894}
+--- !u!114 &6084441279116770549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5254100814671752663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 1
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 1
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 1
+  InLocalSpace: 1
+  SwitchTransformSpaceWhenParented: 1
+  Interpolate: 1
+  SlerpPosition: 1
 --- !u!1 &5284390678329709119
 GameObject:
   m_ObjectHideFlags: 0
@@ -3393,9 +3412,6 @@ MonoBehaviour:
   _structuralIntregity: 100
   _structuralFailureThreshold: 60
   _onEngineThrottled_0: {fileID: 0}
-  _onEngineThrottled_1: {fileID: 0}
-  _onEngineThrottled_2: {fileID: 0}
-  _onEngineThrottled_3: {fileID: 0}
   controller: {fileID: 0}
   planeInterface: {fileID: 0}
   thrust: 1000
