@@ -38,10 +38,11 @@ public class PlayerRaycast : MonoBehaviour
 
                     if (hit.collider.TryGetComponent<NetworkObject>(out var netObj))
                     {
-                        InteractServerRpc(netObj.NetworkObjectId);
+                        GetComponent<ClientPlayer>().InteractServerRpc(netObj.NetworkObjectId);
                     }
                     else
                     {
+                        Debug.Log("I'm Interacting widda non-network object!");
                         hit.collider.gameObject.GetComponent<I_Interactable>().Interact(_localPlayer.NetworkObjectId);
                     }
                 }
@@ -55,17 +56,6 @@ public class PlayerRaycast : MonoBehaviour
 
     }
 
-    [ServerRpc]
-    private void InteractServerRpc(ulong targetId)
-    {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var obj))
-        {
-            if (obj.TryGetComponent<I_Interactable>(out var interactable))
-            {
-                interactable.Interact(_localPlayer.NetworkObjectId);
-            }
-        }
-    }
     void InformListeners()
     {
 

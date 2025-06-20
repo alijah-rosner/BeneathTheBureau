@@ -55,6 +55,19 @@ public class ClientPlayer : NetworkBehaviour
 
     }
 
+    [Rpc(SendTo.Server)]
+    public void InteractServerRpc(ulong targetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out var obj))
+        {
+            if (obj.TryGetComponent<I_Interactable>(out var interactable))
+            {
+                Debug.Log("I'm Interacting widda network object!");
+                interactable.Interact(GetComponent<NetworkBehaviour>().NetworkObjectId);
+            }
+        }
+    }
+
     public void SetNewCameraFollow()
     {
 
