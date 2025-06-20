@@ -26,15 +26,17 @@ public class TurretSystem : AircraftSystem, I_Interactable
 
     private float nextFire = 0.0f;
     private bool _timeToShoot = true;
+    private NetworkVariable<bool> _hasShooter = new NetworkVariable<bool>(); 
 
     private Camera _playerCam;
 
 
     private bool _newShooter = false;
 
-    private GameObject _camera; 
-
-
+    private GameObject _camera;
+    private float xLook = 0;
+    private float yLook = 0;
+    private Vector2 look;
     void Start()
     {
     }
@@ -42,17 +44,24 @@ public class TurretSystem : AircraftSystem, I_Interactable
     // Update is called once per frame
     void Update()
     {
-        if (!IsOwner)
+        if (!_hasShooter.Value)
         {
             return;
         }
-        //UpdateCamera();
+        UpdateCamera();
 
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            RequestOwnershipRpc(false);
+            return; 
+        }
+        
         if (Input.GetKey(KeyCode.Mouse0) && _timeToShoot)
         {
             ShootProjectileRpc();
             _timeToShoot = false;
         }
+        
 
         nextFire += Time.deltaTime;
 
@@ -71,53 +80,30 @@ public class TurretSystem : AircraftSystem, I_Interactable
         netProj.Spawn();
     }
 
-    // private void UpdateCamera()
-    // {
-    //     // Get mouse input for looking around
-    //     mouseMove.y = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * 1000;
-    //     mouseMove.x = Input.GetAxisRaw("Mouse X") * Time.deltaTime * 1000;
-    //
-    //     // Update look angles
-    //     xLook -= mouseMove.y;
-    //     yLook += mouseMove.x;
-    //
-    //     // Clamp vertical look
-    //     xLook = Mathf.Clamp(xLook, -90f, 90f);
-    //     //yLook = Mathf.Clamp(yLook, -90, 90f);
-    //
-    //     // Get the head's up vector in world space
-    //     Vector3 playerUp = _host.transform.up;
-    //
-    //     // Create a rotation that aligns with the player's up direction
-    //     Quaternion alignRotation = Quaternion.FromToRotation(Vector3.up, playerUp);
-    //
-    //     // Create the base camera rotation (pitch and yaw)
-    //     Quaternion lookRotation = Quaternion.Euler(xLook, yLook, 0);
-    //
-    //     // Combine the rotations in the correct order
-    //     targetRotation = alignRotation * lookRotation;
-    //
-    //     // Apply the final rotation
-    //     _head.transform.rotation = targetRotation;
-    //     TurretCamera.transform.rotation = targetRotation;
-    //
-    // }
+    private void UpdateCamera()
+    {
+
+    
+        // Apply the final rotation
+        _head.transform.rotation = Camera.main.transform.rotation;
+    
+    }
 
 
     public void Interact(ulong netObjId)
     {
-        if (_canInteract.Value)
+        if (!_hasShooter.Value)
         {
             _host = NetworkManager.Singleton.LocalClient.PlayerObject.gameObject;
-            RequestOwnershipRpc(netObjId);
+            RequestOwnershipRpc(true);
             _cameraTargetEventData = new(_head, _cameraSettings);
             _cameraTargetEvent?.TriggerEvent(_cameraTargetEventData);
         }
     }
 
     [Rpc(SendTo.Server)]
-    private void RequestOwnershipRpc(ulong netObjId)
+    private void RequestOwnershipRpc(bool v)
     {
-        GetComponent<NetworkObject>().ChangeOwnership(netObjId);
+        _hasShooter.Value = v; 
     }
 }

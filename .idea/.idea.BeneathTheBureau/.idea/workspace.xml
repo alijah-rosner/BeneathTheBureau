@@ -6,11 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="587c7240-7692-4f27-a99b-47b4b3312344" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BeneathTheBureau/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/AircraftSystemButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/AircraftSystemButton.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/StarboardTurretSystem.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_Guns/StarboardTurretSystem.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Plane/PF_SimPlane.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/AircraftSystemManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/PlaneDemo.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Guns/TurretSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Guns/TurretSystem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineSystem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineThrottle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/EngineThrottle.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Plane/Components/Flight Essential/FlightController2.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +138,7 @@
       <workItem from="1750290688638" duration="1353000" />
       <workItem from="1750300474164" duration="938000" />
       <workItem from="1750301546995" duration="757000" />
-      <workItem from="1750370678737" duration="734000" />
+      <workItem from="1750370678737" duration="6526000" />
     </task>
     <servers />
   </component>

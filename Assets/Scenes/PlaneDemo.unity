@@ -1666,6 +1666,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 119995603913187547, guid: a24b832b9d8af0847871c662768c353a, type: 3}
+      propertyPath: Lens.NearClipPlane
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 934499268430530891, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.30214
@@ -1737,6 +1741,10 @@ PrefabInstance:
     - target: {fileID: 2042754918546161210, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: field of view
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 2042754918546161210, guid: a24b832b9d8af0847871c662768c353a, type: 3}
+      propertyPath: near clip plane
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3427654414350090602, guid: a24b832b9d8af0847871c662768c353a, type: 3}
       propertyPath: m_Enabled

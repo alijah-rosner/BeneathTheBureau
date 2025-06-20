@@ -9,37 +9,38 @@ public class EngineSystem : AircraftSystem
     [Header("Specifications")]
     [SerializeField] float _maxThrust;
     [SerializeField] private float _fuelConsumptionRate;
-    [SerializeField] private float _airIntakeValue; 
+    [SerializeField] private float _airIntakeValue;
+    [SerializeField] private float _percentagePower; 
 
-    [Header("Events To Listen For")] [SerializeField]
-    private SystemButton_GameEvent _engineEngagedEvent;
-    
-    private SystemButton_EventListener _engineEngagedListener; 
+    [Header("Events To Listen For")] 
+    [SerializeField] private Float_GameEvent _engineEngagedEvent;
+
+    [Header("Events To Trigger")] 
+    [SerializeField] private Float_GameEvent _thrustCalculatedEvent; 
+
+    private Float_GameEventListener _engineEngagedListener; 
 
     public NetworkVariable<float> CurrentThrust = new NetworkVariable<float>(0.0f);
 
     private FlightController2 _controller;
-    private AircraftSystemButton _thrustThrottle; 
 
     private void Start()
     {
-        _engineEngagedListener = new SystemButton_EventListener(OnEngineEngage, _engineEngagedEvent);
+        _engineEngagedListener = new Float_GameEventListener(OnEngineEngage, _engineEngagedEvent);
         _controller = FindFirstObjectByType<FlightController2>();
-        //Online.OnValueChanged += OnlineStateChanged;
-
     }
 
-    private void OnEngineEngage(AircraftSystemButton button)
+    private void OnEngineEngage(float v)
     {
-        _thrustThrottle = button;
-        OnEngineEngageRpc(button.PlayerId);
+        OnEngineEngageRpc(v);
     }
     
-    [Rpc(SendTo.Everyone)]
-    private void OnEngineEngageRpc(ulong clientId)
+    [Rpc(SendTo.Server)]
+    private void OnEngineEngageRpc(float v)
     {
-        _thrustThrottle.RotateAircraftSystemButton(30.0f);
-        CurrentThrust.Value = _thrustThrottle.Value; 
+        float decVal = v / 100f; 
+        CurrentThrust.Value = _maxThrust * decVal;
+        _thrustCalculatedEvent?.TriggerEvent(CurrentThrust.Value);
     }
 
 }

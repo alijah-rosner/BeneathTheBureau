@@ -7,15 +7,15 @@ public class FlightController2 : AircraftSystem
 {
     [Header("Events To Listen For")]
     [SerializeField]
-    private AircraftSystemEvent _onEngineThrottled_0;
-    private AircraftSystemEvent _onEngineThrottled_1;
-    private AircraftSystemEvent _onEngineThrottled_2;
-    private AircraftSystemEvent _onEngineThrottled_3;
+    private Float_GameEvent _onEngineThrottled_0;
+    private Float_GameEvent _onEngineThrottled_1;
+    private Float_GameEvent _onEngineThrottled_2;
+    private Float_GameEvent _onEngineThrottled_3;
 
-    private AircraftSystemGameEventListener _onThrottled_Listener_0;
-    private AircraftSystemGameEventListener _onThrottled_Listener_1;
-    private AircraftSystemGameEventListener _onThrottled_Listener_2;
-    private AircraftSystemGameEventListener _onThrottled_Listener_3;
+    private Float_GameEventListener _onThrottled_Listener_0;
+    private Float_GameEventListener _onThrottled_Listener_1;
+    private Float_GameEventListener _onThrottled_Listener_2;
+    private Float_GameEventListener _onThrottled_Listener_3;
 
     [Header("Components")]
     [SerializeField] public MouseFlightController controller = null;
@@ -55,6 +55,8 @@ public class FlightController2 : AircraftSystem
     private float currentRoll = 0f;
     private float curThrust;
 
+    private float _engine1Thrust = 0f; 
+
     private bool _isControlling = false;
 
 
@@ -72,14 +74,32 @@ public class FlightController2 : AircraftSystem
         base.OnNetworkSpawn();
         if (!TryGetComponent(out rigid))
             Debug.LogError("Missing Rigidbody on FlightController2"); _isControlling = false;
-        //engineSystem.CurrentThrust.OnValueChanged += CalculateTotalCurrentThrust;
     }
 
     private void Start()
     {
+        _onThrottled_Listener_0 = new Float_GameEventListener(UpdateCurrentThrustRpc, _onEngineThrottled_0);
         //controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
     }
+    
+    [Rpc(SendTo.Owner)]
+    private void UpdateCurrentThrustRpc(float v)
+    {
+        if (_engine1Thrust < v)
+        {
+            float diff = v - _engine1Thrust;
+            _engine1Thrust = v;
+            curThrust += diff; 
+        }
+        else
+        {
+            float diff = v - _engine1Thrust; 
+            _engine1Thrust = v;
+            curThrust -= diff; 
+        }
 
+    }
+    
     private void CalculateTotalCurrentThrust(float oldValue, float newValue)
     {
         //CurrentTotalThrust.Value -= oldValue;
@@ -120,7 +140,7 @@ public class FlightController2 : AircraftSystem
     private void FixedUpdate()
     {
         // Server-side physics calculations
-        if (IsOwner)
+        if (IsOwner && _engine1Thrust > 0f)
         {
             curThrust = Mathf.Clamp(curThrust + acceleration * Time.fixedDeltaTime, 0f, maxThrust);
             currentPitch = pitch;

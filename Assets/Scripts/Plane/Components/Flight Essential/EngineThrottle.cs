@@ -42,7 +42,8 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
 
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            _isBeingUsed = false; 
+            _isBeingUsed = false;
+            return; 
         }
 
         float delta = Input.GetAxis("Mouse X") + Input.GetAxis("Mouse Y");
@@ -78,7 +79,8 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
     {
         _networkedRotation.Value = eulAngle;
         transform.localEulerAngles = _networkedRotation.Value;
-        _val = val; 
+        _val = val;
+        _onThrottleValueChanged?.TriggerEvent(val);
     }
 
     private float GetCurrentAngle()
