@@ -93,16 +93,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ReferenceFrame: 0
-  RecenterTarget: 0
+  RecenterTarget: 1
   PanAxis:
     Value: 0
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
     Recentering:
-      Enabled: 0
-      Wait: 1
-      Time: 2
+      Enabled: 1
+      Wait: 0
+      Time: 0
     Restrictions: 0
   TiltAxis:
     Value: 0
@@ -193,6 +193,7 @@ MonoBehaviour:
   _defaultCameraSettings: {fileID: 11400000, guid: 2b86ab6b183228e4eb31e2fca1f73035, type: 2}
   _virtualCamera: {fileID: 119995603913187547}
   _brain: {fileID: 6919155084581860663}
+  _panTilt: {fileID: 0}
 --- !u!1 &2558211257271410948
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,8 +266,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3279492031078820206}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.30214, y: 0.51299036, z: -40.34444}
+  m_LocalRotation: {x: 0.07478492, y: 0.54275507, z: -0.048327934, w: 0.8351579}
+  m_LocalPosition: {x: 5.4739704, y: 30.197649, z: 84.81493}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -303,7 +304,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.1
+  near clip plane: 0.2
   far clip plane: 5000
   field of view: 60
   orthographic: 0

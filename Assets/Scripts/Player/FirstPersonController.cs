@@ -183,7 +183,9 @@ public class FirstPersonController : MonoBehaviour
 
     private void CameraRotation()
     {
-        transform.localRotation = Quaternion.AngleAxis(_mainCamera.transform.rotation.y, Vector3.up);
+        
+        transform.localRotation = Quaternion.Euler(transform.localRotation.eulerAngles.x, _mainCamera.transform.eulerAngles.y, transform.localRotation.eulerAngles.x);
+        //transform.localRotation = Quaternion.AngleAxis(_mainCamera.transform.rotation.y, Vector3.up);
     }
 
 

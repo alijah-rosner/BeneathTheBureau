@@ -13,6 +13,8 @@ public class PlayerRaycast : MonoBehaviour
     private GameObject _camera;
     private Ray _raycast;
     [SerializeField] NetworkBehaviour _localPlayer;
+    private Transform _cameraPosition; 
+    
 
     void Start()
     {
@@ -30,12 +32,11 @@ public class PlayerRaycast : MonoBehaviour
 
         if (_camera)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
+            if (Input.GetKeyDown(KeyCode.E))
             {
-                if (Input.GetKeyDown(KeyCode.E))
+                RaycastHit hit;
+                if (Physics.Raycast(_camera.transform.position, _camera.transform.forward, out hit, 1, 1 << 9))
                 {
-
                     if (hit.collider.TryGetComponent<NetworkObject>(out var netObj))
                     {
                         GetComponent<ClientPlayer>().InteractServerRpc(netObj.NetworkObjectId);
@@ -51,9 +52,9 @@ public class PlayerRaycast : MonoBehaviour
         }
         else
         {
+            //_cameraPosition = _localPlayer.GetComponent<SimulatedPlaneVisual>().GetVisualObj.GetComponent<SimCharacter>().CameraPosition.transform; 
             _camera = GameObject.FindGameObjectWithTag("PlayerCamera");
         }
-
     }
 
     void InformListeners()

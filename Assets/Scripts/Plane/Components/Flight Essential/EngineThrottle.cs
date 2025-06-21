@@ -1,7 +1,10 @@
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
+using UnityEditor;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 public class EngineThrottle : NetworkBehaviour, I_Interactable
@@ -18,7 +21,7 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
     [SerializeField] private GameObject _draggable;
 
     private NetworkVariable<Vector3> _networkedRotation = new NetworkVariable<Vector3>();
-
+    private GameObject _camera; 
     private ulong _playerId;
     private float _val;
     private bool _isBeingUsed = false;
@@ -30,6 +33,9 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
     {
         _playerId = netObjId;
         _isBeingUsed = !_isBeingUsed;
+        _camera = GameObject.FindGameObjectWithTag("PlayerCamera");
+        _camera.GetComponent<CinemachineInputAxisController>().enabled = false; 
+        Debug.Log("Interacting with throttle: " + _isBeingUsed);
         _currentAngle = GetCurrentAngle();
     }
     
@@ -43,6 +49,7 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             _isBeingUsed = false;
+            _camera.GetComponent<CinemachineInputAxisController>().enabled = true; 
             return; 
         }
 
@@ -67,7 +74,7 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         _val = Mathf.InverseLerp(_minRotationOnAxis, _maxRotationOnAxis, _currentAngle) * 100f;
         
         
-            SyncRotationRpc(euler, _val);
+        SyncRotationRpc(euler, _val);
         
         
         
@@ -83,6 +90,11 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         _onThrottleValueChanged?.TriggerEvent(val);
     }
 
+    private void SetIsBeingUsed(bool v)
+    {
+        _isBeingUsed = v; 
+    }
+    
     private float GetCurrentAngle()
     {
         if (_axisToRotate.x != 0)

@@ -45,7 +45,8 @@ public class PlaneInterface : AircraftSystem, I_Interactable
             ReleasePilotControlServerRpc(currentPilotId.Value);
             _playerController.SetIsPilot(false);
             //playerController.SetInAircraft(true);
-            CameraTargetEventData playerCameraData = new(simObj, _onExitCameraSettings);
+            GameObject camTarget = simObj.GetComponent<SimCharacter>().CameraPosition;
+            CameraTargetEventData playerCameraData = new(camTarget, _onExitCameraSettings);
 
             _cameraTargetEvent?.TriggerEvent(playerCameraData);
 
