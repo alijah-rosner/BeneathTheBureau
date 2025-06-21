@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.Cinemachine;
 using Unity.Netcode;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTargetEventData>
@@ -17,6 +18,7 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
     [Header("References")]
     [SerializeField] private CinemachineCamera _virtualCamera;
     [SerializeField] private CinemachineBrain _brain;
+    [SerializeField] private CinemachinePanTilt _panTilt;
 
     
     // Current camera state
@@ -37,31 +39,13 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
     
     private void OnEnable()
     {
-        // _cameraTargetEvent = GlobalGameEvents.CameraTargetEvent;
-        // _cameraTargetEvent.RegisterListener(this);
+
         // Register for events
         if (_cameraTargetEvent != null)
         {
             _cameraTargetEvent.RegisterListener(this);
             Debug.Log("Registered event listener");
         }
-        
-        
-        // Set up default camera settings
-        // if (_defaultCameraTarget != null && _defaultCameraSettings != null)
-        // {
-        //     _currentTarget = _defaultCameraTarget;
-        //     _currentSettings = _defaultCameraSettings;
-        //     
-        //     _currentSettings.SetCameraSettingsTarget(_currentTarget);
-        //     _virtualCamera.Follow = _currentTarget.transform;
-        //     
-        //     // Initialize yaw/pitch from the target orientation
-        //     _currentSettings.CinemachineTargetYaw = _currentTarget.transform.rotation.eulerAngles.y;
-        //     _currentSettings.CinemachineTargetPitch = 0f;
-        //     Debug.Log("Camera set up correctly");
-        //     //_virtualCamera.GetCinemachineComponent<Cinem>
-        // }
     }
     
     private void OnDisable()
@@ -89,11 +73,11 @@ public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTa
         
         // Configure the camera settings
         _currentSettings.SetCameraSettingsTarget(_currentTarget);
-        //transform.parent.transform.parent = _currentTarget.transform.parent.transform.parent;
+        transform.parent.transform.parent = _currentTarget.transform.parent;
      
         _virtualCamera.Follow = _currentTarget.transform;
         _brain.WorldUpOverride = GameObject.FindGameObjectWithTag("SimulatedAircraft").transform;
-        
+
         Debug.Log($"Camera switched to target: {_currentTarget.name}");
     }
     

@@ -66,8 +66,6 @@ public class ElectricalPowerSystem : AircraftSystem
         {
             return;
         }
-        Debug.Log("Old Electricity Val: " + prevInputVal);
-        Debug.Log("New Electricity: " + v);
         prevInputVal = v;
         electricityInput.Value = v;
         electricityOutput.Value = v;

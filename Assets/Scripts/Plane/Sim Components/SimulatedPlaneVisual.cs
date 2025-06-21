@@ -47,10 +47,11 @@ public class SimulatedPlaneVisual : NetworkBehaviour
         {
             pos.Value = transform.localPosition;
             rotation.Value = transform.rotation;
-          
+            SimChar.transform.localPosition = pos.Value;
+            SimChar.transform.rotation = rotation.Value;
         }
 
-        UpdateSimMovementRPC();
+       // UpdateSimMovementRPC();
     }
     
     [Rpc(SendTo.Everyone)]

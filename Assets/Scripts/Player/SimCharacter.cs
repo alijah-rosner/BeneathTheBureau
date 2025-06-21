@@ -14,7 +14,8 @@ public class SimCharacter : MonoBehaviour
 
     [Header("Triggers the following events")]
     [SerializeField] private CameraTargetEvent _cameraTargetEvent;
-
+    
+    public GameObject CameraPosition => _cameraTarget; 
     private void Start()
     {
     }
