@@ -13,12 +13,14 @@ public class EngineSystem : AircraftSystem
     [SerializeField] private float _percentagePower; 
 
     [Header("Events To Listen For")] 
-    [SerializeField] private Float_GameEvent _engineEngagedEvent;
+    [SerializeField] private Float_GameEvent _onEngineFedFuelEvent;
+    [SerializeField] private Float_GameEvent _engineFuelDepeletedEvent;
 
     [Header("Events To Trigger")] 
     [SerializeField] private Float_GameEvent _thrustCalculatedEvent; 
-
+    
     private Float_GameEventListener _engineEngagedListener; 
+    private Float_GameEventListener _engineFuelDepletedListener; 
 
     public NetworkVariable<float> CurrentThrust = new NetworkVariable<float>(0.0f);
 
@@ -26,20 +28,41 @@ public class EngineSystem : AircraftSystem
 
     private void Start()
     {
-        _engineEngagedListener = new Float_GameEventListener(OnEngineEngage, _engineEngagedEvent);
+        _engineEngagedListener = new Float_GameEventListener(OnEngineFedFuel, _onEngineFedFuelEvent);
+        _engineFuelDepletedListener = new Float_GameEventListener(OnFuelDepleted, _engineFuelDepeletedEvent);
         _controller = FindFirstObjectByType<FlightController2>();
     }
 
-    private void OnEngineEngage(float v)
+    private void OnFuelDepleted(float v)
     {
-        OnEngineEngageRpc(v);
+        if (!IsOwner)
+        {
+            return;
+        }
+        OnFuelDepletedRpc(v);
+    }
+
+    private void OnEngineFedFuel(float v)
+    {
+        if (!IsOwner)
+        {
+            return;
+        }
+        OnEngineFedFuelRpc(v);
     }
     
     [Rpc(SendTo.Server)]
-    private void OnEngineEngageRpc(float v)
+    private void OnEngineFedFuelRpc(float v)
     {
         float decVal = v / 100f; 
         CurrentThrust.Value = _maxThrust * decVal;
+        _thrustCalculatedEvent?.TriggerEvent(CurrentThrust.Value);
+    }
+    
+    [Rpc(SendTo.Server)]
+    private void OnFuelDepletedRpc(float v)
+    {
+        CurrentThrust.Value = 0f;
         _thrustCalculatedEvent?.TriggerEvent(CurrentThrust.Value);
     }
 

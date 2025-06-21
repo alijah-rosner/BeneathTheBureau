@@ -19,6 +19,7 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
     [SerializeField] private float _minRotationOnAxis;
     [SerializeField] private float _sensitivity;
     [SerializeField] private GameObject _draggable;
+    
 
     private NetworkVariable<Vector3> _networkedRotation = new NetworkVariable<Vector3>();
     private GameObject _camera; 
@@ -35,7 +36,6 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         _isBeingUsed = !_isBeingUsed;
         _camera = GameObject.FindGameObjectWithTag("PlayerCamera");
         _camera.GetComponent<CinemachineInputAxisController>().enabled = false; 
-        Debug.Log("Interacting with throttle: " + _isBeingUsed);
         _currentAngle = GetCurrentAngle();
     }
     
@@ -50,6 +50,8 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         {
             _isBeingUsed = false;
             _camera.GetComponent<CinemachineInputAxisController>().enabled = true; 
+            _onThrottleValueChanged?.TriggerEvent(_val);
+
             return; 
         }
 
@@ -87,7 +89,6 @@ public class EngineThrottle : NetworkBehaviour, I_Interactable
         _networkedRotation.Value = eulAngle;
         transform.localEulerAngles = _networkedRotation.Value;
         _val = val;
-        _onThrottleValueChanged?.TriggerEvent(val);
     }
 
     private void SetIsBeingUsed(bool v)

@@ -7,15 +7,15 @@ public class FlightController2 : AircraftSystem
 {
     [Header("Events To Listen For")]
     [SerializeField]
-    private Float_GameEvent _onEngineThrottled_0;
-    private Float_GameEvent _onEngineThrottled_1;
-    private Float_GameEvent _onEngineThrottled_2;
-    private Float_GameEvent _onEngineThrottled_3;
+    private Float_GameEvent _onEngineThrustCalculated_0;
+    private Float_GameEvent _onEngineThrustCalculated_1;
+    private Float_GameEvent _onEngineThrustCalculated_2;
+    private Float_GameEvent _onEngineThrustCalculated_3;
 
-    private Float_GameEventListener _onThrottled_Listener_0;
-    private Float_GameEventListener _onThrottled_Listener_1;
-    private Float_GameEventListener _onThrottled_Listener_2;
-    private Float_GameEventListener _onThrottled_Listener_3;
+    private Float_GameEventListener _onEngineThrustCalculated_Listener_0;
+    private Float_GameEventListener _onEngineThrustCalculated_Listener_1;
+    private Float_GameEventListener _onEngineThrustCalculated_Listener_2;
+    private Float_GameEventListener _onEngineThrustCalculated_Listener_3;
 
     [Header("Components")]
     [SerializeField] public MouseFlightController controller = null;
@@ -49,11 +49,12 @@ public class FlightController2 : AircraftSystem
     public float Yaw { set { yaw = Mathf.Clamp(value, -1f, 1f); } get { return yaw; } }
     public float Roll { set { roll = Mathf.Clamp(value, -1f, 1f); } get { return roll; } }
 
-    private Rigidbody rigid;
+    [SerializeField] private Rigidbody rigid;
 
     private float currentPitch = 0f;
     private float currentRoll = 0f;
     private float curThrust;
+    private float thrustTracker = 0f; 
 
     private float _engine1Thrust = 0f; 
 
@@ -78,7 +79,7 @@ public class FlightController2 : AircraftSystem
 
     private void Start()
     {
-        _onThrottled_Listener_0 = new Float_GameEventListener(UpdateCurrentThrustRpc, _onEngineThrottled_0);
+        _onEngineThrustCalculated_Listener_0 = new Float_GameEventListener(UpdateCurrentThrustRpc, _onEngineThrustCalculated_0);
         //controller = GameObject.FindGameObjectWithTag("MouseFlightManager").GetComponent<MouseFlightController>();
     }
     
@@ -89,7 +90,8 @@ public class FlightController2 : AircraftSystem
         {
             float diff = v - _engine1Thrust;
             _engine1Thrust = v;
-            curThrust += diff; 
+            curThrust += diff;
+            
         }
         else
         {
@@ -97,7 +99,7 @@ public class FlightController2 : AircraftSystem
             _engine1Thrust = v;
             curThrust -= diff; 
         }
-
+        thrustTracker = curThrust; 
     }
     
     private void CalculateTotalCurrentThrust(float oldValue, float newValue)

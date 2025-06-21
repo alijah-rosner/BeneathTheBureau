@@ -11,5 +11,4 @@ public class Float_GameEventListener : GameEventListener<float>
     public Float_GameEventListener(Action<float> response) : base(response)
     {
     }
-
 }

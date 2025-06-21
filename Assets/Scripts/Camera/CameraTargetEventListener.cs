@@ -1,7 +1,6 @@
 using System.Collections;
 using Unity.Cinemachine;
 using Unity.Netcode;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CameraTargetEventListener : MonoBehaviour, I_EventListener<CameraTargetEventData>
