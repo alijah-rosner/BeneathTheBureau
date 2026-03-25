@@ -5888,6 +5888,10 @@ PrefabInstance:
       propertyPath: _onEngineFedFuelEvent
       value: 
       objectReference: {fileID: 11400000, guid: bddfbbc1396028f4f9b5aed48627538e, type: 2}
+    - target: {fileID: 7705463679110084277, guid: f230fbfa2547e704780e6d7214e08b53, type: 3}
+      propertyPath: _currentFuelQuantity.m_InternalValue
+      value: 100
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
